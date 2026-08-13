@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
 configuration:
   pageTitle: zesheng 的数字花园
-  pageTitleSuffix: ""
+  pageTitleSuffix: "· 运维知识库"
   enableSPA: true
   enablePopovers: true
   locale: zh-CN
@@ -19,25 +19,25 @@ configuration:
       code: "JetBrains Mono"
     colors:
       lightMode:
-        light: "#faf8f8"
-        lightgray: "#e5e5e5"
-        gray: "#b8b8b8"
-        darkgray: "#4e4e4e"
-        dark: "#2b2b2b"
-        secondary: "#284b63"
-        tertiary: "#84a59d"
-        highlight: rgba(143, 159, 169, 0.15)
-        textHighlight: "#fff23688"
+        light: "#fafaf9"
+        lightgray: "#e7e5e4"
+        gray: "#a8a29e"
+        darkgray: "#44403c"
+        dark: "#292524"
+        secondary: "#0f766e"
+        tertiary: "#14b8a6"
+        highlight: rgba(15, 118, 110, 0.12)
+        textHighlight: "#fde68a88"
       darkMode:
-        light: "#161618"
-        lightgray: "#393639"
-        gray: "#646464"
-        darkgray: "#d4d4d4"
-        dark: "#ebebec"
-        secondary: "#7b97aa"
-        tertiary: "#84a59d"
-        highlight: rgba(143, 159, 169, 0.15)
-        textHighlight: "#b3aa0288"
+        light: "#1c1917"
+        lightgray: "#292524"
+        gray: "#78716c"
+        darkgray: "#e7e5e4"
+        dark: "#f5f5f4"
+        secondary: "#2dd4bf"
+        tertiary: "#5eead4"
+        highlight: rgba(45, 212, 191, 0.15)
+        textHighlight: "#facc1588"
 plugins:
   - source: "@quartz-community/created-modified-date"
     enabled: true
@@ -104,7 +104,7 @@ plugins:
   - source: "@quartz-community/favicon"
     enabled: true
   - source: "@quartz-community/og-image"
-    enabled: false
+    enabled: true
   - source: "@quartz-community/cname"
     enabled: false
   - source: "@quartz-community/canvas-page"
@@ -178,6 +178,7 @@ plugins:
     options:
       links:
         GitHub: https://github.com/liaozesheng
+        RSS: /index.xml
   - source: "@quartz-community/spacer"
     enabled: true
     options: {}
