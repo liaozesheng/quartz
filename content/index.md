@@ -35,7 +35,6 @@ tags:
 | 服务器磁盘快满了 | [[Linux 磁盘空间爆满排查]], [[syslog 日志异常增长排查]] |
 | Pod 起不来 | [[Kubernetes Pod Pending 排查]], [[Kubernetes Pod CrashLoopBackOff 排查]] |
 | 服务访问失败 | [[Kubernetes Service 无响应排查]], [[Kubernetes Ingress 路由失效排查]] |
-| 自动化脚本部署 | [[Shell 自动化索引]], [[Shell脚本说明模板]] |
 | Docker 排障 | [[Docker 基础与常用操作]], [[Docker 生产实践索引]] |
 | Nginx 配置 | [[Nginx 安装与反向代理配置手册]] |
 | PostgreSQL | [[PostgreSQL 15 安装部署手册]], [[PostgreSQL 基础命令速查]] |
@@ -66,6 +65,6 @@ tags:
 
 ## 技术栈
 
-本知识库使用 [Quartz](https://quartz.jzhao.xyz/) 构建，托管在 [GitHub Pages](https://github.com/ZeSheng678/quartz-demo)。
+本知识库使用 [Quartz](https://quartz.jzhao.xyz/) 构建，托管在 [GitHub Pages](https://github.com/liaozesheng/quartz)。
 
-支持：`[[双链]]` · 反向链接 · 知识图谱 · 全文搜索 · 深色模式 · 代码高亮
+支持：[[双链]] · 全文搜索 · 深色模式 · 代码高亮
