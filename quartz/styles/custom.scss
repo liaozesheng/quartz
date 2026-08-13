@@ -1,3 +1,38 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+/* 正文内部链接：虚线描边，悬停变色 */
+article a.internal-link {
+  text-decoration: none;
+  border-bottom: 1px dashed var(--tertiary);
+  transition: color 0.15s ease, border-bottom-color 0.15s ease;
+}
+article a.internal-link:hover {
+  color: var(--secondary);
+  border-bottom-color: var(--secondary);
+}
+
+/* 表格：表头淡色底 + 行悬停高亮 */
+article table thead th {
+  background: color-mix(in srgb, var(--secondary) 10%, transparent);
+  font-weight: 600;
+}
+article table tbody tr:hover {
+  background: color-mix(in srgb, var(--lightgray) 45%, transparent);
+}
+
+/* Callout 圆角 + 加粗左边框 */
+.callout {
+  border-radius: 8px;
+  border-left-width: 4px;
+}
+
+/* 代码块轻微内阴影 */
+pre {
+  border-radius: 8px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* 选中文字带主题色 */
+::selection {
+  background: color-mix(in srgb, var(--secondary) 30%, transparent);
+}
