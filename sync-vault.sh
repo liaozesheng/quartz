@@ -134,13 +134,18 @@ git pull --quiet origin main
 log "拉取 obsidian-vault 最新内容..."
 cd "$VAULT_DIR" || exit 1
 git fetch origin
-REMOTE_NEW=$(git log HEAD..origin/main --oneline)
+REMOTE_NEW=$(git log HEAD..origin/main --oneline)      # 远程领先本地的提交
+LOCAL_NEW=$(git log origin/main..HEAD --oneline)       # 本地领先远程的提交
 
-# 检查是否有变更
+# 检查是否有变更：只要本地或远程任一侧有新提交，都视为需要同步
 if [[ -n "$REMOTE_NEW" ]]; then
     git pull --quiet origin main
     ok "vault 已更新到 $(git log -1 --format='%h %s')"
     echo "$REMOTE_NEW"
+elif [[ -n "$LOCAL_NEW" ]]; then
+    LOCAL_COUNT=$(echo "$LOCAL_NEW" | wc -l | tr -d ' ')
+    ok "vault 本地有 $LOCAL_COUNT 个未推送的提交，直接纳入同步"
+    echo "$LOCAL_NEW"
 else
     ok "vault没有变更，提前结束"
     exit 0
