@@ -11,7 +11,7 @@ command -v claude
 >[!warn] 警告
 >Windows 和 Linux 系统使用不同的方式配置环境变量
 ```bash
-[Environment]::SetEnvironmentVariable("export ANTHROPIC_BASE_URL", "https://api.deepseek.com/anthropic", "User")
+[Environment]::SetEnvironmentVariable("ANTHROPIC_BASE_URL", "https://api.deepseek.com/anthropic", "User")
 [Environment]::SetEnvironmentVariable("ANTHROPIC_AUTH_TOKEN", "sk-**********************", "User")
 [Environment]::SetEnvironmentVariable("ANTHROPIC_MODEL", "deepseek-v4-flash", "User")
 [Environment]::SetEnvironmentVariable("ANTHROPIC_DEFAULT_OPUS_MODEL", "deepseek-v4-pro", "User")
@@ -19,7 +19,7 @@ command -v claude
 [Environment]::SetEnvironmentVariable("ANTHROPIC_DEFAULT_HAIKU_MODEL", "deepseek-v4-flash", "User")
 [Environment]::SetEnvironmentVariable("CLAUDE_CODE_SUBAGENT_MODEL", "deepseek-v4-flash", "User")
 [Environment]::SetEnvironmentVariable("CLAUDE_CODE_EFFORT_LEVEL", "max", "User")
-
+[Environment]::SetEnvironmentVariable("CLAUDE_CODE_AUTO_COMPACT_WINDOW", "786432", "User")
 ```
 
 ```bash
@@ -33,6 +33,7 @@ export ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-pro[1m]
 export ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
 export CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
 export CLAUDE_CODE_EFFORT_LEVEL=max
+export CLAUDE_CODE_AUTO_COMPACT_WINDOW=786432
 
 source ~/.bashrc
 ```
