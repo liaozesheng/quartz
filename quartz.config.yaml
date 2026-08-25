@@ -5,7 +5,7 @@ configuration:
   enableSPA: true
   enablePopovers: true
   locale: zh-CN
-  baseUrl: liaozesheng.github.io/quartz
+  baseUrl: liaozesheng.github.io
   ignorePatterns:
     - private
     - templates
