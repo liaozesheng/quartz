@@ -1,10 +1,10 @@
 ---
-updated: 2026-08-04
+updated: 2026-08-26
 ---
 
 # 📚 Kubernetes 实用英语词汇全集
 
-> 小爪出品 · 累计 211 词 · 每日更新
+> 小爪出品 · 累计 231 词 · 每日更新
 
 ---
 
@@ -1509,3 +1509,153 @@ updated: 2026-08-04
 ---
 
 > 📅 最后更新：2026-08-04 | 累计 211 词 | 持续更新中 🐾
+
+---
+
+## 第22期 — 网络、共识、认证与可靠性
+
+### 212. CIDR
+
+- **音标**: /ˈsaɪdər/（Classless Inter-Domain Routing 缩写）
+- **词义**: 无类别域间路由；用"IP + 斜杠 + 前缀长度"表示网段（如 `10.244.0.0/16`），K8s 用它为 Pod、Service 规划地址池，Flannel、Calico 等 CNI 按 CIDR 分配 IP
+- **例句**: The cluster's Pod CIDR is set to 10.244.0.0/16, so every Pod gets an address within this range.
+- **🪄 记忆**: CIDR 就是给 IP 画"地盘"——`/16` 是围栏大小，数字越小围栏越大（/16 有 65536 个地址，/24 只有 256 个）。看到 `10.244.0.0/16`，就知道这个集群的 Pod 网段有多大。
+
+### 213. Conntrack
+
+- **音标**: /ˈkɒntræk/
+- **词义**: 连接跟踪；Linux 内核记录所有网络连接状态的机制（conntrack 表），kube-proxy 的 NAT 转发、LoadBalancer 和防火墙都依赖它判断流量归属
+- **例句**: A full conntrack table can drop new connections under heavy load, so monitoring it is essential in large clusters.
+- **🪄 记忆**: Con(nection 连接) + Track(跟踪) → 内核里的"交通监控探头"，每条进出连接都被记录在案。kube-proxy 做 NAT 全靠它知道"这条响应是哪个 Pod 的"。**排障时看到 `nf_conntrack: table full` 就是它满了，该扩容了。**
+
+### 214. iptables
+
+- **音标**: /ˌaɪ piːˈteɪbəlz/
+- **词义**: Linux 内核的防火墙/数据包规则工具；kube-proxy 的默认后端模式，通过在 Node 上写入 iptables 规则实现 Service 的负载均衡与 DNAT 转发
+- **例句**: kube-proxy programs iptables rules on each node so that traffic to a Service's ClusterIP is forwarded to a backend Pod.
+- **🪄 记忆**: IP + Tables(表格) → 内核里一排排"查表规则"。数据包进来先查表：匹配哪条规则就按哪条办（转发、丢弃、改地址）。kube-proxy 就是往这张表里"写规则"的勤务员——规则多了性能会掉，所以新贵 eBPF 来接班。
+
+### 215. eBPF
+
+- **音标**: /ˌiː biː piː ˈef/（extended Berkeley Packet Filter）
+- **词义**: 扩展的伯克利包过滤器；Linux 内核可编程技术，允许在内核中安全运行用户程序，用于高性能网络、可观测性与安全，是 Cilium 等新一代 CNI 的核心底座
+- **例句**: Cilium leverages eBPF to bypass iptables and provide high-performance service networking and security policies.
+- **🪄 记忆**: 给内核"开外挂"——不改内核代码、不重启机器，就能注入小程序在内核里跑。相比 iptables 一条条规则线性遍历，eBPF 直接在数据路径上执行，又快又灵活。Cilium 靠它把 Service 转发性能拉满。
+
+### 216. Raft
+
+- **音标**: /rɑːft/
+- **词义**: Raft 共识算法；分布式一致性算法，etcd 用它实现多节点日志复制与 Leader 选举，保证集群状态强一致
+- **例句**: etcd replicates every write to all members using the Raft consensus algorithm, committing only after a quorum acknowledges.
+- **🪄 记忆**: Raft 原意"木筏"——筏上的人步调一致才能不翻船。etcd 里所有节点通过 Raft 复制同一条日志，任何写入都要"大多数成员确认"才算生效。**K8s 控制面的"账本"就是靠 Raft 记平的。**
+
+### 217. Quorum
+
+- **音标**: /ˈkwɔːrəm/
+- **词义**: 法定人数/多数派；分布式系统达成决策所需的最少确认节点数（通常 N/2+1），etcd 只有获得 Quorum 确认才提交写入
+- **例句**: If more than half of the etcd members fail, the cluster loses quorum and stops accepting writes to protect consistency.
+- **🪄 记忆**: Quorum 像开会表决——必须"过半数点头"才拍板。5 节点 etcd 挂 2 个还能干活（3 个达成法定），挂 3 个就"会开不成"，集群进入只读模式保护数据。**记住：过半即法定，etcd 最小规模请用 3 节点。**
+
+### 218. JWT (JSON Web Token)
+
+- **音标**: /ˌdʒeɪ dʌbəljuː ˈtiː/
+- **词义**: JSON Web 令牌；紧凑的签名令牌，由 Header.Payload.Signature 三段组成，K8s 中每个 ServiceAccount 都会签发 JWT，Pod 挂载后用它向 API Server 认证
+- **例句**: Each ServiceAccount gets a JWT that Pods mount and present to the API server for authentication.
+- **🪄 记忆**: JWT 像一张"盖章的通行证"——身份信息（Payload）写在卡上，签名（Signature）防伪造，出示即通过、无需回查服务器。注意它默认不加密，**别把密码塞进去**。
+
+### 219. OIDC (OpenID Connect)
+
+- **音标**: /ˌəʊ aɪ diː ˈsiː/
+- **词义**: 基于 OAuth 2.0 的身份认证协议；K8s API Server 支持配置 OIDC，让用户用企业统一账号（SSO）登录集群，并签发 JWT 完成认证
+- **例句**: By configuring OIDC on the API server, users can authenticate to the cluster with their corporate single sign-on accounts.
+- **🪄 记忆**: OIDC = 企业门禁系统——员工拿公司工牌（统一账号）刷脸进门（SSO），门禁（API Server）验证后发临时通行证（JWT）。企业里做 K8s 认证，OIDC 是标配。
+
+### 220. GitOps
+
+- **音标**: /ˈɡɪt ɒps/
+- **词义**: 以 Git 为唯一事实来源（single source of truth）的声明式交付模式；ArgoCD、Flux 等工具持续对比 Git 中的期望状态与集群实际状态并自动同步
+- **例句**: With GitOps, every change is first merged into Git, and ArgoCD automatically reconciles the cluster to match the desired state.
+- **🪄 记忆**: Git(仓库) + Ops(运维) → "代码即配置，提交即发布"。所有改动走 Git 留痕、可审阅、可回滚，集群只是 Git 的"影子"。它和 K8s 的 Declarative（声明式）理念天生一对，所以 ArgoCD/Flux 才能大行其道。
+
+### 221. SLO (Service Level Objective)
+
+- **音标**: /ˌes el ˈəʊ/
+- **词义**: 服务等级目标；对服务可靠性的量化承诺（如可用性 99.9%、延迟 P99 < 200ms），SRE 用它定义"什么算故障"、决定何时报警；对应 SLI 是实际测量值
+- **例句**: The team defines an SLO of 99.9% availability and alerts the on-call engineer when the burn rate exceeds the budget.
+- **🪄 记忆**: SLO 是"及格线"——写在纸上的目标（99.9%），SLI 是"实际考分"（真实测出来的值），Error Budget 是"允许挂科的次数"。考砸了（违反 SLO）就该报警了。**评估服务可靠性，三件套：SLI → SLO → Error Budget。**
+
+## 第23期 — 高可用、容错与性能
+
+### 222. Failover
+
+- **音标**: /ˈfeɪlˌəʊvər/
+- **词义**: 故障转移；当主节点/主实例不可用时，自动将工作切换到备用实例的机制。K8s 中控制器把 Pod 重新调度到健康节点实现 Failover，etcd 通过 Leader 切换实现
+- **例句**: When a node crashes, the control plane performs a failover by rescheduling the Pods onto healthy nodes.
+- **🪄 记忆**: Fail(失败) + Over(翻过去) → "挂了就翻篇"。像接力赛掉棒瞬间自动换替补上场——节点挂了，Pod 自动在别的节点重获新生。**高可用的本质就是"随时准备好 Failover"。**
+
+### 223. Fault Tolerance
+
+- **音标**: /fɔːlt ˈtɒlərəns/
+- **词义**: 容错；系统在部分组件故障时仍能继续提供服务的能力。K8s 通过多副本（Replica）、跨可用区部署、健康检查等实现容错
+- **例句**: Running three replicas across different availability zones gives the workload fault tolerance against zone failures.
+- **🪄 记忆**: Fault(故障) + Tolerance(容忍) → "故障我忍得住"。像打不死的小强——单点挂了，剩下的照样顶住。它与 Resilience（韧性）是近义词：容错是手段，韧性是目标。
+
+### 224. Circuit Breaker
+
+- **音标**: /ˈsɜːrkɪt ˈbreɪkər/
+- **词义**: 熔断器；微服务治理模式，当下游服务连续失败达到阈值时"跳闸"快速失败，防止故障雪崩，过段时间自动半开试探恢复。Istio 中通过 DestinationRule 配置
+- **例句**: A circuit breaker trips when the backend fails repeatedly, returning an error immediately instead of piling up requests.
+- **🪄 记忆**: 家里跳闸的"空气开关"——线路短路就自动断电保护整屋。服务也一样：下游崩了立刻"拉闸"，宁可快速失败也不排队硬挤，等恢复期到了再合闸试探。**熔断 + 重试 + 超时，是防雪崩三件套。**
+
+### 225. Self-Healing
+
+- **音标**: /ˌself ˈhiːlɪŋ/
+- **词义**: 自愈；系统自动检测并修复故障的能力，无需人工干预。K8s 的核心特性：容器挂了自动重启、节点失联自动驱逐并重新调度、探针失败自动重启容器
+- **例句**: Kubernetes self-healing restarts failed containers and reschedules Pods without human intervention.
+- **🪄 记忆**: Self(自己) + Heal(治愈) → 像壁虎断尾再生。K8s 是"永动机医生"：容器挂了自动重启（RestartPolicy）、节点挂了自动搬家（重新调度）——你只需要声明期望状态，剩下的它自己医。**声明式 + 自愈 = K8s 的底层哲学。**
+
+### 226. Heartbeat
+
+- **音标**: /ˈhɑːrtbiːt/
+- **词义**: 心跳；组件间周期性发送的存活信号，用于探测对端是否健康。Kubelet 定期向 API Server 上报节点状态，etcd 节点间也靠心跳维持 Leader 关系
+- **例句**: The kubelet sends a heartbeat to the API server every few seconds to report the node's status.
+- **🪄 记忆**: 心跳 = 活着的证明。Kubelet 每隔几秒给 API Server 报一次"我还活着"，超过阈值没消息就被判定"猝死"，开始驱逐 Pod。**排障时看到 Node 状态 NotReady，先查心跳断了多久。**
+
+### 227. Leader Election
+
+- **音标**: /ˈliːdər ɪˈlekʃn/
+- **词义**: 领导选举；分布式系统中多副本竞争"唯一领导者"的机制，保证同一时刻只有一个实例在干活。kube-controller-manager、etcd、Operator 的高可用部署都靠它
+- **例句**: Multiple replicas of the controller manager run leader election so only one acts as the active leader at a time.
+- **🪄 记忆**: 一个团队只能有一个"带班组长"。多副本同时跑，但通过 Lease（租约）争夺领导权：谁抢到谁干活，Leader 挂了自动选新的。**注意：它不是"一人一票"民主，是"先到先得"抢锁。**
+
+### 228. Idempotent
+
+- **音标**: /ˌaɪdəmˈpoʊtənt/
+- **词义**: 幂等的；同一操作执行多次与执行一次结果相同。K8s 的声明式 API 天然幂等：apply 同一个 YAML 一百次，集群状态不变；这也是 Reconcile 循环能反复运行的基础
+- **例句**: Applying the same manifest multiple times is idempotent, so the cluster state remains unchanged.
+- **🪄 记忆**: Idem(相同) + Potent(力量) → "多打几遍结果都一样"。像按电梯按钮——按一次和按十次，电梯都只来一趟。kubectl apply 反复执行不会重复建资源，这就是幂等。
+
+### 229. Throughput
+
+- **音标**: /ˈθruːpʊt/
+- **词义**: 吞吐量；单位时间内系统成功处理的请求/数据量（如 QPS、TPS、GB/s）。性能压测看 Throughput，体验看 Latency，两者往往此消彼长
+- **例句**: The gateway achieves a throughput of 20,000 requests per second under normal load.
+- **🪄 记忆**: Through(穿过) + Put(放) → "单位时间能淌过去多少水"。水管粗细决定吞吐量，水流快慢是延迟（Latency）——**粗管子高吞吐，细管子低延迟，取舍是门艺术。**
+
+### 230. Bandwidth
+
+- **音标**: /ˈbændwɪdθ/
+- **词义**: 带宽；网络链路的最大数据传输能力。K8s 中可通过 CNI（如 Cilium Bandwidth Manager）、Pod 注解或 QoS 层做带宽管理，跨可用区流量还会涉及带宽成本
+- **例句**: High-bandwidth workloads may require dedicated nodes or bandwidth annotations to avoid network contention.
+- **🪄 记忆**: Band(波段) + Width(宽度) → "路的车道数"。带宽 = 路有多宽，吞吐量 = 实际过了多少车。HPA 扩缩容、网络策略评估时带宽都是隐藏瓶颈——**查慢别只盯 CPU，先看带宽是不是堵死了。**
+
+### 231. Cold Start
+
+- **音标**: /kəʊld stɑːrt/
+- **词义**: 冷启动；应用实例从零拉起（拉镜像→创建容器→初始化）到可服务的时间，Serverless/Knative 缩到零后首次请求尤其明显；预热（Warm Pool）、降低副本下限可缓解
+- **例句**: Serverless workloads suffer from cold start latency when an instance is created on demand.
+- **🪄 记忆**: 冷启动 = 车放了一夜再打火，发动机要热身；热启动 = 车刚熄火，一拧就着。Knative 缩到 0 副本后，第一发请求要经历拉镜像 + 初始化，慢到怀疑人生——**线上服务慎开 Scale-to-Zero，除非你受得了冷启动。**
+
+---
+
+> 📅 最后更新：2026-08-26 | 累计 231 词 | 持续更新中 🐾

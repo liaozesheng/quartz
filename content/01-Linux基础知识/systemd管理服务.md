@@ -4,7 +4,7 @@ Systemd 是 Rocky Linux 9.6（以及大多数现代 Linux 发行版）的默认�
 它负责管理系统的启动、服务的运行、日志记录、定时任务等功能。Systemd 通过单元（units）文件以声明式的方式管理服务、设备、挂载点等资源，提供高效、并行化的启动流程和强大的依赖管理。
 
 **如何读懂这个图片？**
-![[Pasted image 20251027102240.png]]
+![[Pasted_image_20251027102240.png]]
 ```bash
 ○ NetworkManager.service - Network Manager
      Loaded: loaded (/usr/lib/systemd/system/NetworkManager.service; disabled; preset: enabled)
@@ -47,7 +47,7 @@ systemctl list-unit-files --state=enabled
 ```
 
 # ③systemd的概念
-![[Pasted image 20260310174652.png]]
+![[Pasted_image_20260310174652.png]]
 由3种概念组成，**units单元管理**，**targets运行级别**，**服务状态** 3种
 下面我给你**逐一、通俗易懂、结构化**讲解  
 `/usr/lib/systemd/system/` 目录下各种类型文件和目录的作用。

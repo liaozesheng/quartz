@@ -1,123 +1,123 @@
 # Linux目录
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778671561089-2d5cefd7-7908-4d0a-a22b-7a4f696e5afe.png)
+![[1778671561089-2d5cefd7-7908-4d0a-a22b-7a4f696e5afe.png]]
 
 # 命令分类大全
 ### 补充知识
 ##### fortune
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778160071170-24e89237-e5b8-4d82-a9de-a9ee803ea03b.png)
+![[1778160071170-24e89237-e5b8-4d82-a9de-a9ee803ea03b.png]]
 
 ##### AppImage
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778160676704-2ca35f86-0811-450d-a457-5ccfdb9d8504.png)
+![[1778160676704-2ca35f86-0811-450d-a457-5ccfdb9d8504.png]]
 
 ##### tee
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778160823408-29c1dee8-f903-4eb8-9c5c-3d87ce01a2a8.png)
+![[1778160823408-29c1dee8-f903-4eb8-9c5c-3d87ce01a2a8.png]]
 
 ##### nice / renice
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778160897634-c90cc8ad-35ba-4d95-aa93-3208110f8a8b.png)
+![[1778160897634-c90cc8ad-35ba-4d95-aa93-3208110f8a8b.png]]
 
 ##### nano
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778162095408-7620e18d-ce68-4979-9761-654351fcdc1d.png)
+![[1778162095408-7620e18d-ce68-4979-9761-654351fcdc1d.png]]
 
 ##### sudo
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778162195921-47db7447-2e11-4371-a6e8-2d223fd42e8c.png)
+![[1778162195921-47db7447-2e11-4371-a6e8-2d223fd42e8c.png]]
 
 ##### 系统日志
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778162870465-910363a9-b227-482c-8248-ff9c5874c526.png)
+![[1778162870465-910363a9-b227-482c-8248-ff9c5874c526.png]]
 
 ##### snap包
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778163246839-508503d0-6ffb-4f5d-bd48-f3f9faf48ff1.png)
+![[1778163246839-508503d0-6ffb-4f5d-bd48-f3f9faf48ff1.png]]
 
 ### 基础命令
 ##### ip
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778154900887-5a828e0d-7aaf-401c-9c12-b011ee16d649.png)
+![[1778154900887-5a828e0d-7aaf-401c-9c12-b011ee16d649.png]]
 
 ##### nslookup
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155020918-60bdfa3a-880e-4bf4-a4f5-926d725f7f0c.png)
+![[1778155020918-60bdfa3a-880e-4bf4-a4f5-926d725f7f0c.png]]
 
 ##### journalctl
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155110521-6bc1f755-d259-4873-83dd-ab27ccda3d07.png)
+![[1778155110521-6bc1f755-d259-4873-83dd-ab27ccda3d07.png]]
 
 ##### stat
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778154558472-35ca4ac3-5780-45a6-a45c-65e0b0628f37.png)
+![[1778154558472-35ca4ac3-5780-45a6-a45c-65e0b0628f37.png]]
 
 ##### file
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155217585-2c1929e3-f39e-48f8-bb2d-0f5ec4e45807.png)
+![[1778155217585-2c1929e3-f39e-48f8-bb2d-0f5ec4e45807.png]]
 
 ##### touch
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155269413-92245e94-9a5c-40ad-ad2b-75448f0d675d.png)
+![[1778155269413-92245e94-9a5c-40ad-ad2b-75448f0d675d.png]]
 
 ##### tree
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155349615-cb06d03d-df47-4363-8518-ccdd29c88cf8.png)
+![[1778155349615-cb06d03d-df47-4363-8518-ccdd29c88cf8.png]]
 
 ##### uniq
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778160335236-25c2374c-be0f-4d1d-ba21-8b4ed1c04930.png)
+![[1778160335236-25c2374c-be0f-4d1d-ba21-8b4ed1c04930.png]]
 
 ##### who&w
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155735287-43096241-3f96-4f15-acc7-729e86ca2800.png)
+![[1778155735287-43096241-3f96-4f15-acc7-729e86ca2800.png]]
 
 ##### yes
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155802005-7411986a-6e20-4031-9671-320aca6465c3.png)
+![[1778155802005-7411986a-6e20-4031-9671-320aca6465c3.png]]
 
 ##### cal
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778155912016-39a55b6d-099b-4e32-915c-dd7fb2ca7f26.png)
+![[1778155912016-39a55b6d-099b-4e32-915c-dd7fb2ca7f26.png]]
 
 ##### dig
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156017692-91ca69b0-ead8-4a7a-8ed9-289af3527626.png)
+![[1778156017692-91ca69b0-ead8-4a7a-8ed9-289af3527626.png]]
 
 ##### uname
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156087871-a3f6ad38-8705-412d-95b8-fe2aaba4fd1a.png)
+![[1778156087871-a3f6ad38-8705-412d-95b8-fe2aaba4fd1a.png]]
 
 ##### hostname
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156155193-03e2698f-88d3-40f2-aa4a-7e70851b2acb.png)
+![[1778156155193-03e2698f-88d3-40f2-aa4a-7e70851b2acb.png]]
 
 ##### sort
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156327709-69fff1f1-605a-491b-85fd-11357c514609.png)
+![[1778156327709-69fff1f1-605a-491b-85fd-11357c514609.png]]
 
 ##### ss
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156415282-963a1a1b-3a48-4a94-9fce-1bf694567d7c.png)
+![[1778156415282-963a1a1b-3a48-4a94-9fce-1bf694567d7c.png]]
 
 ##### time
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156686276-110eccda-cf07-4e8e-81c5-1ea15a1bb34f.png)
+![[1778156686276-110eccda-cf07-4e8e-81c5-1ea15a1bb34f.png]]
 
 ##### date
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156757012-4f49d03e-d7f6-4ad6-ace1-6dac5f733432.png)
+![[1778156757012-4f49d03e-d7f6-4ad6-ace1-6dac5f733432.png]]
 
 ##### kill<!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156807912-061e2df1-fab5-4480-9ab5-1aa06aadafab.png)
+![[1778156807912-061e2df1-fab5-4480-9ab5-1aa06aadafab.png]]
 ##### lsof
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778156913357-c1f89090-2bb2-4417-a198-5b3844892df4.png)
+![[1778156913357-c1f89090-2bb2-4417-a198-5b3844892df4.png]]
 
 ##### ps
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157095087-d0e7fba3-ccd9-4981-bf77-613418cc60f5.png)
+![[1778157095087-d0e7fba3-ccd9-4981-bf77-613418cc60f5.png]]
 
 ##### cat
 cat=catenate  连接的意思,意思是将文件的内容连接展示出来看看
@@ -162,23 +162,23 @@ ssh root@100.100.71.216 ls
 ##### man
 ##### cut
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157206523-d38d5415-c4e1-4ff6-8223-a915fd076219.png)
+![[1778157206523-d38d5415-c4e1-4ff6-8223-a915fd076219.png]]
 
 ##### tr
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157271291-87894ca4-45d7-4540-94d4-199984f1bbf4.png)
+![[1778157271291-87894ca4-45d7-4540-94d4-199984f1bbf4.png]]
 
 ##### find
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157355568-62b8e66d-5406-46d3-a9bc-42f2fc38a7e5.png)
+![[1778157355568-62b8e66d-5406-46d3-a9bc-42f2fc38a7e5.png]]
 
 ##### diff
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778162718352-9377c74b-d0e6-4a6f-a9f8-9dc1357259d3.png)
+![[1778162718352-9377c74b-d0e6-4a6f-a9f8-9dc1357259d3.png]]
 
 ##### wget
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157499707-f76826a5-3abc-4a88-8017-02ddbbe52b4a.png)
+![[1778157499707-f76826a5-3abc-4a88-8017-02ddbbe52b4a.png]]
 
 ##### curl
 调试，访问API
@@ -192,7 +192,7 @@ curl -L http://192.168.71.213:9090
 
 ##### ping
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157588981-28f91a1a-eee6-4f26-938a-bd9039e80e70.png)
+![[1778157588981-28f91a1a-eee6-4f26-938a-bd9039e80e70.png]]
 
 ##### tcpdump
 基础的抓包工具，用于分析和捕获网络数据包。
@@ -220,7 +220,7 @@ tcpdump -i any -n udp port 8472 -e -c 5
 ```
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1780456215131-746a7838-8aec-449b-8019-37f5d1aec2fa.png)
+![[1780456215131-746a7838-8aec-449b-8019-37f5d1aec2fa.png]]
 
 ```bash
 [ 外层以太网帧 ] → [ 外层IP ] → [ 外层UDP:8472 ] → [ OTV头 ] → [ 内层以太网帧 ]
@@ -372,11 +372,11 @@ ss -ti | grep -B 3 "rtt:10[0-9]"
 ### 系统管理
 ##### alias
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157726022-532b3363-5d0a-4b75-bb91-0ddbc6f166b7.png)
+![[1778157726022-532b3363-5d0a-4b75-bb91-0ddbc6f166b7.png]]
 
 ##### crontab定时任务
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161665053-5d9a1e6d-6ced-4750-b037-325f2b48fb80.png)
+![[1778161665053-5d9a1e6d-6ced-4750-b037-325f2b48fb80.png]]
 
 ##### systemctl
 systemd的管理命令
@@ -391,31 +391,31 @@ systemctl start apache2
 
 ##### usermod
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778157922520-1fe9c6b4-e508-4ff7-8abb-aee054c4abe0.png)
+![[1778157922520-1fe9c6b4-e508-4ff7-8abb-aee054c4abe0.png]]
 
 ##### 文件权限
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161296574-2ff5e834-58ca-42d4-9728-b8eec4ebfaa0.png)
+![[1778161296574-2ff5e834-58ca-42d4-9728-b8eec4ebfaa0.png]]
 
 ##### 用户账户管理
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161950054-dd389614-6cb2-42a8-b4ef-86be1b978e2d.png)
+![[1778161950054-dd389614-6cb2-42a8-b4ef-86be1b978e2d.png]]
 
 ##### 用户管理
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161474749-478428b7-8568-422e-8f71-82822b88bd5f.png)
+![[1778161474749-478428b7-8568-422e-8f71-82822b88bd5f.png]]
 
 ##### 用户组管理
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161562498-5956c225-bd83-4da0-9ed3-78e9bdffa297.png)
+![[1778161562498-5956c225-bd83-4da0-9ed3-78e9bdffa297.png]]
 
 ##### 环境变量PATH
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158002377-b99f1639-6caf-484d-82ea-2161b06c82a1.png)
+![[1778158002377-b99f1639-6caf-484d-82ea-2161b06c82a1.png]]
 
 ##### 符号连接ln
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158078982-19eb7df5-50dd-4184-af68-092b5999257c.png)
+![[1778158078982-19eb7df5-50dd-4184-af68-092b5999257c.png]]
 
 ##### history
 history=就是bash命令的历史记录,很有用的命令,可以看到你在这台机器上干了些什么
@@ -449,10 +449,10 @@ history | grep sudo
 
 ##### top
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158533509-b1969d3e-f448-48ac-91ea-f73b6652ae27.png)
+![[1778158533509-b1969d3e-f448-48ac-91ea-f73b6652ae27.png]]
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1776133091929-f0bf7d6b-c43d-4b0a-813d-1ab7ee752253.png)
+![[1776133091929-f0bf7d6b-c43d-4b0a-813d-1ab7ee752253.png]]
 
 1. 系统运行状态行
 
@@ -605,7 +605,7 @@ top命令
 
 ##### bg & fg
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158492703-39affce5-2a77-4a7f-afd6-3895bf0b5c07.png)
+![[1778158492703-39affce5-2a77-4a7f-afd6-3895bf0b5c07.png]]
 
 后台和前台
 
@@ -640,61 +640,61 @@ kill %1
 scp=secure copy 安全的复制
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158445475-135c67c6-7d01-41b7-931e-f96c2b1fbcc3.png)
+![[1778158445475-135c67c6-7d01-41b7-931e-f96c2b1fbcc3.png]]
 
 ##### ssh公钥认证
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161762045-23c49bc5-4197-42b2-8c3c-7d5db46bc717.png)
+![[1778161762045-23c49bc5-4197-42b2-8c3c-7d5db46bc717.png]]
 
 ##### memory&swap
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158626852-009e8e29-f8b6-451a-bfd6-155dd704ce20.png)
+![[1778158626852-009e8e29-f8b6-451a-bfd6-155dd704ce20.png]]
 
 ##### head & tail
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778162451799-00c1bd25-9593-4062-8e86-a7df678e5ff6.png)
+![[1778162451799-00c1bd25-9593-4062-8e86-a7df678e5ff6.png]]
 
 ##### load average
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778162515329-25af0649-b043-4995-a8dc-3047593a1662.png)
+![[1778162515329-25af0649-b043-4995-a8dc-3047593a1662.png]]
 
 ##### apt
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161370004-7628f4fc-d9fe-4d6b-af4c-5bb8576ec758.png)
+![[1778161370004-7628f4fc-d9fe-4d6b-af4c-5bb8576ec758.png]]
 
 ### 文件与存储
 ##### tar & gizp
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158726362-38d8b480-885a-4508-84f9-422eab94f025.png)
+![[1778158726362-38d8b480-885a-4508-84f9-422eab94f025.png]]
 
 ##### du & df
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158880292-6f9746ac-83a0-45bf-a440-294e42773fbe.png)
+![[1778158880292-6f9746ac-83a0-45bf-a440-294e42773fbe.png]]
 
 ##### /etc/fstab文件
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778158951995-1eda6a2f-c809-46dc-8205-6c861a1d8509.png)
+![[1778158951995-1eda6a2f-c809-46dc-8205-6c861a1d8509.png]]
 
 ##### linux文件系统
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778159006710-76a516c8-739f-451d-bb3f-4429147d3bf1.png)
+![[1778159006710-76a516c8-739f-451d-bb3f-4429147d3bf1.png]]
 
 ##### 磁盘格式化与挂载
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778161097742-5ef25435-31fb-4c81-9023-b17c0ea9d2a0.png)
+![[1778161097742-5ef25435-31fb-4c81-9023-b17c0ea9d2a0.png]]
 
 ### linux文本处理
 ##### grep
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778159081033-af3c9d9a-757e-4c43-8885-b4688d5182ff.png)
+![[1778159081033-af3c9d9a-757e-4c43-8885-b4688d5182ff.png]]
 
 ##### sed
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778159125263-42d4683c-ad1d-45be-8e23-1cc9cf3658a5.png)
+![[1778159125263-42d4683c-ad1d-45be-8e23-1cc9cf3658a5.png]]
 
 ##### awk
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778159160491-9895bca7-e2d4-4286-a057-a90743dcbd77.png)
+![[1778159160491-9895bca7-e2d4-4286-a057-a90743dcbd77.png]]
 
 ### 性能工具
 ##### sar性能监控
@@ -706,15 +706,15 @@ scp=secure copy 安全的复制
 标准错误流
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778159339409-0d44e8d4-b132-4678-af9a-b1cc87afd70e.png)
+![[1778159339409-0d44e8d4-b132-4678-af9a-b1cc87afd70e.png]]
 
 ### linux发行版
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778159449076-0f08b5c9-8c47-48da-8049-83750a84e292.png)
+![[1778159449076-0f08b5c9-8c47-48da-8049-83750a84e292.png]]
 
 ##### 桌面环境
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1778163095751-81f9c9d3-e35c-47f5-90a6-1a2a0e1c74a0.png)
+![[1778163095751-81f9c9d3-e35c-47f5-90a6-1a2a0e1c74a0.png]]
 
 
 
