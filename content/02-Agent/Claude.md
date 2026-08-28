@@ -16,7 +16,7 @@ vscode中的Claude code和命令行cli完全没关系，是各自都有一套二
 个人喜好只安装vscode插件，不装npm包，保持环境整洁。
 
 >[!tips] 离线下载VSCODE 插件
-> 注意架构信息，一般选择 win-32-x64架构
+> 注意架构信息，一般选择 `win-32-x64` 架构
 
 ```bash
 https://marketplace.visualstudio.com/_apis/public/gallery/publishers/anthropic/vsextensions/claude-code/2.1.247/vspackage?targetPlatform=win32-x64
@@ -62,8 +62,8 @@ opencode go 目前已经提供了response 、 anthropic、chat completion等格�
 
 所以opencode go的订阅可以直接通过环境变量的设置让claude code直接调用opencode go提供的模型服务。不需要第三方 cc-switch的格式转换了。
 
->[!info] 注意
-> opencode go 的anthropic响应格式的baseURL 不带 /v1
+>[!danger] 注意
+> `opencode go` 的 `anthropic` 响应格式的baseURL 不带 `/v1` 
 
 这里提供一个参考:
 ```json
@@ -91,10 +91,10 @@ opencode go 目前已经提供了response 、 anthropic、chat completion等格�
 
 ```
 
->[!warn] 注意
->首次进入时，Claude询问是否使用自定义的API_KEY, 选择YES，就可以进入了
->如果，选择了NO，claude就会一直提示/login要你登录
->需要更改 .claude.json 这个文件
+>[!warning] 注意
+>首次进入时，**Claude**询问是否使用自定义的`API_KEY` , 选择 `YES` ，就可以进入了
+>如果，选择了`NO` ，**claude**就会一直提示`/login` 要你登录
+>需要更改 `.claude.json` 这个文件
 
 关键在于这一段配置，需要将你的key标识放在`approved`  中，而不是`rejected` 
 ```json

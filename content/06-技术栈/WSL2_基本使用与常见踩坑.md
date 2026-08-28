@@ -97,6 +97,8 @@ wsl --manage Ubuntu-24.04 --set-default-user zesheng
 
 # 启动wsl 指定名称
 wsl -d Ubuntu-24.04
+
+git clone https://gitlab.liaozesheng.cn/poqaod/dotfiles.git
 ```
 
 ### 导入后设置用户名和密码
