@@ -1,10 +1,10 @@
 ---
-updated: 2026-08-26
+updated: 2026-08-27
 ---
 
 # 📚 Kubernetes 实用英语词汇全集
 
-> 小爪出品 · 累计 231 词 · 每日更新
+> 小爪出品 · 累计 241 词 · 每日更新
 
 ---
 
@@ -1658,4 +1658,78 @@ updated: 2026-08-26
 
 ---
 
-> 📅 最后更新：2026-08-26 | 累计 231 词 | 持续更新中 🐾
+## 第24期 — 资源治理与 QoS
+
+### 232. Guaranteed
+
+- **音标**: /ˌɡærənˈtiːd/
+- **词义**: 保证的；K8s 中 QoS 等级最高的 Pod。所有容器都同时设置了 requests 和 limits 且两者相等，资源最稳定、最不容易被驱逐，适合核心数据库等关键应用
+- **例句**: A Guaranteed Pod has requests equal to limits for every container, making it the highest-priority class for resource stability.
+- **🪄 记忆**: Guarantee(保证) → "铁饭碗"。requests 和 limits 写得一模一样，系统知道它"就吃这么多"，最受优待。`kubectl get pod -o wide` 看到 `QoS Class: Guaranteed`，说明资源声明得很规范。
+
+### 233. Burstable
+
+- **音标**: /ˈbɜːstəbl/
+- **词义**: 可突发的；requests < limits 的 Pod。系统保证它至少拿到 requests 的量，但节点有闲置资源时允许"借力"冲到 limits 上限
+- **例句**: A Burstable Pod can use CPU beyond its requests as long as spare capacity remains on the node.
+- **🪄 记忆**: Burst(爆发) + able(可…的) → "能爆发的"。像银行卡：余额底线（requests）保证你不饿死，透支额度（limits）允许偶尔浪一下。K8s 里大部分 Pod 都是这个等级，是资源利用率的"主力军"。
+
+### 234. BestEffort
+
+- **音标**: /ˌbest ɪˈfɔːrt/
+- **词义**: 尽力而为；完全没有设置 requests/limits 的 Pod，QoS 最低级。能吃多少吃多少，节点资源紧张时第一个被驱逐或杀掉
+- **例句**: BestEffort Pods are the first to be evicted when the node runs out of resources.
+- **🪄 记忆**: Best(最好) + Effort(努力) → "我尽力了"。像没订房的散客——有空房就住，满员第一个被请走。**生产环境千万别裸奔，不写资源限制的 Pod 就是"被牺牲的那个"。**
+
+### 235. Capacity
+
+- **音标**: /kəˈpæsəti/
+- **词义**: 容量；节点的总资源量（CPU、内存、存储等）。`kubectl describe node` 中 Capacity 显示物理总量，Allocatable 才是 Pod 真正能用的量
+- **例句**: Check the node's capacity with kubectl describe node to understand its total CPU and memory resources.
+- **🪄 记忆**: Cap(帽子) 的引申 → 帽子能装多少就是容量。Capacity 是"房屋总面积"，Allocatable 是"扣掉公摊的套内面积"——排障看资源，先对比这两个字段的差距。
+
+### 236. Allocatable
+
+- **音标**: /əˈləʊkeɪtəbl/
+- **词义**: 可分配的；节点扣除系统预留（kube-reserved、system-reserved、eviction-threshold）后，实际可供 Pod 使用的资源量，调度器依据它决定能否调度新 Pod
+- **例句**: The allocatable resources on a node equal its capacity minus the system reservations for the kubelet and the OS.
+- **🪄 记忆**: Allocate(分配) + able(可…) → "能分出去的"。像租房：Capacity 是总面积，Allocatable 是扣掉房东自住后的出租面积。**节点标 8C16G 不代表 Pod 能用满，先看 Allocatable。**
+
+### 237. Overcommit
+
+- **音标**: /ˌəʊvərkəˈmɪt/
+- **词义**: 超卖；集群中所有 Pod 的 requests 总和超过节点实际容量。K8s 允许超卖（按 requests 调度而非实际用量），赌"不是所有 Pod 同时用满"，从而大幅提高资源利用率，但也埋下 OOM 风险
+- **例句**: Kubernetes allows overcommit by scheduling Pods based on requests, which may sum to more than the node's actual capacity.
+- **🪄 记忆**: Over(超过) + Commit(承诺) → "承诺过头了"。像航空公司超卖机票——赌有人不来，赌对了满座率拉满，赌错了就得有人"被降舱"（OOMKilled）。**超卖是提效手段，但必须有监控兜底。**
+
+### 238. Throttle
+
+- **音标**: /ˈθrɒtl/
+- **词义**: 节流/限流；容器 CPU 使用超过 limits 时被内核强制降速（CFS 带宽控制）。注意区别：CPU 超限只是"被降速"（Throttled），内存超限才是"被杀"（OOMKilled）
+- **例句**: A container that exceeds its CPU limit is throttled rather than killed, which may show up as increased latency.
+- **🪄 记忆**: Throttle 原意"油门/节气门"——收油门的动作。CPU 配额用尽不杀你，但给你"收油门"：跑是能跑，速度被压住。**监控里看到 Throttling 高企，说明 CPU limits 设小了。**
+
+### 239. Saturation
+
+- **音标**: /ˌsætʃəˈreɪʃn/
+- **词义**: 饱和；资源利用率接近或达到上限的状态。节点 CPU/内存饱和通常伴随排队、延迟上升，是容量规划的第一警报信号
+- **例句**: Node saturation on CPU or memory often precedes performance degradation and request timeouts.
+- **🪄 记忆**: Saturate(浸透) → 海绵吸满水的状态。资源像海绵：水少随便挤，吸满了再滴一滴都费劲。**监控看"饱和度"比看绝对用量更能预判故障。**
+
+### 240. Contention
+
+- **音标**: /kənˈtenʃn/
+- **词义**: 争抢；多个进程/Pod 同时竞争同一有限资源（CPU、内存、锁、带宽）导致性能下降。K8s 中多 Pod 挤在同一节点、大流量冲击时极易发生
+- **例句**: Under heavy load, CPU contention between Pods on the same node causes erratic response times.
+- **🪄 记忆**: Contend(竞争) + tion → "抢东西"。像高峰期地铁——人人都想挤上去，结果谁都不快。**延迟忽高忽低（抖动）时，先怀疑资源争抢而不是代码问题。**
+
+### 241. Starvation
+
+- **音标**: /stɑːˈveɪʃn/
+- **词义**: 饥饿；进程/任务因长期得不到所需资源（或被更高优先级抢占）而无法推进。低优先级 Pod、等待锁过久的任务都可能"饿死"
+- **例句**: A low-priority Pod may suffer from starvation when higher-priority workloads constantly consume the node's resources.
+- **🪄 记忆**: Starve(挨饿) → 一直被饿着。食堂开饭，高优先级的先打饭，低优先级的排到最后——菜没了只能饿着。**PriorityClass 用得好是保障，用不好就有人"饿死"。**
+
+---
+
+> 📅 最后更新：2026-08-27 | 累计 241 词 | 持续更新中 🐾
