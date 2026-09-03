@@ -108,3 +108,10 @@ opencode go 目前已经提供了response 、 anthropic、chat completion等格�
     "rejected": []
   },
 ```
+
+>[!info] 注意
+>另外，claude检查调用地址国家地区，为绕过检测，可以在`.claude.json` 文件中添加这个配置，跳过最初的引导界面
+
+```json
+"hasCompletedOnboarding": true
+```

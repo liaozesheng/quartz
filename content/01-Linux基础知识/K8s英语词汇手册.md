@@ -1,10 +1,10 @@
 ---
-updated: 2026-08-27
+updated: 2026-09-02
 ---
 
 # 📚 Kubernetes 实用英语词汇全集
 
-> 小爪出品 · 累计 241 词 · 每日更新
+> 小爪出品 · 累计 261 词 · 每日更新
 
 ---
 
@@ -470,7 +470,7 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-07-02 | 累计 201 词 | 持续更新中 🐾
+> 📅 最后更新：2026-07-02 | 累计 81 词 | 持续更新中 🐾
 
 ---
 
@@ -806,7 +806,7 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-07-07 | 累计 201 词 | 持续更新中 🐾
+> 📅 最后更新：2026-07-07 | 累计 121 词 | 持续更新中 🐾
 
 ---
 
@@ -884,7 +884,7 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-07-08 | 累计 201 词 | 持续更新中 🐾
+> 📅 最后更新：2026-07-08 | 累计 131 词 | 持续更新中 🐾
 
 ---
 
@@ -1196,7 +1196,7 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-07-16 | 累计 201 词 | 持续更新中 🐾
+> 📅 最后更新：2026-07-16 | 累计 171 词 | 持续更新中 🐾
 
 ---
 
@@ -1274,7 +1274,7 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-07-16 | 累计 201 词 | 持续更新中 🐾
+> 📅 最后更新：2026-07-16 | 累计 181 词 | 持续更新中 🐾
 
 ---
 
@@ -1352,7 +1352,7 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-07-17 | 累计 201 词 | 持续更新中 🐾
+> 📅 最后更新：2026-07-17 | 累计 191 词 | 持续更新中 🐾
 
 ---
 
@@ -1430,7 +1430,7 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-08-04 | 累计 211 词 | 持续更新中 🐾
+> 📅 最后更新：2026-07-23 | 累计 201 词 | 持续更新中 🐾
 
 ---
 
@@ -1732,4 +1732,156 @@ updated: 2026-08-27
 
 ---
 
-> 📅 最后更新：2026-08-27 | 累计 241 词 | 持续更新中 🐾
+## 第25期 — 数据保护与安全
+
+### 242. Backup
+
+- **音标**: /ˈbækʌp/
+- **词义**: 备份；将数据或集群状态复制到安全位置以防丢失。K8s 中常用 Velero 做集群级备份（含 PVC 数据快照），etcd 备份则用于恢复集群元数据
+- **例句**: Schedule regular cluster backups with Velero so you can restore the entire environment after a disaster.
+- **🪄 记忆**: Back(后面) + Up(起来) → "留后手"。像照片存云盘——手机丢了还能找回来。**没有备份的集群，就像没有保险的人生，出事只能干瞪眼。**
+
+### 243. Restore
+
+- **音标**: /rɪˈstɔːr/
+- **词义**: 恢复；从备份把数据或集群状态还原到某个时间点。K8s 恢复演练要常做，不然备份了却恢复不了等于白备
+- **例句**: After the incident, the team restored the cluster from the latest backup in under an hour.
+- **🪄 记忆**: Re(重新) + Store(存放) → "重新放回去"。像手机恢复出厂设置后导回通讯录。**备份是存钱，恢复才是取钱——只存不练，关键时刻可能提不出款。**
+
+### 244. Replication
+
+- **音标**: /ˌreplɪˈkeɪʃn/
+- **词义**: 复制；将数据或状态同步到多个副本以保证可用性。etcd 通过 Raft 协议在节点间复制数据，存储层（如 PVC 底层）也有跨可用区复制
+- **例句**: etcd uses Raft-based replication to keep all nodes' data consistent across the cluster.
+- **🪄 记忆**: Replicate(复制) → "复印机模式"。一份文件复印三份放三个抽屉，烧了一个还有两个。**注意区分：Replica 是"副本"这个名词，Replication 是"复制"这个过程。**
+
+### 245. Migrate
+
+- **音标**: /maɪˈɡreɪt/
+- **词义**: 迁移；把工作负载或数据从一个环境搬到另一个。常见场景：集群升级换节点、跨云迁移、从虚拟机搬到 K8s、StatefulSet 跨集群搬迁
+- **例句**: The team migrated the legacy application from VMs to Kubernetes without noticeable downtime.
+- **🪄 记忆**: Migrate 同源词"移民"。像搬家——从老房子搬到新小区，家具（数据）得一件不少地带过去。**迁移的坑都在"状态"上：无状态服务随便搬，有状态服务（数据库）才是硬骨头。**
+
+### 246. Upgrade
+
+- **音标**: /ˈʌpɡreɪd/
+- **词义**: 升级；将软件或集群版本更新到更高版本。K8s 升级讲究"小步快跑"（一次升一个 minor 版本），且先升级控制面再升级节点，避免版本不兼容
+- **例句**: Kubernetes upgrades are done incrementally, one minor version at a time, to reduce the risk of breaking changes.
+- **🪄 记忆**: Up(向上) + Grade(等级) → "往上升一级"。像手机系统大版本更新——不升怕漏洞，瞎升怕变砖。**K8s 升级前必看三个东西：API 变更、弃用特性、第三方组件兼容性。**
+
+### 247. Firewall
+
+- **音标**: /ˈfaɪəwɔːl/
+- **词义**: 防火墙；基于规则的网络访问控制设备/软件。云上集群的入口流量靠安全组/防火墙放行，集群内部则用 NetworkPolicy 做"东西向"微隔离
+- **例句**: The cloud firewall only allows traffic from trusted IP ranges to reach the cluster's API server.
+- **🪄 记忆**: Fire(火) + Wall(墙) → "挡火的墙"。像小区门禁——外人先过登记，不是谁都让进。**记住分工：防火墙管南北向（进出集群），NetworkPolicy 管东西向（Pod 之间）。**
+
+### 248. Encryption
+
+- **音标**: /ɪnˈkrɪpʃn/
+- **词义**: 加密；将明文数据转换为密文，只有持有密钥才能读取。K8s 可对 etcd 中的 Secret 做静态加密（encryption at rest），网络传输则靠 TLS
+- **例句**: Enable encryption at rest for etcd so that Secrets stored in the cluster cannot be read in plaintext.
+- **🪄 记忆**: En(使) + Crypt(隐藏) + ion → "藏起来"。像写日记用密码本——偷到本子也看不懂内容。**线上事故查 Secret 泄露时，第一反应就是看 etcd 加密开没开。**
+
+### 249. Certificate
+
+- **音标**: /sərˈtɪfɪkət/
+- **词义**: 证书；数字签名后用于身份验证的公钥凭证。K8s 集群各组件间通信都靠证书（CA 签发），kubeadm 默认证书有效期一年，过期前要轮换（renew）
+- **例句**: The API server presents its certificate to clients so they can verify its identity over TLS.
+- **🪄 记忆**: Certify(证明) + cate → "身份证明"。像身份证——证明"我就是我"，别人看到证书就敢信任。**K8s 翻车名场面：证书过期，kubectl 突然报 x509 错误，第一眼先看证书到期时间。**
+
+### 250. Authentication
+
+- **音标**: /ɔːˌθentɪˈkeɪʃn/
+- **词义**: 认证；确认"你是谁"。K8s 的认证方式：客户端证书、ServiceAccount Token、OIDC、Webhook 等。认证只回答"你是谁"，不回答"你能干什么"
+- **例句**: The kubeconfig file stores the credentials used for authentication against the Kubernetes API server.
+- **🪄 记忆**: Author(作者/本人) 同源 → 验证"你确实是本人"。像进公司刷卡——先确认你是谁。**记口诀：Authentication(认证)=验明正身，Authorization(授权)=你能进哪个办公室。**
+
+### 251. Authorization
+
+- **音标**: /ˌɔːθərəˈzeɪʃn/
+- **词义**: 授权；决定"你能做什么"。K8s 中通过 RBAC（Role/ClusterRole + RoleBinding/ClusterRoleBinding）控制用户对资源的读写权限，遵循最小权限原则
+- **例句**: RBAC authorization determines which operations a user is allowed to perform on cluster resources.
+- **🪄 记忆**: Authorize(批准) → "盖章放行"。认证完还得过授权这关：你是本人没错，但权限表里没有"删库"这一项。**排查权限问题先分两步：认证过没过（401），授权够不够（403）。**
+
+---
+
+> 📅 最后更新：2026-09-01 | 累计 251 词 | 持续更新中 🐾
+
+---
+
+## 第26期 — 容器运行时、Helm 与服务网格
+
+### 252. OCI
+
+- **音标**: /ˌəʊ siː ˈaɪ/
+- **词义**: 开放容器倡议（Open Container Initiative）；Linux 基金会旗下的开源组织，制定容器镜像（image-spec）和容器运行时（runtime-spec）的行业标准，Docker、containerd、CRI-O 等全部遵循
+- **例句**: The OCI image specification ensures that an image built by Docker can run on containerd, CRI-O, or any other OCI-compliant runtime.
+- **🪄 记忆**: OCI = "容器世界的普通话"——以前每家各说各话（Docker 的镜像格式别人不认），OCI 定下统一标准后大家照着说，谁都能听懂。containerd、CRI-O 都是 OCI 的"模范生"。
+
+### 253. CRI
+
+- **音标**: /ˌsiː ɑːr ˈaɪ/
+- **词义**: 容器运行时接口（Container Runtime Interface）；Kubelet 与容器运行时之间的 gRPC 协议，定义了 ImageService 和 RuntimeService 两组 API，让 K8s 可以对接任意符合 CRI 的运行时
+- **例句**: The CRI allows Kubernetes to work with any container runtime — containerd, CRI-O, or others — as long as it implements the CRI protocol.
+- **🪄 记忆**: CRI 就像"USB 接口"——K8s 是电脑，容器运行时是外设（U盘/键盘）。只要外设做成 USB 接口（实现 CRI），插上就能用。有了 CRI，K8s 才能"随便换运行时"。
+
+### 254. CRI-O
+
+- **音标**: /ˈkriː əʊ/
+- **词义**: 轻量级容器运行时；红帽主导开发，专为 K8s 设计，直接实现 CRI 规范，使用 runc 运行容器、containers/image 拉取镜像，不依赖 Docker
+- **例句**: CRI-O is a lightweight runtime built specifically for Kubernetes, enabling direct integration with OCI-compliant runtimes like runc.
+- **🪄 记忆**: CRI + O(open) → "专为 K8s 而生"的运行时。它不做 Docker 那些花活（docker build、docker compose），只专注一件事：让 K8s 把容器跑起来。OpenShift 的默认运行时就是它。
+
+### 255. crictl
+
+- **音标**: /ˈkraɪtl/（亦常逐字母读作 /ˌsiː ɑːr aɪ ˈsiː tiː el/）
+- **词义**: CRI 兼容的容器命令行工具；用法与 kubectl 相似，直接与容器运行时通信，可在 kubectl 不可用的情况下调试容器（拉镜像、查状态、看日志、执行命令）
+- **例句**: On a node with a broken kubelet, you can use crictl ps and crictl logs to inspect the underlying containers directly.
+- **🪄 记忆**: crictl = "kubectl 的平替调试版"。kubectl 是"前台客服"（走 API Server），crictl 是"内部直连"（直接对接运行时）。kubelet 挂了、kubectl 连不上时，登录节点用 crictl 照样能看容器。排障宝藏工具。
+
+### 256. Chart
+
+- **音标**: /tʃɑːrt/
+- **词义**: Helm 的软件包格式；由一组描述 K8s 资源的 YAML 模板、values.yaml、Chart.yaml 元数据组成的目录结构，可以像安装软件一样把整套应用装进集群
+- **例句**: The Bitnami nginx Chart packages the Deployment, Service, and ConfigMap templates together with configurable values.
+- **🪄 记忆**: Chart 原意"航海图"。Helm 是舵手，Chart 就是"航海图+货物清单"——里面画好了怎么部署（模板）、有什么参数可调（values）。`helm install` 就像照着航海图出航，一键装好整套应用。
+
+### 257. Release
+
+- **音标**: /rɪˈliːs/
+- **词义**: Helm 中的发布实例；每次执行 helm install / upgrade 都会创建一个 Release，记录安装的 Chart 版本、配置值和部署历史，可通过 helm rollback 回滚
+- **例句**: Run helm upgrade --install myapp ./mychart to create a new Release or upgrade an existing one.
+- **🪄 记忆**: Release = "一次部署的存档"。同一个 Chart 装 5 次就有 5 个 Release（分别起名）。每个 Release 都有"回滚存档"（revision 历史）——新版本翻车了，`helm rollback` 一键回到上一个版本。打游戏读档的 K8s 版。
+
+### 258. Values
+
+- **音标**: /ˈvæljuːz/
+- **词义**: Helm 的配置值；通过 values.yaml 文件或 --set 参数传入 Chart 模板中的可配置项（副本数、镜像 tag、资源限制等），实现"同一套模板，不同环境不同配置"
+- **例句**: Override the default values by running helm install myapp ./chart --set replicaCount=5 --values prod-values.yaml.
+- **🪄 记忆**: Values = "填空答题卡"。Chart 模板里有各种"空"（{{ .Values.replicaCount }}），Values 就是填进去的答案——开发填 1 副本，生产填 5 副本，模板不用改。`--set` 临时改，`-f` 文件批量改。
+
+### 259. Envoy
+
+- **音标**: /ˈenvɔɪ/
+- **词义**: 云原生高性能代理；CNCF 毕业项目，C++ 编写，支持动态配置，是 Istio 服务网格的数据面核心，负责流量转发、负载均衡、TLS 终止和可观测性数据采集
+- **例句**: Istio injects an Envoy sidecar proxy into each Pod to handle all inbound and outbound traffic.
+- **🪄 记忆**: Envoy 本意"外交使节"——所有进出 Pod 的流量都经过它"翻译转达"。它像每个 Pod 门口的"安检+翻译官"：流量管住（路由/限流/重试）、加密管住（mTLS）、数据管住（指标/日志）。服务网格的"发动机"就是 Envoy。
+
+### 260. mTLS
+
+- **音标**: /ˌem tiː el es/
+- **词义**: 双向 TLS（Mutual TLS）；客户端和服务端互相验证对方证书，比单向 TLS 更安全。服务网格（Istio、Linkerd）默认启用 mTLS，实现服务间通信的加密与身份认证
+- **例句**: Istio's mTLS feature encrypts and authenticates all traffic between services, ensuring that only verified workloads can communicate.
+- **🪄 记忆**: 普通 TLS 是"你验我的证"（客户端验服务器），mTLS 是"互相验"——进小区保安要看你的证，你也得确认他是真保安。服务网格里每个服务都有"身份证"（证书），说话前先互验身份，杜绝伪造和窃听。
+
+### 261. ServiceMesh
+
+- **音标**: /ˈsɜːrvɪs meʃ/
+- **词义**: 服务网格；专门处理服务间通信的基础设施层，将流量管理、安全（mTLS）、可观测性从业务代码中剥离，下沉到 Sidecar 代理（如 Envoy）中。Istio、Linkerd、Consul 是主流实现
+- **例句**: A service mesh moves traffic management and security concerns out of the application code and into a dedicated infrastructure layer.
+- **🪄 记忆**: 想象每条"服务通路"上都架了一张网（Mesh），网格里的"节点"是 Sidecar 代理。业务代码不再管"怎么通信"，只管业务本身——网络、加密、监控全交给这张网。**服务网格 = 给微服务通信"上保险+装监控"的隐形基础设施。**
+
+---
+
+> 📅 最后更新：2026-09-02 | 累计 261 词 | 持续更新中 🐾
