@@ -39,6 +39,7 @@ SYNC_DIRS=(
 # 需要排除的文件（在 SYNC_DIRS 中匹配）
 EXCLUDE_FILES=(
     "个人局域网环境.md"
+    "阿里云ACP考试"
     #"系统监控"
     #"Awesome"
     #"Hermes"
