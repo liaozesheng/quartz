@@ -1,10 +1,10 @@
 ---
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # 📚 Kubernetes 实用英语词汇全集
 
-> 小爪出品 · 累计 261 词 · 每日更新
+> 小爪出品 · 累计 271 词 · 每日更新
 
 ---
 
@@ -1884,4 +1884,78 @@ updated: 2026-09-02
 
 ---
 
-> 📅 最后更新：2026-09-02 | 累计 261 词 | 持续更新中 🐾
+## 第27期 — kubectl 高频操作 · CNI 网络与可观测性
+
+### 262. Apply
+
+- **音标**：/əˈplaɪ/
+- **词义**：应用/套用；kubectl apply 将 YAML 中声明的期望状态"应用"到集群，K8s 自动对比现状并调谐，是声明式管理与 GitOps 的基石命令
+- **例句**：Run kubectl apply -f deployment.yaml to create or update the resources declared in the file.
+- **🪄 记忆**：apply 本意"申请、敷上"——把 YAML 当"膏药"贴到集群上，贴的不是一步步死命令，而是"我最终要的样子"。剩下的差异，K8s 自己会一点点抹平。**声明式 = 说清"要什么"，apply 负责"让它发生"。**
+
+### 263. Describe
+
+- **音标**：/dɪˈskraɪb/
+- **词义**：描述；kubectl describe 查看资源（Pod/Node/Service）的完整详情，包括状态、容器、调度结果与近期事件，是排障第一命令
+- **例句**：When a Pod fails to start, run kubectl describe pod my-pod to inspect its events and conditions.
+- **🪄 记忆**：describe 就是"把来龙去脉讲清楚"。kubectl get 只给一句话简介，describe 会把"病历本"摊开：调度到哪了、镜像拉没拉、为什么 Crash。**排障口诀：先 get 看生死，再 describe 查病根。**
+
+### 264. Debug
+
+- **音标**：/ˌdiːˈbʌɡ/
+- **词义**：调试/排查；kubectl debug 可向运行中的 Pod 临时注入调试容器（或复制出问题 Pod 的副本），共享目标进程命名空间来排查故障，K8s v1.18+ 基于临时容器实现
+- **例句**：Use kubectl debug my-pod -it --image=busybox to attach a temporary debugging container.
+- **🪄 记忆**：debug = 抓 bug。生产容器常为安全连 shell 都不带，但 kubectl debug 能"空降"一个调试容器进现场（共享进程空间），像侦探拎着工具箱上门取证。**用完即走不留痕，别为排查把生产镜像改得臃肿。**
+
+### 265. Calico
+
+- **音标**：/ˈkælɪkəʊ/
+- **词义**：主流 CNI 网络插件；Tigera 出品，用 BGP 做三层路由（无需隧道封装），数据面可选 iptables/eBPF，内置 NetworkPolicy 执行，性能与策略能力都很强
+- **例句**：Calico routes Pod traffic between nodes with BGP and enforces fine-grained NetworkPolicies.
+- **🪄 记忆**：Calico 原意"三花猫"。这只猫不爱钻隧道（不用 overlay 封装），而是让各节点用 BGP 互相"报路名"，Pod 网段全网直达；顺带当"门禁"（NetworkPolicy）。**想要性能与策略两手抓，就养这只三花猫。**
+
+### 266. Flannel
+
+- **音标**：/ˈflænəl/
+- **词义**：老牌 CNI 网络插件；CoreOS 出品，通过 VXLAN 等 overlay 隧道给每个 Node 划分子网，实现跨节点 Pod 互通；部署简单，但不支持 NetworkPolicy
+- **例句**：Flannel gives each node its own subnet and tunnels pod traffic across nodes with VXLAN.
+- **🪄 记忆**：flannel = 法兰绒（毛毯）。想象所有节点"盖在同一张法兰绒大被子"里——这就是 overlay 覆盖网络：各自内网 IP 不用动，钻进被子里（隧道）照样互通。**图省事选 Flannel，要网络策略就得换 Calico。**
+
+### 267. ExternalName
+
+- **音标**：/ɪkˈstɜːrnl neɪm/
+- **词义**：Service 的一种类型；没有 Selector 与端口代理，仅将 Service 的 DNS 名以 CNAME 方式指向集群外域名（如云数据库、SaaS 服务），让集群内代码稳定访问外部服务
+- **例句**：Create an ExternalName Service so Pods can reach a legacy database outside the cluster through a stable in-cluster DNS name.
+- **🪄 记忆**：ExternalName = "给外部服务套集群内马甲"。业务代码只认 mydb.default.svc，Service 悄悄 CNAME 到真实外部地址；将来切回内网数据库，改一行 YAML 就行。**注意：它只做 DNS 转发不做代理，端口/协议原样透传。**
+
+### 268. Egress
+
+- **音标**：/ˈiːɡres/
+- **词义**：出站/出口；NetworkPolicy 中的 egress 规则限定 Pod"能访问谁"，与 Ingress（入站）相对；也泛指离开集群的网络流量
+- **例句**：An egress rule in the NetworkPolicy blocks Pods from reaching the internet except through a whitelisted proxy.
+- **🪄 记忆**：e-（向外）+ gress（行走）= "走出去的路"。Ingress 管谁能进来，Egress 管谁能出去。**安全收口就靠它：默认全禁，只放行白名单出口，把数据外泄的路堵死。**
+
+### 269. Trace
+
+- **音标**：/treɪs/
+- **词义**：追踪/链路；分布式追踪（Distributed Tracing）记录一次请求在多个服务间的完整调用链（span），配合 Jaeger/Tempo 等定位慢请求与故障点，是可观测性三支柱之一
+- **例句**：Distributed tracing reveals every hop a request takes across services, showing which one adds the most latency.
+- **🪄 记忆**：trace 本意"足迹、痕迹"。一次请求像一个人在微服务间串门，每进一家都留下脚印（span）；顺着脚印还原整条路线，一眼看出哪步最慢、断在哪。**"每个服务都挺快但整体很慢"的玄学问题，只有 trace 能破案。**
+
+### 270. Telemetry
+
+- **音标**：/təˈlemətri/
+- **词义**：遥测；自动采集并远程传输系统数据（指标/日志/链路）的技术；OpenTelemetry（OTel）是 CNCF 主流的统一遥测框架，一套 SDK 覆盖可观测性三支柱
+- **例句**：OpenTelemetry standardizes how you collect telemetry — metrics, logs, and traces — across your services.
+- **🪄 记忆**：tele（远）+ metry（测量）= "远程量体温"。应用不用你上门问，主动把"健康数据"上报给监控中心。**OTel 就是遥测界的 USB-C：一套接口通吃 metrics/logs/traces，后端想换谁换谁。**
+
+### 271. Alert
+
+- **音标**：/əˈlɜːrt/
+- **词义**：告警/警报；监控发现指标异常时触发的通知，典型链路：Prometheus 告警规则 → Alertmanager → 邮件/企微/电话；是 SRE 及时响应故障的触发器
+- **例句**：Prometheus evaluates alerting rules and fires an Alert as soon as a metric crosses its threshold.
+- **🪄 记忆**：alert 本意"警惕、拉响警报"。监控最怕"日志躺在那没人看"，alert 就是火警铃——指标越线立刻响铃喊人。**好告警三标准：该响必响（不漏报）、别乱响（不误报）、响了有人理（必行动）。**
+
+---
+
+> 📅 最后更新：2026-09-03 | 累计 271 词 | 持续更新中 🐾
