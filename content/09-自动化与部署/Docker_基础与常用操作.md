@@ -80,6 +80,14 @@ docker volume inspect <volume-name>
 docker inspect <container-name> | grep -A 20 Mounts
 ```
 
+清理所有未被容器使用的volume：
+```bash
+docker volume prune
+```
+
+>[!warning] Warning
+> `docker volume prune` 会删除所有未被当前容器使用的volume。删除后，持久化数据消失，需要确认这些volume的价值。
+
 ## 清理命令
 
 查看空间占用：

@@ -155,7 +155,8 @@ docker run --rm --entrypoint htpasswd httpd:2.4-alpine -Bbn admin "你的密码"
           "retryDelay": "30s",
           "content": [
             {
-              "prefix": "**"
+              "prefix": "**",
+              "destination": "/docker"
             }
           ]
         },
@@ -168,7 +169,8 @@ docker run --rm --entrypoint htpasswd httpd:2.4-alpine -Bbn admin "你的密码"
           "retryDelay": "30s",
           "content": [
             {
-              "prefix": "**"
+              "prefix": "**",
+              "destination": "/ghcr"
             }
           ]
         },
@@ -181,7 +183,8 @@ docker run --rm --entrypoint htpasswd httpd:2.4-alpine -Bbn admin "你的密码"
           "retryDelay": "30s",
           "content": [
             {
-              "prefix": "**"
+              "prefix": "**",
+              "destination": "/gcr"
             }
           ]
         },
@@ -194,7 +197,8 @@ docker run --rm --entrypoint htpasswd httpd:2.4-alpine -Bbn admin "你的密码"
           "retryDelay": "30s",
           "content": [
             {
-              "prefix": "**"
+              "prefix": "**",
+              "destination": "/redhat"
             }
           ]
         },
@@ -207,7 +211,8 @@ docker run --rm --entrypoint htpasswd httpd:2.4-alpine -Bbn admin "你的密码"
           "retryDelay": "30s",
           "content": [
             {
-              "prefix": "**"
+              "prefix": "**",
+              "destination": "/quay"
             }
           ]
         }
@@ -262,19 +267,16 @@ docker login zot.liaozesheng.lol -u admin
 
 ```bash
 # 拉取 docker hub 镜像
-docker pull zot.liaozesheng.lol/library/nginx:alpine
-docker pull zot.liaozesheng.lol/library/alpine
-
-# 拉取 gcr.io 镜像
-docker pull zot.liaozesheng.lol/gcr.io/google-containers/pause:3.9
+docker pull zot.liaozesheng.lol/docker/library/nginx:alpine
+docker pull zot.liaozesheng.lol/docker/library/alpine
 
 # 拉取 quay.io 镜像
-docker pull zot.liaozesheng.lol/quay.io/coreos/etcd:v3.5.12
+docker pull zot.liaozesheng.lol/quay/coreos/etcd:v3.5.12
 ```
 
 ### 核心机制说明（重点）
 
-- Zot `onDemand: true` 为**后台异步缓存**
+- Zot `onDemand: true` 为**后台异步缓存**，当VPS没有，就会去上游拉取
 
 - 第一次拉取新镜像提示 `not found` 是正常现象
 
