@@ -50,7 +50,7 @@ cloudflared --version
 ```
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/46554067/1756865253410-9729c2f0-520f-4d52-ad59-955d0e10e12e.png)
+![[1756865253410-9729c2f0-520f-4d52-ad59-955d0e10e12e.png]]
 
 
 
@@ -66,7 +66,7 @@ cloudflared tunnel login
 + 授权成功后，会在服务器 `/root/.cloudflared/` 下生成一个 `cert.pem` 文件（凭证）。
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/46554067/1756865336945-c4a319bd-b12f-4bbc-8c9d-5f9ab0059167.png)
+![[1756865336945-c4a319bd-b12f-4bbc-8c9d-5f9ab0059167.png]]
 
 
 
@@ -82,7 +82,7 @@ cloudflared tunnel create my-service
 ```
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/46554067/1756865486150-478b97e8-2eaf-4b8a-b365-553539972fd0.png)
+![[1756865486150-478b97e8-2eaf-4b8a-b365-553539972fd0.png]]
 
 
 
@@ -98,10 +98,10 @@ cloudflared tunnel route dns my-service linux.zesheng.lol
  	执行后，Cloudflare 会自动在你的 DNS 管理里添加一条 CNAME，把 `linux.zesheng.lol` 指向 Cloudflare 内部的隧道地址。  
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/46554067/1756865690846-a02a79d2-18a8-4a8e-ba9e-2aa98901afb6.png)
+![[1756865690846-a02a79d2-18a8-4a8e-ba9e-2aa98901afb6.png]]
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2025/png/46554067/1756865583885-483babfe-5a90-4763-a3d4-70e83a40f889.png)
+![[1756865583885-483babfe-5a90-4763-a3d4-70e83a40f889.png]]
 
 
 
@@ -276,7 +276,7 @@ cloudflared tunnel delete my-service
 将cf分配的nameservers替换掉porkbun上默认的nameservers。
 
 <!-- 这是一张图片，ocr 内容为： -->
-![](https://cdn.nlark.com/yuque/0/2026/png/46554067/1787731921755-20314fc2-8aa7-4a68-874f-0db96f4bc652.png)
+![[1787731921755-20314fc2-8aa7-4a68-874f-0db96f4bc652.png]]
 
 替换成功后，cf上重新检测等待结果就好，一般1小时左右。
 
