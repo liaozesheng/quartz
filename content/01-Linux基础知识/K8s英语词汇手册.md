@@ -1,10 +1,10 @@
 ---
-updated: 2026-09-03
+updated: 2026-09-20
 ---
 
 # 📚 Kubernetes 实用英语词汇全集
 
-> 小爪出品 · 累计 271 词 · 每日更新
+> 小爪出品 · 累计 281 词 · 每日更新
 
 ---
 
@@ -1958,4 +1958,78 @@ updated: 2026-09-03
 
 ---
 
-> 📅 最后更新：2026-09-03 | 累计 271 词 | 持续更新中 🐾
+## 第28期 — 配置治理与稳定性高频词
+
+### 272. Deprecated
+
+- **音标**：/ˈdeprəkeɪtɪd/
+- **词义**：已弃用/不推荐使用；标记某个 API、字段或特性将在未来版本移除。K8s 每版都会弃用部分 API（如 extensions/v1beta1），kubectl 会打印 deprecated 警告，升级前必须清理，否则资源直接报错
+- **例句**：The extensions/v1beta1 Ingress API is deprecated; migrate your manifests to networking.k8s.io/v1 before the upgrade.
+- **🪄 记忆**：de-（向下）+ prec（祈祷）+ ate → 原意"祈求别用"。被标 deprecated 不等于"立刻不能用"，而是官方在喊"别用了，下个版本我要拆"。**收到 deprecated 警告 = 收到一张欠债单，趁升级前还掉。**
+
+### 273. Drift
+
+- **音标**：/drɪft/
+- **词义**：漂移；实际运行状态与声明文件（Git/YAML）不一致的现象，称 Configuration Drift（配置漂移）。有人手工 kubectl edit 改过生产、或资源被外部控制器改动就会产生，是 GitOps 要解决的头号问题
+- **例句**：Someone hot-fixed production by hand last night, and now we have configuration drift between the cluster and Git.
+- **🪄 记忆**：drift 本意"漂流"——船没拴好就随波逐流。集群也一样：手工改一行 YAML，它就悄悄漂离 Git 里那条"航线"。**GitOps 的核心动作就是"把漂走的船拽回航道"（自动 reconcile）。**
+
+### 274. Baseline
+
+- **音标**：/ˈbeɪslaɪn/
+- **词义**：基线/基准；作为对比参照的稳定版本或标准值，如 baseline manifest（基线清单）、性能 baseline、安全 baseline（CIS Benchmark）；一切"变化"与"异常"都要跟它比才有意义
+- **例句**：Capture a performance baseline before the upgrade so you can tell whether the new version actually regressed.
+- **🪄 记忆**：base（基础）+ line（线）——先在地上画一条线，后面所有测量都从这条线量起。**没有 baseline 的优化是玄学：你说"变快了"，拿什么证明？**
+
+### 275. Orphan
+
+- **音标**：/ˈɔːfn/
+- **词义**：孤儿；失去父级管理者的资源对象。级联删除时若选 orphan 策略（--cascade=orphan），子资源会被"放生"独立存在；也指没有 OwnerReference 或无人认领的对象
+- **例句**：Deleting the Deployment with --cascade=orphan leaves the Pods running as orphans.
+- **🪄 记忆**：orphan 就是"孤儿"。删掉爸爸（Deployment）时，孩子（ReplicaSet/Pod）本该跟着走；选 orphan 模式就是把孩子留在世上自生自灭。**排查"删了工作负载 Pod 还在跑"的灵异现象，先查有没有孤儿。**
+
+### 276. Cascade
+
+- **音标**：/kæˈskeɪd/
+- **词义**：级联/连锁；删除父资源时自动连带删除子资源的行为，kubectl 默认 foreground（先删子再删父）或 background（先删父、后台删子）；也泛指故障的级联放大（cascading failure）
+- **例句**：Deleting a Namespace triggers a cascading deletion of every resource inside it.
+- **🪄 记忆**：cascade 本意"小瀑布"——水一层层往下砸，层层受影响。删一个 Namespace，底下所有资源像瀑布一样跟着冲走。**反过来想：级联故障也是这个道理，一个组件雪崩会顺着依赖链一路砸下去。**
+
+### 277. Suspend
+
+- **音标**：/səˈspend/
+- **词义**：挂起/暂停；CronJob 的 spec.suspend=true 可临时停掉定时任务而保留定义，不删资源即可止住任务；Deployment 的 rollout 也能 pause 挂起
+- **例句**：Set suspend: true on the CronJob to stop the nightly job during the migration window without deleting it.
+- **🪄 记忆**：suspend = "悬着不落地"（suspender 吊带裤、suspend 停职）。任务定义还在，只是"吊在半空不执行"。**大促/迁移期间要临时止血，suspend 比删了再建回来安全得多。**
+
+### 278. Concurrency
+
+- **音标**：/kənˈkʌrənsi/
+- **词义**：并发/并发度；同时进行的任务数量。CronJob 的 concurrencyPolicy 决定新任务与上一个未完成任务如何相处：Allow（允许并行）/ Forbid（禁止，跳过）/ Replace（杀掉旧的换新的）
+- **例句**：Set concurrencyPolicy: Forbid so a slow backup job never overlaps with the next scheduled run.
+- **🪄 记忆**：con-（一起）+ cur（跑）+ rency → "一起跑"。注意区分 concurrency（并发，同时处理）与 parallelism（并行，同时执行）——并发是"都要管"，并行是"同时干"。**备份类任务默认用 Forbid，否则上一轮没跑完又叠一层，机器直接趴。**
+
+### 279. Parallelism
+
+- **音标**：/ˌpærəˈlelɪzəm/
+- **词义**：并行度；Job 的 spec.parallelism 控制同一时刻最多起几个 Pod 干活，completions 控制总共要完成几个；两者配合决定批处理任务的"横向火力"
+- **例句**：A Job with completions: 100 and parallelism: 10 processes the batch in ten waves of ten Pods.
+- **🪄 记忆**：parallel（平行的）+ ism——"并排跑"。completions 是"总共要跑几趟"，parallelism 是"同时派几辆车"。**调 parallelism 就是调油门，但别忘了 Node 资源这个油箱的容量。**
+
+### 280. Threshold
+
+- **音标**：/ˈθreʃhəʊld/
+- **词义**：阈值/门槛；触发告警或动作的临界值，如 CPU 超过 80% 触发 HPA 扩容、错误率超过 5% 触发告警；HPA 的 targetCPUUtilizationPercentage 就是一个典型阈值
+- **例句**：Prometheus fires an alert only when memory usage stays above the threshold for five minutes.
+- **🪄 记忆**：threshold 本意"门槛"（古时铺在门下的石板）。跨过这道坎就"进门"——触发告警或扩容。**阈值定低了天天误报，定高了故障不响；加个"持续 N 分钟"条件能过滤掉大部分抖动。**
+
+### 281. Overhead
+
+- **音标**：/ˈəʊvəhed/
+- **词义**：开销/额外负担；为实现某个功能而付出的额外资源代价，如 sidecar 代理带来的 CPU/内存 overhead、服务网格每跳多一次网络转发、加密通信的 CPU 开销
+- **例句**：The sidecar proxy adds roughly 10% CPU overhead per Pod, which matters at scale.
+- **🪄 记忆**：over（在上）+ head（头）→ 原指"头顶上的费用"（房租水电这类固定支出）。技术里就是"为了功能额外掏的钱"。**任何"零成本增强"都要警惕——overhead 只是被藏在了别处。**
+
+---
+
+> 📅 最后更新：2026-09-20 | 累计 281 词 | 持续更新中 🐾
