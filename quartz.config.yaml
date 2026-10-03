@@ -109,6 +109,24 @@ plugins:
     enabled: false
   - source: "@quartz-community/canvas-page"
     enabled: true
+# 原生 HTML 卡片：把 content/ 下的独立 .html 渲染成带 Quartz 外壳的页面
+# 实现见 quartz-plugins/html-card/，通过 package.json 的 file: 依赖链接为本地 npm 包
+# （不要写成 "./quartz-plugins/html-card"：loader 对本地路径会 symlink，
+#   Windows 无开发者模式时会 EPERM 导致插件被静默跳过）
+  - source: "@liaozesheng/quartz-plugin-html-card"
+    enabled: true
+    order: 95
+    options:
+      # 只接管匹配该正则的文件（相对 content 目录）
+      pattern: "\\.html$"
+      # CSS 作用域容器类名：卡片样式会被加上这个前缀，避免污染站点主题
+      scopeClass: html-card
+      # <title> 缺失时回退到文件名
+      titleFrom: title
+      # 需要给卡片加标签时打开（会生成对应的标签页）
+      # frontmatter:
+      #   tags:
+      #     - 知识卡
   - source: "@quartz-community/content-page"
     enabled: true
   - source: "@quartz-community/folder-page"
@@ -232,3 +250,13 @@ layout:
       positions:
         right: []
     canvas: {}
+    # 原生 HTML 卡片页：卡片自带 hero 标题，故去掉重复的 article-title、
+    # 没有日期的 content-meta，以及空的 note-properties。
+    # 注意：exclude 里的名字必须是**完整 source 串**——loader 的
+    # extractPluginName() 对 npm 包不做去 scope 处理，
+    # 写 "article-title" 是匹配不上的（现存 folder/tag 的 reader-mode 同理为空操作）。
+    "html-card":
+      exclude:
+        - "@quartz-community/article-title"
+        - "@quartz-community/content-meta"
+        - "@quartz-community/note-properties"
