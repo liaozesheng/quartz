@@ -194,6 +194,18 @@ log "提交并推送（目标分支: $SYNC_BRANCH）..."
 ensure_sync_branch
 cd "$QUARTZ_DIR"
 
+# 是否存在未跟踪文件
+untracked=$(git ls-files --others --exclude-standard)
+
+if [ $has_modified -ne 0 ] || [ -n "$untracked" ];then
+  echo "✅ 发现未跟踪文件："
+  echo "$untracked"
+  # 或者只add这些untracked文件，更精准
+  echo "$untracked" | xargs git add
+else
+  echo "仓库干净"
+fi
+
 # 检查是否有变更
 if git diff --quiet && git diff --cached --quiet; then
     ok "没有变更，跳过推送"

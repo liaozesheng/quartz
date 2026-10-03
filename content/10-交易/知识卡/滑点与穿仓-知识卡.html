@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>滑点与穿仓 · 知识卡</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F5F1;
+  --paper:#FFFFFF;
+  --ink:#1D1D1B;
+  --ink2:#5C5C57;
+  --ink3:#8E8E87;
+  --line:#E7E5DF;
+  --violet:#534AB7;
+  --violet-bg:#EEEDFE;
+  --violet-line:#CECBF6;
+  --violet-dp:#3C3489;
+  --red:#A32D2D;
+  --red-bg:#FCEBEB;
+  --red-line:#F7C1C1;
+  --warn:#854F0B;
+  --warn-bg:#FAEEDA;
+  --safe:#0F6E56;
+  --safe-bg:#E1F5EE;
+  --radius:14px;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  padding:36px 20px 72px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- hero ---------- */
+.hero{
+  background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);padding:36px 36px 30px;
+  position:relative;overflow:hidden;
+}
+.hero::before{content:"";position:absolute;left:0;top:0;height:50%;width:5px;background:var(--violet)}
+.hero::after{content:"";position:absolute;left:0;top:50%;bottom:0;width:5px;background:var(--red)}
+.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--ink3);text-transform:uppercase;font-weight:600;margin-bottom:14px}
+h1{font-size:34px;line-height:1.25;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+h1 .and{color:var(--ink3);font-weight:400;font-size:24px;padding:0 6px}
+.lede{font-size:15.5px;color:var(--ink2);max-width:660px}
+.lede strong{color:var(--ink);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}
+.stat{background:var(--bg);border-radius:10px;padding:14px 16px}
+.stat .k{font-size:12px;color:var(--ink3);margin-bottom:4px}
+.stat .v{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.stat .v small{font-size:12px;font-weight:400;color:var(--ink2);margin-left:3px}
+
+/* ---------- section ---------- */
+.sec-title{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:2px;flex-wrap:wrap}
+.sec-title .idx{font-size:12px;font-weight:600;color:var(--paper);background:var(--ink);border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+.sec-title h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.sec-title .hint{font-size:12.5px;color:var(--ink3);margin-left:auto}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px}
+.card + .card{margin-top:16px}
+
+.def{
+  font-size:14.5px;color:var(--ink2);padding:16px 20px;border-radius:10px;
+  background:var(--violet-bg);border-left:3px solid var(--violet);margin-bottom:22px;
+}
+.def.red{background:var(--red-bg);border-left-color:var(--red)}
+.def b{color:var(--ink);font-weight:600}
+.def .hl{color:var(--violet-dp);font-weight:600}
+.def.red .hl{color:#7C2218;font-weight:600}
+
+/* ---------- svg figure ---------- */
+.fig{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 20px 16px}
+.figcap{font-size:12.5px;color:var(--ink3);padding:0 8px 4px;text-align:center}
+
+/* ---------- causes ---------- */
+.causes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.cause{border:1px solid var(--line);border-radius:11px;padding:16px 18px}
+.cause .n{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.1em;margin-bottom:7px}
+.cause h4{font-size:13.5px;font-weight:600;margin-bottom:5px}
+.cause p{font-size:12.5px;color:var(--ink2);line-height:1.65}
+
+/* ---------- calculator ---------- */
+.slider-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+.slider-head .t{font-size:13.5px;color:var(--ink2)}
+.slider-head .lv{font-size:26px;font-weight:600;color:var(--violet);letter-spacing:-.02em}
+.slider-head .lv small{font-size:13px;font-weight:400;color:var(--ink3);margin-left:2px}
+input[type=range]{width:100%;accent-color:var(--violet);height:26px;cursor:pointer;background:transparent}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-top:-4px}
+.out{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0 18px}
+.out .cell{background:var(--bg);border-radius:10px;padding:13px 15px}
+.out .cell .k{font-size:12px;color:var(--ink3);margin-bottom:3px}
+.out .cell .v{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.out .cell .v small{font-size:11.5px;font-weight:400;color:var(--ink2);margin-left:2px}
+.bar{height:10px;background:var(--bg);border-radius:99px;overflow:hidden;margin-bottom:10px}
+.bar i{display:block;height:100%;width:50%;border-radius:99px;transition:width .18s ease,background .18s ease}
+.verdict{font-size:13px;padding:12px 15px;border-radius:10px;border-left:3px solid var(--line);background:var(--bg);color:var(--ink2)}
+.verdict.safe{border-left-color:var(--safe);color:#0B5544}
+.verdict.warn{border-left-color:var(--warn);color:#6E4008}
+.verdict.risk{border-left-color:var(--red);color:#8C2A21}
+.note{font-size:11.5px;color:var(--ink3);margin-top:12px}
+
+/* ---------- case ---------- */
+.case{
+  background:#FCFBF9;border:1px solid var(--line);border-left:3px solid var(--red);
+  border-radius:11px;padding:18px 22px;margin-top:20px;
+}
+.case .tag{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--red);margin-bottom:8px}
+.case h4{font-size:14px;font-weight:600;margin-bottom:8px}
+.case p{font-size:13px;color:var(--ink2)}
+.case .kpis{display:flex;gap:22px;margin-top:14px;flex-wrap:wrap}
+.case .kpi .k{font-size:11.5px;color:var(--ink3)}
+.case .kpi .v{font-size:16px;font-weight:600;color:var(--red);letter-spacing:-.01em}
+
+/* ---------- waterfall ---------- */
+.falls{display:flex;flex-direction:column;gap:0}
+.fall{
+  display:flex;gap:18px;align-items:flex-start;
+  padding:20px 22px;border:1px solid var(--line);border-radius:11px;
+  background:var(--paper);
+}
+.fall .lvl{
+  flex-shrink:0;width:64px;height:64px;border-radius:11px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:600;letter-spacing:.04em;
+}
+.fall .lvl b{font-size:19px;font-weight:600;line-height:1.15}
+.fall.l1 .lvl{background:var(--safe-bg);color:var(--safe)}
+.fall.l2 .lvl{background:var(--warn-bg);color:var(--warn)}
+.fall.l3 .lvl{background:var(--red-bg);color:var(--red)}
+.fall .body{flex:1;min-width:0}
+.fall .body h4{font-size:14.5px;font-weight:600;margin-bottom:5px}
+.fall .body p{font-size:13px;color:var(--ink2)}
+.fall .body p b{color:var(--ink);font-weight:600}
+.fall .body .meta{font-size:11.5px;color:var(--ink3);margin-top:7px}
+.connector{display:flex;justify-content:center;padding:2px 0}
+.connector span{width:2px;height:20px;background:var(--line)}
+
+/* ---------- adl ---------- */
+.adl-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;margin-top:4px}
+.formula{
+  background:var(--bg);border-radius:11px;padding:18px 20px;
+}
+.formula .lb{font-size:12px;color:var(--ink3);margin-bottom:6px}
+.formula .eq{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:14px}
+.formula .eq.pos{color:var(--red)}
+.formula .eq.neg{color:var(--safe)}
+.formula .exp{font-size:12.5px;color:var(--ink2);padding-top:14px;border-top:1px dashed var(--line)}
+.formula .exp b{color:var(--ink)}
+
+.ladder{display:flex;flex-direction:column;gap:8px}
+.rung{display:flex;align-items:center;gap:10px;font-size:12.5px}
+.rung .lights{display:flex;gap:3px;flex-shrink:0;width:88px}
+.rung .lights i{width:14px;height:14px;border-radius:3px;background:#EFEDE7}
+.rung .lights i.on{background:var(--c)}
+.rung .txt{color:var(--ink2)}
+.rung .txt b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.rung .pct{color:var(--ink3);font-size:11.5px;margin-left:auto;white-space:nowrap}
+
+/* ---------- guards ---------- */
+.guards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.guard{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+.guard .n{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.1em;margin-bottom:8px}
+.guard h4{font-size:14px;font-weight:600;margin-bottom:7px}
+.guard p{font-size:13px;color:var(--ink2)}
+
+/* ---------- compare ---------- */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cmp .c{border-radius:var(--radius);padding:24px 26px;border:1px solid var(--line);background:var(--paper);border-top:3px solid var(--line)}
+.cmp .c.a{border-top-color:var(--violet)}
+.cmp .c.b{border-top-color:var(--red)}
+.cmp h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.cmp .c.a h3{color:var(--violet-dp)}
+.cmp .c.b h3{color:var(--red)}
+.cmp .sub{font-size:12.5px;color:var(--ink3);margin-bottom:14px}
+.cmp p{font-size:13.5px;color:var(--ink2)}
+.cmp p + p{margin-top:10px}
+.cmp p b{color:var(--ink);font-weight:600}
+
+/* ---------- footer ---------- */
+footer{
+  border:1px solid #EBD9C6;background:#FDF6EC;border-radius:var(--radius);
+  padding:20px 24px;font-size:12.5px;color:#7A5A32;line-height:1.75;
+}
+footer b{color:#5C3F1B}
+footer .src{margin-top:12px;padding-top:12px;border-top:1px dashed #EBD9C6;font-size:11.5px;color:#9C8462}
+
+@media (max-width:760px){
+  body{padding:20px 12px 48px}
+  h1{font-size:26px}
+  .hero{padding:26px 22px 24px}
+  .stats,.causes,.out,.adl-grid,.guards,.cmp{grid-template-columns:1fr}
+  .out{grid-template-columns:1fr 1fr}
+  .card,.fig{padding:20px 16px}
+  .fall{padding:16px;gap:12px}
+  .fall .lvl{width:52px;height:52px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Crypto 101 · 风险机制</div>
+    <h1>滑点 <span class="and">与</span> 穿仓</h1>
+    <p class="lede">合约里最容易被忽略的两把刀：<strong>滑点悄悄多收你的钱</strong>，每天都在发生；<strong>穿仓让你亏得比保证金还多</strong>，极少发生，但一旦发生就无法挽回。</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="k">正常时段的滑点</div>
+        <div class="v num">&lt;0.1<small>%</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">清算防线层级</div>
+        <div class="v num">3<small>级瀑布</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">2025 年 10 月清算规模</div>
+        <div class="v num">190<small>亿美元起</small></div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">01</span>
+      <h2>滑点：从「想成交的价」到「实际成交的价」</h2>
+    </div>
+    <div class="card" style="padding-bottom:22px">
+      <div class="def">
+        <b>滑点（Slippage）</b>＝ 你预期的成交价 与 实际成交价 之间的差距。它不会出现在你的交易账单上，但每一次市价成交都在扣你的钱。<span class="hl">它偷的是成本，不是本金。</span>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 680 350" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+          <title>市价买单吃掉多档挂单产生滑点</title>
+          <desc>订单簿前四档挂单被市价买单逐层吃掉，成交均价从预期的 100.00 被推高到 100.28，产生约 0.28% 的滑点。</desc>
+
+          <rect x="104" y="130" width="250" height="150" fill="#EEEDFE"/>
+
+          <line x1="40" y1="280" x2="640" y2="280" stroke="#E7E5DF" stroke-width="0.5"/>
+
+          <rect x="60" y="250" width="88" height="30" fill="#7F77DD"/>
+          <rect x="160" y="232" width="88" height="48" fill="#7F77DD"/>
+          <rect x="260" y="214" width="88" height="66" fill="#7F77DD"/>
+          <rect x="360" y="196" width="88" height="84" fill="#7F77DD"/>
+          <rect x="460" y="178" width="88" height="102" fill="#CECBF6"/>
+
+          <line x1="104" y1="136" x2="104" y2="300" stroke="#888780" stroke-width="0.5" stroke-dasharray="3 3"/>
+          <line x1="354" y1="112" x2="354" y2="300" stroke="#A32D2D" stroke-width="0.5" stroke-dasharray="3 3"/>
+
+          <text x="104" y="124" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5C5C57">预期成交价 100.00</text>
+          <text x="354" y="100" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#A32D2D">实际成交均价 100.28</text>
+          <text x="229" y="160" text-anchor="middle" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="500" fill="#3C3489">滑点 ≈ 0.28%</text>
+
+          <text x="104" y="298" text-anchor="middle" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#8E8E87">100.00</text>
+          <text x="204" y="298" text-anchor="middle" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#8E8E87">100.10</text>
+          <text x="304" y="298" text-anchor="middle" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#8E8E87">100.20</text>
+          <text x="404" y="298" text-anchor="middle" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#8E8E87">100.30</text>
+          <text x="504" y="298" text-anchor="middle" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#8E8E87">100.40</text>
+
+          <text x="340" y="330" text-anchor="middle" font-family="system-ui,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#8E8E87">深色档位：已被你的市价单吃掉　　浅色档位：剩余挂单</text>
+        </svg>
+        <div class="figcap">订单簿不是无限的：一张大额市价单，必须一层层吃掉挂单，成交均价自然被推高。</div>
+      </div>
+
+      <div class="causes">
+        <div class="cause">
+          <div class="n">CAUSE 01</div>
+          <h4>订单簿有深度，但不是无限</h4>
+          <p>每一档挂单都有限额。你的单子越大，需要吃掉的档位越多，成交均价偏离最优价就越远 —— 这就是「冲击成本」。</p>
+        </div>
+        <div class="cause">
+          <div class="n">CAUSE 02</div>
+          <h4>价格在你点击之后还在跑</h4>
+          <p>从下单到撮合之间有一段极短的时间，行情可能在那一刻跳走。行情越剧烈，这段「时间差」越贵。</p>
+        </div>
+        <div class="cause">
+          <div class="n">CAUSE 03</div>
+          <h4>流动性越差，滑点越夸张</h4>
+          <p>小市值币种、亚洲凌晨时段、极端行情里，盘口可能只有几千 USDT 的深度，此时任何稍大的单子都在裸奔。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">02</span>
+      <h2>滑点到底有多贵</h2>
+      <span class="hint">本金 10,000 USDT · 名义头寸 100,000 USDT</span>
+    </div>
+    <div class="card">
+      <div class="slider-head">
+        <span class="t">成交滑点</span>
+        <span class="lv num"><span id="slOut">0.50</span><small>%</small></span>
+      </div>
+      <input type="range" id="slip" min="1" max="500" step="1" value="50" aria-label="滑点百分比">
+      <div class="scale"><span>0.01%</span><span>1%</span><span>2%</span><span>3%</span><span>4%</span><span>5%</span></div>
+
+      <div class="out">
+        <div class="cell">
+          <div class="k">滑点造成的损失</div>
+          <div class="v num"><span id="costOut">500</span><small>USDT</small></div>
+        </div>
+        <div class="cell">
+          <div class="k">占你的保证金</div>
+          <div class="v num"><span id="pctOut">5.0</span><small>%</small></div>
+        </div>
+        <div class="cell">
+          <div class="k">等效于多付手续费</div>
+          <div class="v num">×<span id="feeOut">50</span></div>
+        </div>
+      </div>
+
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="verdict" id="verdict"></div>
+      <p class="note">说明：滑点直接侵蚀保证金，而杠杆会把它同比放大 —— 1% 的滑点在 10 倍杠杆下，等于本金的 10%。上表按单边成交估算；开仓加平仓各滑一次，实际成本接近翻倍。等效手续费按 0.01% 的基准粗略换算。</p>
+
+      <div class="case">
+        <div class="tag">真实案例 · 2025 年 10 月 10 日</div>
+        <h4>35 分钟里，订单簿被抽空了 98%</h4>
+        <p>做市商在极端行情中集体撤离，被追踪代币的市场深度骤降至 2.7 万美元，较事件前下降约 98%。流动性消失后，部分山寨币跌幅达到约 80%，强平单在几乎没有对手盘的市场里以极差的价格成交 —— 这正是滑点与穿仓同时爆发的教科书场景。</p>
+        <div class="kpis">
+          <div class="kpi"><div class="k">市场深度降幅</div><div class="v num">约 98%</div></div>
+          <div class="kpi"><div class="k">全球清算规模</div><div class="v num">190 亿美元起</div></div>
+          <div class="kpi"><div class="k">部分山寨币跌幅</div><div class="v num">约 80%</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">03</span>
+      <h2>穿仓：亏损超过了你的保证金</h2>
+    </div>
+    <div class="card">
+      <div class="def red">
+        <b>爆仓</b>是保证金归零，本金没了。<b>穿仓</b>是爆仓之后亏损仍然超过了保证金，账户权益变成负数 —— 在极端行情下，你的强平单可能根本卖不掉，或者只能卖在远差于预期的价格上。<span class="hl">比爆仓更狠：本金归零之后还欠钱。</span>
+      </div>
+
+      <div class="falls">
+        <div class="fall l1">
+          <div class="lvl"><b>01</b>正常</div>
+          <div class="body">
+            <h4>订单簿强平</h4>
+            <p>仓位跌破维持保证金要求，系统通过订单簿把它市价平掉。如果平仓价优于破产价（即保证金刚好归零的价格），<b>多出来的钱会注入保险基金</b>。</p>
+            <div class="meta">绝大多数强平都终止在这一层</div>
+          </div>
+        </div>
+        <div class="connector"><span></span></div>
+        <div class="fall l2">
+          <div class="lvl"><b>02</b>兜底</div>
+          <div class="body">
+            <h4>保险基金</h4>
+            <p>当订单簿流动性不足、强平将产生坏账时，<b>保险基金吸收这笔损失</b>。这笔钱来自正常强平的盈余和平台投入，每个合约通常有独立的基金池。</p>
+            <div class="meta">到这里，穿仓的洞还是平台在补</div>
+          </div>
+        </div>
+        <div class="connector"><span></span></div>
+        <div class="fall l3">
+          <div class="lvl"><b>03</b>最后</div>
+          <div class="body">
+            <h4>自动减仓 ADL</h4>
+            <p>保险基金也撑不住时，系统会<b>强制平掉对手方的盈利仓位</b>来吸收损失。这就是「自动减仓」（Auto-Deleveraging），翻译成人话：<b>别人替你买单，代价由赚了钱的那一方承担。</b></p>
+            <div class="meta">触发条件：账户已破产 + 强平价极差 + 保险基金耗尽</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">04</span>
+      <h2>ADL：做对了方向也可能被平掉</h2>
+      <span class="hint">这是整张卡里最反直觉的一条</span>
+    </div>
+    <div class="card">
+      <p style="font-size:13.5px;color:var(--ink2);margin-bottom:22px">当 ADL 被触发，平台会把所有反向的盈利仓位排成一队，从分数最高的开始减仓。分数越高，越先被强制平仓。</p>
+
+      <div class="adl-grid">
+        <div>
+          <div class="formula">
+            <div class="lb">盈利头寸的排队分数</div>
+            <div class="eq pos">ADE 分数 ＝ 盈利百分比 × 有效杠杆</div>
+            <div class="exp">
+              盈利 <b>50%</b> 配上 <b>20 倍</b>杠杆 ＝ <b>1,000 分</b>；<br>
+              盈利 <b>20%</b> 配上 <b>10 倍</b>杠杆 ＝ <b>200 分</b>。<br>
+              第一个先被减仓。
+            </div>
+          </div>
+          <div class="formula" style="margin-top:14px">
+            <div class="lb">亏损头寸的排队分数</div>
+            <div class="eq neg">ADE 分数 ＝ 盈利百分比 ÷ 有效杠杆</div>
+            <div class="exp">亏损仓位也可能被选中，但<b>优先级低得多</b>。</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="ladder">
+            <div class="rung" style="--c:#3B6D11">
+              <div class="lights"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+              <span class="txt">低风险</span><span class="pct">队列后 80%</span>
+            </div>
+            <div class="rung" style="--c:#639922">
+              <div class="lights"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+              <span class="txt">中等</span><span class="pct">60% – 80%</span>
+            </div>
+            <div class="rung" style="--c:#BA7517">
+              <div class="lights"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+              <span class="txt"><b>较高</b></span><span class="pct">40% – 60%</span>
+            </div>
+            <div class="rung" style="--c:#D85A30">
+              <div class="lights"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+              <span class="txt"><b>高</b></span><span class="pct">20% – 40%</span>
+            </div>
+            <div class="rung" style="--c:#A32D2D">
+              <div class="lights"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+              <span class="txt"><b>最高</b></span><span class="pct">前 20%</span>
+            </div>
+          </div>
+          <p class="note" style="margin-top:16px">交易界面里通常有一个 ADL 指示灯，就在仓位详情附近，灯亮得越多，你在减仓队列里的位置越靠前。多数人从没点开看过。</p>
+        </div>
+      </div>
+
+      <div class="case" style="border-left-color:var(--violet)">
+        <div class="tag" style="color:var(--violet)">残酷的讽刺</div>
+        <p style="font-size:13.5px;color:var(--ink2)">盈利能力最强的交易者，往往也是杠杆用最高的人 —— 于是他们排在了 ADL 队列的最前面。<b style="color:var(--ink)">做对了方向、账面上正浮盈，却因为没有对手盘而被迫平仓，并且丧失后续的全部上涨空间。</b>控制杠杆不只是为了不爆仓，也是为了不成为这张名单上的那一个。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">05</span>
+      <h2>七道护栏</h2>
+    </div>
+    <div class="guards">
+      <div class="guard">
+        <div class="n">GUARD 01</div>
+        <h4>能用限价单就别用市价单</h4>
+        <p>限价单的最差结果是不成交，市价单的最差结果是没有下限。必须立刻成交时，开启平台的滑点保护/价格保护功能，给成交价设一道天花板。</p>
+      </div>
+      <div class="guard">
+        <div class="n">GUARD 02</div>
+        <h4>大单拆开打</h4>
+        <p>TWAP、冰山委托这类工具存在的唯一理由就是把冲击成本摊平。一笔大单砸下去和拆成二十笔慢慢喂，成交均价能差出一截。</p>
+      </div>
+      <div class="guard">
+        <div class="n">GUARD 03</div>
+        <h4>挑流动性和时段</h4>
+        <p>优先主流币种。避开资金费率结算前后、重大数据发布、以及亚洲凌晨的低流动性时段。深度只有几千 U 的标的，别去下五位数的单。</p>
+      </div>
+      <div class="guard">
+        <div class="n">GUARD 04</div>
+        <h4>优先用逐仓</h4>
+        <p>逐仓把最大亏损锁死在这一个仓位的保证金里；全仓模式下，一笔穿仓的仓位会把整个账户的余额一起卷走。</p>
+      </div>
+      <div class="guard">
+        <div class="n">GUARD 05</div>
+        <h4>降杠杆</h4>
+        <p>这是唯一能同时压缩爆仓距离、缓解滑点伤害、并降低 ADL 排队优先级的一个动作。没有别的操作有这种三重效果。</p>
+      </div>
+      <div class="guard">
+        <div class="n">GUARD 06</div>
+        <h4>下单前扫一眼盘口</h4>
+        <p>看看订单簿深度、标记价格与强平价的距离、以及 ADL 指示灯。这三个数字花你十秒，能省下的可能是全部本金。</p>
+      </div>
+      <div class="guard">
+        <div class="n">GUARD 07</div>
+        <h4>瀑布行情里不交易</h4>
+        <p>极端行情下，最好的仓位管理是不开仓。流动性消失时，任何方向都可能被滑点和 ADL 同时收割 —— 包括你看对的那一次。</p>
+      </div>
+      <div class="guard" style="background:var(--red-bg);border-color:var(--red-line)">
+        <div class="n" style="color:var(--red)">REMEMBER</div>
+        <h4>滑点是成本，穿仓是终局</h4>
+        <p>滑点你无法完全避免，只能压低；穿仓你可以通过杠杆和保证金模式的选择，把它挡在门外。别把这两件事的应对方式搞反了。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">06</span>
+      <h2>一句话区分</h2>
+    </div>
+    <div class="cmp">
+      <div class="c a">
+        <h3>滑点 · 慢性病</h3>
+        <div class="sub">每次交易都在发生</div>
+        <p>单次伤害小，累积起来惊人。它偷的是你的<b>成本</b>，你甚至不会在账单上看到它。</p>
+        <p>应对方式：限价单、拆单、选流动性好的标的。<b>目标是压低，不是消除。</b></p>
+      </div>
+      <div class="c b">
+        <h3>穿仓 · 急性病</h3>
+        <div class="sub">极少发生，但无法挽回</div>
+        <p>一旦发生就是账户归零加欠账，还会连带触发保险基金和 ADL，把风险传导给完全无关的盈利方。它偷的是你的<b>本金</b>，甚至更多。</p>
+        <p>应对方式：低杠杆、逐仓、留足保证金。<b>目标是让它不可能发生。</b></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>合规提示：</b>在中国内地，虚拟货币相关业务活动属于非法金融活动，交易合同不受法律保护，交易平台亦不在境内监管范围内。本卡片仅为交易机制层面的知识梳理，不构成任何投资建议。合约交易存在本金全部损失的风险，极端行情下还可能产生超出保证金的亏损。
+    <div class="src">制表时间：2026-10-03 · 案例数据来自公开报道（2025 年 10 月清算事件）· 强平、保险基金与 ADL 的具体触发阈值和公式以平台最新规则为准。</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var slip = document.getElementById('slip');
+  var slOut = document.getElementById('slOut');
+  var costOut = document.getElementById('costOut');
+  var pctOut = document.getElementById('pctOut');
+  var feeOut = document.getElementById('feeOut');
+  var barFill = document.getElementById('barFill');
+  var verdict = document.getElementById('verdict');
+
+  var NOTIONAL = 100000;
+  var MARGIN = 10000;
+  var BASE_FEE = 0.0001;
+
+  var LOG_MIN = Math.log(0.01);
+  var LOG_MAX = Math.log(5);
+
+  function fmt(n){
+    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function render(){
+    var p = Number(slip.value) / 100;
+    var cost = NOTIONAL * p / 100;
+    var pct = cost / MARGIN * 100;
+    var mult = (p / 100) / BASE_FEE;
+
+    slOut.textContent = p.toFixed(2);
+    costOut.textContent = fmt(cost);
+    pctOut.textContent = pct < 1 ? pct.toFixed(2) : pct.toFixed(1);
+    feeOut.textContent = fmt(mult);
+
+    var ratio = (Math.log(Math.min(Math.max(p, 0.01), 5)) - LOG_MIN) / (LOG_MAX - LOG_MIN);
+    var width = Math.max(3, Math.min(100, ratio * 100));
+
+    var color, cls, text;
+    if (p < 0.1){
+      color = '#0F6E56'; cls = 'safe';
+      text = '正常水平。主流币种在常规时段的普通订单，基本都在这个量级以内 —— 但它在持续发生，一天来回几次也够买杯咖啡了。';
+    } else if (p < 1){
+      color = '#BA7517'; cls = 'warn';
+      text = '开始疼了。这通常出现在中小市值币种、或行情开始活跃的时段。注意：这只是单边的滑点，开仓一次平仓一次，成本按两倍算。';
+    } else {
+      color = '#A32D2D'; cls = 'risk';
+      text = '这不是成本，这是事故。到这个量级说明订单簿已经被抽空或价格正在跳空 —— 此刻成交本身就是风险，强平单会在同样的环境里被以更差的价格抛出去。';
+    }
+
+    barFill.style.width = width + '%';
+    barFill.style.background = color;
+    verdict.className = 'verdict ' + cls;
+    verdict.textContent = text;
+  }
+
+  slip.addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>
