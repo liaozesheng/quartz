@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>比特币减半 · 知识卡</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F5F1;
+  --paper:#FFFFFF;
+  --ink:#1D1D1B;
+  --ink2:#5C5C57;
+  --ink3:#8E8E87;
+  --line:#E7E5DF;
+  --blue:#185FA5;
+  --blue-bg:#E6F1FB;
+  --blue-line:#B5D4F4;
+  --teal:#0F6E56;
+  --teal-bg:#E1F5EE;
+  --teal-line:#9FE1CB;
+  --amber:#854F0B;
+  --amber-bg:#FAEEDA;
+  --amber-line:#FAC775;
+  --up:#C0392B;
+  --up-bg:#FCEBEB;
+  --down:#2E7D4F;
+  --down-bg:#E8F5EC;
+  --radius:14px;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  padding:36px 20px 72px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- hero ---------- */
+.hero{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:36px 36px 30px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;left:0;top:0;height:50%;width:5px;background:var(--blue);
+}
+.hero::after{
+  content:"";position:absolute;left:0;top:50%;bottom:0;width:5px;background:var(--amber);
+}
+.eyebrow{
+  font-size:11px;letter-spacing:.18em;color:var(--ink3);
+  text-transform:uppercase;font-weight:600;margin-bottom:14px;
+}
+h1{font-size:34px;line-height:1.25;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+h1 .sub{color:var(--ink3);font-weight:400;font-size:20px;padding:0 4px}
+.lede{font-size:15.5px;color:var(--ink2);max-width:660px}
+.lede strong{color:var(--ink);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+.stat{background:var(--bg);border-radius:10px;padding:14px 16px}
+.stat .k{font-size:12px;color:var(--ink3);margin-bottom:4px}
+.stat .v{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.stat .v small{font-size:12px;font-weight:400;color:var(--ink2);margin-left:3px}
+.stat.hi{background:var(--blue-bg)}
+.stat.hi .k{color:#4A7EB5}
+.stat.hi .v{color:var(--blue)}
+.hero-bar{margin-top:22px}
+.hero-bar .lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--ink3);margin-bottom:7px}
+.bar{height:8px;background:var(--bg);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--blue);transition:width .18s ease,background .18s ease}
+
+/* ---------- section ---------- */
+.sec-title{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:2px}
+.sec-title .idx{
+  font-size:12px;font-weight:600;color:var(--paper);
+  background:var(--ink);border-radius:6px;padding:2px 8px;letter-spacing:.04em;
+}
+.sec-title h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.sec-title .hint{font-size:12.5px;color:var(--ink3);margin-left:auto}
+
+/* ---------- chart ---------- */
+.chart-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px 18px}
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--ink3);padding:0 6px 2px}
+.chart-legend span{display:flex;align-items:center;gap:6px}
+.chart-legend i{width:12px;height:12px;border-radius:3px;display:block}
+.chart-note{font-size:12.5px;color:var(--ink2);border-top:1px dashed var(--line);margin-top:12px;padding-top:14px}
+.chart-note b{color:var(--ink);font-weight:600}
+
+/* ---------- table ---------- */
+.tbl-wrap{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{
+  text-align:left;font-size:12.5px;font-weight:600;color:var(--ink3);
+  padding:14px 18px;background:var(--bg);border-bottom:1px solid var(--line);letter-spacing:.02em;
+}
+tbody td{padding:13px 18px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+tbody tr:last-child td{border-bottom:none}
+tbody td:first-child{color:var(--ink3);font-size:12.5px;white-space:nowrap;width:80px}
+tbody tr:nth-child(even){background:#FCFBF9}
+tbody tr.now td{background:var(--blue-bg)}
+tbody tr.now td:first-child{color:#4A7EB5}
+tbody tr.future td{background:#FCFBF9;color:var(--ink3)}
+td b{color:var(--ink);font-weight:600}
+.rew{font-weight:600;color:var(--ink);white-space:nowrap}
+.rew.main{color:var(--blue)}
+.rew.half{color:var(--ink3)}
+
+/* ---------- interactive ---------- */
+.calc{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px}
+.slider-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;gap:16px}
+.slider-head .t{font-size:13.5px;color:var(--ink2)}
+.slider-head .lv{font-size:26px;font-weight:600;color:var(--blue);letter-spacing:-.02em;white-space:nowrap}
+.slider-head .lv small{font-size:13px;font-weight:400;color:var(--ink3);margin-left:2px}
+input[type=range]{width:100%;accent-color:var(--blue);height:26px;cursor:pointer;background:transparent}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-top:-4px}
+.out{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 18px}
+.out .cell{background:var(--bg);border-radius:10px;padding:13px 15px}
+.out .cell .k{font-size:12px;color:var(--ink3);margin-bottom:3px}
+.out .cell .v{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.out .cell .v small{font-size:11.5px;font-weight:400;color:var(--ink2);margin-left:2px}
+.out .cell.hi{background:var(--blue-bg)}
+.out .cell.hi .k{color:#4A7EB5}
+.out .cell.hi .v{color:var(--blue)}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.presets button{
+  font:inherit;font-size:12.5px;color:var(--ink2);background:var(--bg);
+  border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.presets button:hover{border-color:var(--ink3);color:var(--ink)}
+.presets button.on{background:var(--blue-bg);border-color:var(--blue-line);color:var(--blue);font-weight:600}
+.note{font-size:11.5px;color:var(--ink3);margin-top:12px}
+
+/* ---------- price cycles ---------- */
+.cyc{display:flex;flex-direction:column;gap:12px}
+.cyc-row{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 22px;display:grid;grid-template-columns:170px 1fr 150px;gap:20px;align-items:center;
+}
+.cyc-row .when{font-size:12.5px;color:var(--ink3);line-height:1.5}
+.cyc-row .when b{display:block;font-size:14px;color:var(--ink);font-weight:600;font-size:14.5px;margin-bottom:2px}
+.cyc-row .mid .rng{font-size:13px;color:var(--ink2);margin-bottom:8px}
+.cyc-row .mid .rng b{color:var(--ink);font-weight:600}
+.cyc-row .track{height:9px;background:var(--bg);border-radius:99px;overflow:hidden}
+.cyc-row .track i{display:block;height:100%;border-radius:99px;background:var(--up);opacity:.72}
+.cyc-row .mult{text-align:right;font-size:24px;font-weight:600;color:var(--up);letter-spacing:-.02em}
+.cyc-row .mult small{display:block;font-size:11.5px;font-weight:400;color:var(--ink3);letter-spacing:0;margin-top:2px}
+
+/* ---------- pitfalls ---------- */
+.pits{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pit{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+.pit .n{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.1em;margin-bottom:8px}
+.pit h4{font-size:14px;font-weight:600;margin-bottom:7px;color:var(--ink)}
+.pit p{font-size:13px;color:var(--ink2)}
+.pit p b{color:var(--ink);font-weight:600}
+
+/* ---------- cards ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col{
+  background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);padding:24px;border-top:3px solid transparent;
+}
+.col.blue{border-top-color:var(--blue)}
+.col.amber{border-top-color:var(--amber)}
+.col h3{font-size:16px;font-weight:600;margin-bottom:2px}
+.col.blue h3{color:var(--blue)}
+.col.amber h3{color:var(--amber)}
+.col .sub{font-size:12.5px;color:var(--ink3);margin-bottom:16px}
+.row{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);font-size:13.5px}
+.row:first-of-type{border-top:none}
+.row .lab{color:var(--ink3);min-width:60px;flex-shrink:0;font-size:12.5px;padding-top:1px}
+.row .val{color:var(--ink2)}
+.row .val b{color:var(--ink);font-weight:600}
+.formula{
+  background:var(--bg);border-radius:10px;padding:14px 16px;margin-top:6px;
+  font-size:13px;color:var(--ink2);line-height:1.9;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+.formula b{color:var(--blue);font-weight:600}
+.warnbox{
+  margin-top:15px;padding:12px 15px;border-radius:9px;font-size:12.5px;
+  background:var(--up-bg);color:#8C2A21;border-left:3px solid var(--up);
+}
+.warnbox b{font-weight:600}
+
+/* ---------- endgame ---------- */
+.endgame{background:#1D1D1B;color:#EDECE7;border-radius:var(--radius);padding:30px 32px}
+.endgame .tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8E8E87;font-weight:600;margin-bottom:12px}
+.endgame h3{font-size:19px;font-weight:600;margin-bottom:12px;letter-spacing:-.01em;color:#fff}
+.endgame p{font-size:14px;color:#B9B8B2;max-width:700px}
+.endgame p+p{margin-top:10px}
+.endgame b{color:#fff;font-weight:600}
+.endgame .hl{color:#85B7EB;font-weight:600}
+
+/* ---------- footer ---------- */
+footer{
+  border:1px solid #EBD9C6;background:#FDF6EC;border-radius:var(--radius);
+  padding:20px 24px;font-size:12.5px;color:#7A5A32;line-height:1.75;
+}
+footer b{color:#5C3F1B}
+footer .src{margin-top:12px;padding-top:12px;border-top:1px dashed #EBD9C6;font-size:11.5px;color:#9C8462}
+
+@media (max-width:760px){
+  body{padding:20px 12px 48px}
+  h1{font-size:26px}
+  h1 .sub{font-size:16px}
+  .hero{padding:26px 22px 24px}
+  .stats,.cols,.pits{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .out{grid-template-columns:1fr 1fr}
+  .cyc-row{grid-template-columns:1fr;gap:12px}
+  .cyc-row .mult{text-align:left}
+  thead th,tbody td{padding:11px 13px}
+  tbody td:first-child{width:auto}
+  .calc{padding:20px 18px}
+  .slider-head{flex-direction:column;gap:2px}
+  .endgame{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Bitcoin Halving · 机制科普</div>
+    <h1>比特币减半<span class="sub">·</span>把通胀写进代码</h1>
+    <p class="lede">
+      每挖出 <strong>210,000 个区块</strong>，矿工能拿到的新币补贴就减半一次。这条规则从 2009 年第一条链跑到现在，<strong>一个字都没改过</strong>。它是比特币身上唯一能被数学证明的叙事，也是被过度解读得最厉害的地方。
+    </p>
+    <div class="stats">
+      <div class="stat hi">
+        <div class="k">当前区块奖励</div>
+        <div class="v num">3.125<small>BTC</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">当前区块高度</div>
+        <div class="v num">969,650</div>
+      </div>
+      <div class="stat">
+        <div class="k">距下次减半</div>
+        <div class="v num">80,350<small>块</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">年化通胀率</div>
+        <div class="v num">0.82<small>%</small></div>
+      </div>
+    </div>
+    <div class="hero-bar">
+      <div class="lbl"><span>第 5 轮周期进度（区块 840,000 → 1,050,000）</span><span class="num">61.7%　·　预计 2028 年 4 月 13 日前后</span></div>
+      <div class="bar"><i style="width:61.7%"></i></div>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">01</span>
+      <h2>减产阶梯：15 年，从 50 枚跌到 3.125 枚</h2>
+      <span class="hint">纵轴为对数刻度，每一级等高</span>
+    </div>
+    <div class="chart-card">
+      <svg viewBox="0 0 872 340" width="100%" role="img" aria-labelledby="stT stD" style="display:block">
+        <title id="stT">比特币各减产周期的区块奖励阶梯</title>
+        <desc id="stD">区块奖励自 2009 年的 50 BTC 起逐次减半，当前第 5 轮为 3.125 BTC，2028 年后降至 1.5625 BTC。</desc>
+        <rect x="558" y="84" width="110" height="222" rx="10" fill="rgba(24,95,165,.07)"/>
+        <line x1="60" y1="250" x2="812" y2="250" stroke="#D9D7D0" stroke-width="1"/>
+        <rect x="98"  y="92"  width="86" height="158" rx="4" fill="#B4B2A9"/>
+        <rect x="216" y="120" width="86" height="130" rx="4" fill="#B4B2A9"/>
+        <rect x="334" y="148" width="86" height="102" rx="4" fill="#B4B2A9"/>
+        <rect x="452" y="176" width="86" height="74"  rx="4" fill="#B4B2A9"/>
+        <rect x="570" y="204" width="86" height="46"  rx="4" fill="#85B7EB" stroke="#185FA5" stroke-width="1"/>
+        <rect x="688" y="232" width="86" height="18"  rx="4" fill="none" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="5 4"/>
+        <g font-size="13" fill="#5C5C57" text-anchor="middle">
+          <text x="141" y="82">50 BTC</text>
+          <text x="259" y="110">25</text>
+          <text x="377" y="138">12.5</text>
+          <text x="495" y="166">6.25</text>
+          <text x="731" y="222">1.5625</text>
+        </g>
+        <text x="613" y="194" font-size="13.5" font-weight="600" fill="#185FA5" text-anchor="middle">3.125 BTC</text>
+        <g font-size="12.5" fill="#8E8E87" text-anchor="middle">
+          <text x="141" y="274">2009–2012</text>
+          <text x="259" y="274">2012–2016</text>
+          <text x="377" y="274">2016–2020</text>
+          <text x="495" y="274">2020–2024</text>
+          <text x="731" y="274">2028–2032</text>
+        </g>
+        <text x="613" y="274" font-size="12.5" font-weight="600" fill="#185FA5" text-anchor="middle">2024–2028</text>
+        <g font-size="11.5" fill="#8E8E87" text-anchor="middle">
+          <text x="141" y="296">7,200 枚/天</text>
+          <text x="259" y="296">3,600</text>
+          <text x="377" y="296">1,800</text>
+          <text x="495" y="296">900</text>
+          <text x="731" y="296">225</text>
+        </g>
+        <text x="613" y="296" font-size="11.5" fill="#185FA5" text-anchor="middle">450 枚/天</text>
+      </svg>
+      <div class="chart-legend" style="margin-top:10px">
+        <span><i style="background:#B4B2A9"></i>已完成周期</span>
+        <span><i style="background:#85B7EB"></i>当前周期（第 5 轮）</span>
+        <span><i style="background:#fff;border:1px dashed #B4B2A9"></i>预计未来</span>
+      </div>
+      <div class="chart-note">
+        注意最下面那行：<b>日增发量从 7,200 枚一路降到了 450 枚</b>，减半后是 225 枚。这才是减半真正在改变的东西——它不改变存量，只改变<b>增量的速度</b>。按每块 10 分钟、每天约 144 块估算。
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">02</span>
+      <h2>五次减产全表</h2>
+      <span class="hint">触发条件是区块高度，不是日期</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>轮次</th><th>触发区块</th><th>日期</th><th>奖励变化</th><th>减半时的 BTC 价格</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>创世</td><td class="num">0</td><td class="num">2009-01-03</td>
+            <td class="rew">— → 50 BTC</td><td>没有市场，无价格</td>
+          </tr>
+          <tr>
+            <td>第 1 次</td><td class="num">210,000</td><td class="num">2012-11-28</td>
+            <td class="rew">50 → 25 BTC</td><td class="num">约 $12</td>
+          </tr>
+          <tr>
+            <td>第 2 次</td><td class="num">420,000</td><td class="num">2016-07-09</td>
+            <td class="rew">25 → 12.5 BTC</td><td class="num">约 $650</td>
+          </tr>
+          <tr>
+            <td>第 3 次</td><td class="num">630,000</td><td class="num">2020-05-11</td>
+            <td class="rew">12.5 → 6.25 BTC</td><td class="num">约 $8,600</td>
+          </tr>
+          <tr>
+            <td>第 4 次</td><td class="num">840,000</td><td class="num">2024-04-20</td>
+            <td class="rew">6.25 → 3.125 BTC</td><td class="num">约 $63,800</td>
+          </tr>
+          <tr class="now">
+            <td>第 5 次</td><td class="num">1,050,000</td><td class="num">预计 2028-04</td>
+            <td class="rew main">3.125 → 1.5625 BTC</td><td>—</td>
+          </tr>
+          <tr class="future">
+            <td>第 6 次</td><td class="num">1,260,000</td><td class="num">预计 2032</td>
+            <td class="rew half">1.5625 → 0.78125 BTC</td><td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">03</span>
+      <h2>区块高度换算器</h2>
+      <span class="hint">拖动滑块，看任意高度上的规则</span>
+    </div>
+    <div class="calc">
+      <div class="slider-head">
+        <span class="t">这条链在任意一个区块高度上，补贴是多少、发了多少币</span>
+        <span class="lv num" id="hOut">969,650<small>区块高度</small></span>
+      </div>
+      <input type="range" id="hRange" min="0" max="1260000" step="1" value="969650" aria-label="区块高度">
+      <div class="scale"><span>0 · 创世块</span><span class="num">1,050,000 · 第 5 次</span><span class="num">1,260,000 · 第 6 次</span></div>
+
+      <div class="out">
+        <div class="cell hi"><div class="k">所处周期</div><div class="v" id="eraOut">第 5 轮</div></div>
+        <div class="cell hi"><div class="k">区块奖励</div><div class="v num" id="rwOut">3.125 <small>BTC</small></div></div>
+        <div class="cell"><div class="k">满速日增发</div><div class="v num" id="dayOut">450 <small>枚</small></div></div>
+        <div class="cell"><div class="k">估算时间</div><div class="v num" id="dtOut">2026-10</div></div>
+      </div>
+
+      <div class="bar"><i id="issBar" style="width:95.7%"></i></div>
+      <div class="note" id="issNote">
+        累计已发行 <b class="num">20,092,490</b> BTC，占 2,100 万上限的 <b class="num">95.7%</b>。
+      </div>
+
+      <div class="presets">
+        <button data-h="0">创世块</button>
+        <button data-h="840000">第 4 次减半</button>
+        <button data-h="969650" class="on">现在</button>
+        <button data-h="1050000">第 5 次减半</button>
+        <button data-h="1260000">第 6 次减半</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">04</span>
+      <h2>减半之后发生了什么</h2>
+      <span class="hint">4 次样本 · 倍数一路衰减</span>
+    </div>
+    <div class="cyc">
+      <div class="cyc-row">
+        <div class="when"><b>2012-11-28</b>减半 → 2013-11-30 见顶</div>
+        <div class="mid">
+          <div class="rng">$12 <b>→</b> $1,163</div>
+          <div class="track"><i style="width:100%"></i></div>
+        </div>
+        <div class="mult num">94<small>倍 · 用时 367 天</small></div>
+      </div>
+      <div class="cyc-row">
+        <div class="when"><b>2016-07-09</b>减半 → 2017-12-17 见顶</div>
+        <div class="mid">
+          <div class="rng">$650 <b>→</b> $19,783</div>
+          <div class="track"><i style="width:75%"></i></div>
+        </div>
+        <div class="mult num">30<small>倍 · 用时 526 天</small></div>
+      </div>
+      <div class="cyc-row">
+        <div class="when"><b>2020-05-11</b>减半 → 2021-11-10 见顶</div>
+        <div class="mid">
+          <div class="rng">$8,600 <b>→</b> $69,000</div>
+          <div class="track"><i style="width:46%"></i></div>
+        </div>
+        <div class="mult num">8<small>倍 · 用时 548 天</small></div>
+      </div>
+      <div class="cyc-row">
+        <div class="when"><b>2024-04-20</b>减半 → 2025-10-06 见顶</div>
+        <div class="mid">
+          <div class="rng">$63,800 <b>→</b> $126,198</div>
+          <div class="track"><i style="width:15%"></i></div>
+        </div>
+        <div class="mult num">2.0<small>倍 · 用时 534 天</small></div>
+      </div>
+    </div>
+    <div class="warnbox" style="margin-top:14px">
+      <b>这一栏不构成规律，更不构成预测。</b>倍数从 94 倍衰减到 2 倍，一半是基数变大的数学必然，另一半是流动性环境变了。4 个样本、每次还叠着完全不同的宏观变量，统计上根本不够格叫"周期"。而 2026 年这轮从 $126,198 跌到约 $85,000，原因跟供给毫无关系——这个反驳比上面四条数据都更有说服力。
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">05</span>
+      <h2>减半不改变的四件事</h2>
+      <span class="hint">误解最集中的地方</span>
+    </div>
+    <div class="pits">
+      <div class="pit">
+        <div class="n">MISCONCEPTION 01</div>
+        <h4>已有的币不会变少</h4>
+        <p>减半只约束<b>新增发行</b>，你钱包里的数量一个都不会少。总供应是<b>单调递增</b>的，减半降低的是它的增速，不是它的存量。所谓"通缩"是相对于法币增发速度而言的，不是绝对意义上的减少。</p>
+      </div>
+      <div class="pit">
+        <div class="n">MISCONCEPTION 02</div>
+        <h4>手续费不受减半影响</h4>
+        <p>手续费是<b>区块空间的市场竞价</b>出来的，跟补贴规则无关。补贴归零之后它才会变成主角。目前链上不拥堵，手续费只占区块奖励的约 0.9%——这个数字决定了减半对矿工的冲击几乎是坦的。</p>
+      </div>
+      <div class="pit">
+        <div class="n">MISCONCEPTION 03</div>
+        <h4>减半不会自动推高价格</h4>
+        <p>这是一次<b>提前四年、公开写在代码里、全世界都知道</b>的事件。完全可预期的东西早被定价了。它能影响的是矿工的边际成本和抛压节奏，不是价格的因果起点。</p>
+      </div>
+      <div class="pit">
+        <div class="n">MISCONCEPTION 04</div>
+        <h4>减半没有改变"稀缺"的终点</h4>
+        <p>2,100 万的硬上限从<b>创世块那一刻就定死了</b>，减半只是逼近它的路径。终点从未改变，变的只是走完这条路的节奏——所以"减半制造稀缺"这个说法，方向本身就是反的。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">06</span>
+      <h2>矿工的账本，和 2,100 万的来历</h2>
+      <span class="hint">同一件事的两端</span>
+    </div>
+    <div class="cols">
+      <div class="col blue">
+        <h3>矿工收入 = 补贴 + 手续费</h3>
+        <div class="sub">减半砍掉的是前一半</div>
+        <div class="row"><span class="lab">现在</span><span class="val num"><b>3.125</b> 补贴 + <b>约 0.03</b> 手续费 ≈ 3.155 BTC/块</span></div>
+        <div class="row"><span class="lab">2028 后</span><span class="val num"><b>1.5625</b> 补贴 + 手续费 → 收入近乎腰斩</span></div>
+        <div class="row"><span class="lab">算力</span><span class="val">每次减半后，一批高成本矿机被淘汰，全网算力先掉一截再爬回来</span></div>
+        <div class="warnbox">
+          真正的悬念在 2140 年之后：补贴归零，矿工 100% 靠手续费活着。<b>手续费能不能撑起整条链的安全预算</b>——这是比特币最核心、也最未经验证的一个假设。
+        </div>
+      </div>
+      <div class="col amber">
+        <h3>2,100 万不是"设"出来的</h3>
+        <div class="sub">它是一个等比数列收敛的结果</div>
+        <div class="row"><span class="lab">每周期</span><span class="val num">210,000 个区块</span></div>
+        <div class="row"><span class="lab">补贴序列</span><span class="val num">50, 25, 12.5, 6.25 …</span></div>
+        <div class="formula">
+          210,000 × 50 × (1 + 1/2 + 1/4 + …)<br>
+          = 210,000 × 50 × <b>2</b><br>
+          = <b>21,000,000</b>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <span class="lab">含义</span>
+          <span class="val">上限是这个数列<b>自己收敛到</b>的值。中本聪只是把 210,000 和 50 两个初始条件写进去，终点是算术推出来的，不需要任何人执行。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <div class="endgame">
+      <div class="tag">The Endgame</div>
+      <h3>33 个周期，约 2140 年，最后一枚比特币</h3>
+      <p>补贴会一直减半下去，直到小到无法表示为止。总共 <b>33 个周期</b>，预计在 <b>2140 年前后</b>，最后一丁点补贴发完，比特币的"发行"这件事才算彻底结束。</p>
+      <p>那时矿工收入 100% 来自手续费。所以真正的问题从来不是"减半会不会涨"，而是——<span class="hl">一条不再产出新币的链，靠什么让陌生人持续为它烧电</span>。</p>
+      <p>这个问题没有答案，只有一个已经跑了 17 年、从未停止出块的实验。</p>
+    </div>
+  </section>
+
+  <footer>
+    <b>合规提示：</b>在中国内地，虚拟货币相关业务活动属于非法金融活动，交易合同不受法律保护，交易平台亦不在境内监管范围内。本卡片仅为比特币发行机制层面的知识梳理，不构成任何投资建议，也不构成对任何交易平台或标的的推荐。加密资产价格波动极大，历史数据不代表未来表现。
+    <div class="src">制表时间：2026-10-03 · 链上数据快照：区块高度 969,650（2026-10-03）· 历史价格为当日近似值，不同来源口径略有差异 · 2028 / 2032 年日期为按每块 10 分钟外推的估算，实际以触发区块高度为准。</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var INTERVAL = 210000;
+  var CAP = 21000000;
+  var GENESIS_MS = Date.UTC(2009, 0, 3, 18, 15, 0);
+
+  var range   = document.getElementById('hRange');
+  var hOut    = document.getElementById('hOut');
+  var eraOut  = document.getElementById('eraOut');
+  var rwOut   = document.getElementById('rwOut');
+  var dayOut  = document.getElementById('dayOut');
+  var dtOut   = document.getElementById('dtOut');
+  var issBar  = document.getElementById('issBar');
+  var issNote = document.getElementById('issNote');
+  var presets = document.querySelectorAll('.presets button');
+
+  function fmt(n){
+    return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  function rewardAt(h){
+    var era = Math.floor(h / INTERVAL);
+    return 50 / Math.pow(2, era);
+  }
+  function issuedAt(h){
+    var era = Math.floor(h / INTERVAL);
+    var total = 0;
+    for (var i = 0; i < era; i++) total += INTERVAL * (50 / Math.pow(2, i));
+    total += (h - era * INTERVAL) * (50 / Math.pow(2, era));
+    return total;
+  }
+  function fmtReward(r){
+    if (r >= 1) return (Math.round(r * 1000) / 1000).toString();
+    return r.toFixed(6).replace(/0+$/, '');
+  }
+  function dateAt(h){
+    var d = new Date(GENESIS_MS + h * 10 * 60 * 1000);
+    return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0');
+  }
+
+  function render(){
+    var h = Number(range.value);
+    var era = Math.floor(h / INTERVAL) + 1;
+    var reward = rewardAt(h);
+    var issued = issuedAt(h);
+    var pct = issued / CAP * 100;
+
+    hOut.textContent = fmt(h);
+    eraOut.textContent = '第 ' + era + ' 轮';
+    rwOut.innerHTML = fmtReward(reward) + ' <small>BTC</small>';
+    dayOut.innerHTML = fmt(reward * 144) + ' <small>枚</small>';
+    dtOut.textContent = dateAt(h);
+    issBar.style.width = pct.toFixed(2) + '%';
+    issNote.innerHTML = '累计已发行 <b class="num">' + fmt(issued) + '</b> BTC，占 2,100 万上限的 <b class="num">' + pct.toFixed(2) + '%</b>。';
+
+    for (var i = 0; i < presets.length; i++){
+      presets[i].classList.toggle('on', Number(presets[i].dataset.h) === h);
+    }
+  }
+
+  range.addEventListener('input', render);
+  for (var i = 0; i < presets.length; i++){
+    presets[i].addEventListener('click', function(){
+      range.value = this.dataset.h;
+      render();
+    });
+  }
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>币圈大事记 · 2009 — 2026</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F5F1;
+  --paper:#FFFFFF;
+  --ink:#1D1D1B;
+  --ink2:#5C5C57;
+  --ink3:#8E8E87;
+  --line:#E7E5DF;
+  --radius:14px;
+  --tech:#185FA5;    --tech-bg:#E6F1FB;
+  --market:#854F0B;  --market-bg:#FAEEDA;
+  --crash:#A32D2D;   --crash-bg:#FCEBEB;
+  --hack:#534AB7;    --hack-bg:#EEEDFE;
+  --reg:#0F6E56;     --reg-bg:#E1F5EE;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  padding:32px 20px 80px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- hero ---------- */
+.hero{
+  background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);padding:38px 36px 30px;
+  position:relative;overflow:hidden;margin-bottom:22px;
+}
+.hero::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:.2em;color:var(--ink3);text-transform:uppercase;font-weight:600;margin-bottom:14px}
+h1{font-size:36px;line-height:1.2;font-weight:600;letter-spacing:-.015em;margin-bottom:12px}
+h1 .yr{color:var(--ink3);font-weight:400;font-size:26px;padding-left:6px}
+.lede{font-size:15.5px;color:var(--ink2);max-width:660px}
+.lede strong{color:var(--ink);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:26px}
+.stat{background:var(--bg);border-radius:10px;padding:13px 15px}
+.stat .k{font-size:11.5px;color:var(--ink3);margin-bottom:3px}
+.stat .v{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.stat .v small{font-size:11.5px;font-weight:400;color:var(--ink2);margin-left:2px}
+
+/* ---------- era nav ---------- */
+.eranav{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 14px;scrollbar-width:none}
+.eranav::-webkit-scrollbar{display:none}
+.eranav a{
+  flex-shrink:0;font-size:12.5px;color:var(--ink2);text-decoration:none;
+  border:1px solid var(--line);background:var(--paper);
+  padding:6px 13px;border-radius:99px;white-space:nowrap;transition:.15s;
+}
+.eranav a:hover{border-color:var(--ink3);color:var(--ink)}
+.eranav a b{font-weight:600;color:var(--ink3);margin-right:5px;font-size:11.5px}
+
+/* ---------- toolbar ---------- */
+.toolbar{
+  position:sticky;top:0;z-index:30;background:var(--bg);
+  padding:12px 2px;border-bottom:1px solid var(--line);margin-bottom:24px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+.toolbar .lb{font-size:12.5px;color:var(--ink3);margin-right:2px}
+.chip{
+  font-family:inherit;font-size:12.5px;color:var(--ink2);
+  border:1px solid var(--line);background:var(--paper);
+  padding:5px 13px;border-radius:99px;cursor:pointer;transition:.15s;
+}
+.chip:hover{border-color:var(--ink3)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:1px}
+
+/* ---------- era ---------- */
+.era{margin-bottom:40px;scroll-margin-top:70px}
+.era-head{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px 26px;display:flex;align-items:flex-start;gap:18px;margin-bottom:20px;
+}
+.era-no{
+  flex-shrink:0;width:46px;height:46px;border-radius:11px;background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;
+  letter-spacing:.02em;
+}
+.era-head .txt{flex:1;min-width:0}
+.era-head h3{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:3px}
+.era-head h3 span{font-size:13px;font-weight:400;color:var(--ink3);margin-left:8px}
+.era-head .tag{font-size:13px;color:var(--ink2);line-height:1.6}
+.era-head .price{
+  flex-shrink:0;text-align:right;font-size:13px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;padding-top:2px;
+}
+.era-head .price b{display:block;font-size:14.5px;color:var(--ink);font-weight:600;letter-spacing:-.01em}
+
+/* ---------- timeline ---------- */
+.tl{position:relative;padding-left:30px}
+.tl::before{content:"";position:absolute;left:6px;top:12px;bottom:12px;width:1px;background:var(--line)}
+.ev{position:relative;margin-bottom:14px}
+.ev:last-child{margin-bottom:0}
+.ev::before{
+  content:"";position:absolute;left:-28px;top:15px;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--tc);box-shadow:0 0 0 3px var(--bg);
+}
+.ev-box{
+  background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--tc);
+  border-radius:11px;padding:15px 20px 16px;
+}
+.ev-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.ev-date{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums;font-weight:500}
+.tg{font-size:11px;padding:2px 8px;border-radius:5px;font-weight:500;background:var(--tc-bg);color:var(--tc)}
+.ev-box h4{font-size:14.5px;font-weight:600;letter-spacing:-.005em;margin-bottom:4px}
+.ev-box p{font-size:13px;color:var(--ink2)}
+
+/* ---------- lesson ---------- */
+.lesson{
+  margin-top:20px;background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);padding:20px 24px;
+  border-left:3px solid var(--ink);
+}
+.lesson .lb{font-size:11px;letter-spacing:.14em;font-weight:700;color:var(--ink3);margin-bottom:8px}
+.lesson p{font-size:13.5px;color:var(--ink2)}
+.lesson p b{color:var(--ink);font-weight:600}
+
+/* ---------- final ---------- */
+.final{margin-top:52px}
+.final > h2{
+  font-size:22px;font-weight:600;letter-spacing:-.015em;margin-bottom:6px;
+}
+.final > .sub{font-size:13.5px;color:var(--ink3);margin-bottom:24px}
+.final .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fx{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+.fx .n{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.1em;margin-bottom:8px}
+.fx h4{font-size:14px;font-weight:600;margin-bottom:7px}
+.fx p{font-size:13px;color:var(--ink2)}
+.fx.hl{background:var(--ink);border-color:var(--ink)}
+.fx.hl .n{color:#8E8E87}
+.fx.hl h4{color:#fff}
+.fx.hl p{color:#C9C9C3}
+
+footer{
+  margin-top:34px;border:1px solid #EBD9C6;background:#FDF6EC;border-radius:var(--radius);
+  padding:20px 24px;font-size:12.5px;color:#7A5A32;line-height:1.75;
+}
+footer b{color:#5C3F1B}
+footer .src{margin-top:12px;padding-top:12px;border-top:1px dashed #EBD9C6;font-size:11.5px;color:#9C8462}
+
+.hidden{display:none !important}
+
+@media (max-width:760px){
+  body{padding:18px 12px 60px}
+  h1{font-size:27px}
+  .hero{padding:26px 22px 24px}
+  .stats{grid-template-columns:1fr 1fr}
+  .era-head{flex-wrap:wrap;gap:12px;padding:18px}
+  .era-head .price{text-align:left;padding-top:0}
+  .final .grid{grid-template-columns:1fr}
+  .tl{padding-left:24px}
+  .ev::before{left:-22px}
+  .ev-box{padding:13px 16px 14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Crypto History · 全景回顾</div>
+    <h1>币圈大事记<span class="yr">2009 — 2026</span></h1>
+    <p class="lede">十七年，从密码学邮件列表里的一份白皮书，到一个被写进主权国家资产负债表、也不断被清算的资产类别。<strong>这里记录那些真正改变过行业走向的时刻，以及它们各自留下的教训。</strong></p>
+    <div class="stats">
+      <div class="stat"><div class="k">跨度</div><div class="v num">17<small>年</small></div></div>
+      <div class="stat"><div class="k">减半次数</div><div class="v num">4<small>次</small></div></div>
+      <div class="stat"><div class="k">腰斩级崩盘</div><div class="v num">5<small>次</small></div></div>
+      <div class="stat"><div class="k">总量上限</div><div class="v num">2,100<small>万枚</small></div></div>
+    </div>
+  </header>
+
+  <div class="eranav" id="eranav"></div>
+
+  <div class="toolbar">
+    <span class="lb">按类型查看</span>
+    <button class="chip on" data-f="all">全部</button>
+    <button class="chip" data-f="tech"><span class="dot" style="background:#185FA5"></span>技术</button>
+    <button class="chip" data-f="market"><span class="dot" style="background:#854F0B"></span>行情</button>
+    <button class="chip" data-f="crash"><span class="dot" style="background:#A32D2D"></span>崩盘</button>
+    <button class="chip" data-f="hack"><span class="dot" style="background:#534AB7"></span>安全</button>
+    <button class="chip" data-f="reg"><span class="dot" style="background:#0F6E56"></span>监管</button>
+  </div>
+
+  <div id="timeline"></div>
+
+  <section class="final">
+    <h2>十七年，八条经验</h2>
+    <p class="sub">把上面这些事件放在一起看，反复出现的规律其实不多，但每一条都很贵。</p>
+    <div class="grid" id="finalGrid"></div>
+  </section>
+
+  <footer>
+    <b>特别说明：</b>本页为中国内地用户编写，需明确知悉：中国人民银行等十部门于 2021 年 9 月发布的《关于进一步防范和处置虚拟货币交易炒作风险的通知》已明确，虚拟货币相关业务活动属于非法金融活动；虚拟货币不具有与法定货币等同的法律地位，不应且不能作为货币在市场上流通使用。2025 年 11 月，中国人民银行再次召开打击虚拟货币交易炒作工作协调机制会议，重申继续坚持禁止性政策。本页内容为公开历史事件的客观梳理，<b>不构成任何投资建议，也不构成对任何交易平台的推荐</b>。虚拟货币价格波动剧烈，参与者需自行承担全部风险。
+    <div class="src">资料整理时间：2026-10-03 · 价格数据来自公开市场资料，不同来源口径可能略有差异，均已取整处理 · 事件时间以公开报道为准</div>
+  </footer>
+
+</div>
+
+<script>
+var TYPES = {
+  tech:   {name:'技术', c:'#185FA5', bg:'#E6F1FB'},
+  market: {name:'行情', c:'#854F0B', bg:'#FAEEDA'},
+  crash:  {name:'崩盘', c:'#A32D2D', bg:'#FCEBEB'},
+  hack:   {name:'安全', c:'#534AB7', bg:'#EEEDFE'},
+  reg:    {name:'监管', c:'#0F6E56', bg:'#E1F5EE'}
+};
+
+var ERAS = [
+{
+  id:'era1', no:'01', name:'创世期', years:'2008 — 2012',
+  tag:'一个署名中本聪的人，把一份九页的白皮书丢进了密码学邮件列表。没有交易所，没有价格，只有一群极客在验证一件事：一个没有中心的账本，能不能自己活下去。',
+  price:'$0 → $13',
+  events:[
+    {d:'2008.10.31', t:'tech', h:'比特币白皮书发布', p:'中本聪在密码学邮件列表发出一份九页论文《比特币：一种点对点的电子现金系统》。它没有经过同行评审，学术界最初的判断是「这不可能work」。'},
+    {d:'2009.01.03', t:'tech', h:'创世区块被挖出', p:'第一个区块诞生，里面嵌入当天《泰晤士报》的头版标题：「财政大臣正处于第二次救助银行的边缘」。这句话是整条链的第一个注解。'},
+    {d:'2009.01.12', t:'tech', h:'第一笔比特币转账', p:'中本聪向密码学家 Hal Finney 转账 10 枚 BTC。这是比特币作为支付工具的第一笔真实记录。'},
+    {d:'2010.05.22', t:'market', h:'披萨日', p:'程序员 Laszlo Hanyecz 用 10,000 枚 BTC 买了两个披萨。按今天的价格，这笔交易价值数亿美元——它成了整个行业最著名的估值寓言。'},
+    {d:'2010.07', t:'market', h:'Mt.Gox 上线', p:'一家原本做《万智牌》卡牌交易的网站转型为比特币交易所，很快成为全球最大的交易场所。四年后，它将成为这个行业的第一场灾难。'},
+    {d:'2010.12', t:'tech', h:'中本聪消失', p:'在维基解密事件之后，中本聪逐渐淡出，把代码仓库控制权交给 Gavin Andresen。此后他再未公开露面，身份至今成谜。'},
+    {d:'2011.02', t:'market', h:'丝绸之路开启', p:'暗网市场 Silk Road 上线，只接受比特币支付。存续 30 个月内促成约 990 万枚 BTC 的交易，也成为比特币走向主流视野的第一条路径——很不光彩的那条。'},
+    {d:'2011.06', t:'hack', h:'Mt.Gox 首次被黑', p:'黑客攻入交易所，BTC 价格在几分钟内从 32 美元崩到 0.01 美元。这是加密史上第一次「闪崩」，也是第一次提醒：交易所的服务器不是保险箱。'},
+    {d:'2012.11.28', t:'tech', h:'第一次减半', p:'区块奖励从 50 枚降到 25 枚，比特币第一次按代码预设的节奏收紧供给。这个四年一次的事件，此后成为整个市场最稳定的叙事锚点。'}
+  ],
+  lesson:'这个阶段没有价格，也没有机构，只有极少数人在赌一个技术判断。它留下的最重要遗产不是币价，而是一条时间戳——<b>自 2009 年 1 月 3 日起，这条链没有停止过出块。</b>'
+},
+{
+  id:'era2', no:'02', name:'监管登场与第一次寒冬', years:'2013 — 2016',
+  tag:'比特币第一次被主流看见，代价是第一次被主流按住。牛市、崩盘、交易所倒闭、ICO 前身事件，行业在这四年里把该犯的错几乎犯了一遍。',
+  price:'$13 → $1,151 → $170',
+  events:[
+    {d:'2013.04', t:'market', h:'塞浦路斯银行危机', p:'银行冻结储户存款引发恐慌，比特币作为「不受任何政府控制的资产」首次被大规模讨论。价格从 13 美元一路冲向 260 美元。'},
+    {d:'2013.10', t:'reg', h:'FBI 关停丝绸之路', p:'Ross Ulbricht 在旧金山公共图书馆被捕，FBI 查获约 3 万枚 BTC——这是美国政府机构第一次大规模查封比特币资产。'},
+    {d:'2013.11', t:'market', h:'首次突破 1,000 美元', p:'比特币站上四位数，一年内涨了近 90 倍。几乎所有当时的报道都用了同一个词：「泡沫」。'},
+    {d:'2013.12.05', t:'reg', h:'中国发布首个监管文件', p:'中国人民银行等五部委发布《关于防范比特币风险的通知》，将比特币定义为「特定的虚拟商品」，明确其不具有与货币等同的法律地位，禁止金融机构和支付机构开展相关业务。'},
+    {d:'2014.02', t:'hack', h:'Mt.Gox 破产', p:'申请破产保护时，交易所承认丢失约 85 万枚 BTC（其中约 75 万枚属于用户）。当时价值约 4.5 亿美元。行业进入长达两年的寒冬。'},
+    {d:'2015.07.30', t:'tech', h:'以太坊主网上线', p:'Vitalik Buterin 等人把「区块链不只是记账」变成现实，智能合约让链上可以承载任意逻辑。行业从此分为比特币和「其他」两条路线。'},
+    {d:'2016.06.17', t:'hack', h:'The DAO 被黑', p:'基于以太坊的最大众筹项目遭到攻击，约 360 万枚 ETH 被转移，占当时 ETH 总量的 5%。「代码即法律」这句话第一次被现实狠狠打脸。'},
+    {d:'2016.07.20', t:'tech', h:'以太坊硬分叉', p:'为了追回被盗资金，以太坊社区投票决定回滚交易，链分裂为 ETH 和 ETC。这开了「协议可以为了纠正错误而改写历史」的先例，至今仍有争议。'},
+    {d:'2016.07.09', t:'tech', h:'第二次减半', p:'区块奖励降至 12.5 枚。次年，市场迎来了至今最疯狂的一轮牛市。'}
+  ],
+  lesson:'门头沟事件证明了一件事：<b>把币放在交易所，等于把资产交给一个你无法审计的公司。</b>自托管从此不是可选项，而是必修课。而 The DAO 则证明，智能合约的漏洞不会因为你是「去中心化」就网开一面。'
+},
+{
+  id:'era3', no:'03', name:'ICO 狂潮与泡沫', years:'2017 — 2018',
+  tag:'一份白皮书就能融资，一个概念就能上市。这一年诞生了无数个「下一代以太坊」，也留下了整个行业最昂贵的一堂课。',
+  price:'$963 → $19,783 → $3,200',
+  events:[
+    {d:'2017 全年', t:'market', h:'ICO 融资浪潮', p:'上千个项目通过发行代币募集资金，总规模达数十亿美元。绝大多数项目只有白皮书和愿景，没有产品或收入。'},
+    {d:'2017.08.01', t:'tech', h:'比特币现金分叉', p:'围绕区块扩容的路线之争最终撕裂社区，比特币分叉出 Bitcoin Cash。关于「什么才是真正的比特币」的争论延续至今。'},
+    {d:'2017.09.04', t:'reg', h:'中国叫停 ICO', p:'中国人民银行等七部委联合发布《关于防范代币发行融资风险的公告》，明确代币发行融资「本质上是一种未经批准非法公开融资的行为」，要求立即停止。此后境内交易所陆续清退。'},
+    {d:'2017.12.17', t:'market', h:'历史高点 19,783 美元', p:'比特币全年涨幅约 20 倍，所有主流媒体都在讨论它。这个数字成为此后三年再也无法触及的天花板。'},
+    {d:'2018.01', t:'crash', h:'泡沫破裂', p:'从高点开始持续阴跌，全年几乎没有任何像样的反弹。市场情绪从「上不封顶」直接切换到「这行业是不是完了」。'},
+    {d:'2018.12', t:'crash', h:'跌至 3,200 美元', p:'较历史高点回撤超过 80%，大量项目归零、团队解散。这是行业第一次完整经历的「周期之痛」。'}
+  ],
+  lesson:'2017 年教会市场的不是「区块链能改变世界」，而是<b>「只要故事讲得足够好，估值可以离基本面无限远」</b>。每一轮牛市顶部都有一个无法证伪的新叙事，2017 年是 ICO，此后每轮都在换皮，功能从未改变。'
+},
+{
+  id:'era4', no:'04', name:'机构前夜与 DeFi 萌芽', years:'2019 — 2020',
+  tag:'一边是科技巨头试图把加密货币纳入自家体系，一边是链上金融第一次真正跑通。而在 2020 年 3 月，比特币经历了一次身份认证。',
+  price:'$3,400 → $28,900',
+  events:[
+    {d:'2019.06', t:'reg', h:'Facebook 发布 Libra 白皮书', p:'科技巨头宣布要发自己的全球稳定币，立刻引发各国监管的强烈反弹。项目最终夭折，但它第一次让各国央行认真对待「数字货币」这件事。'},
+    {d:'2020.03.12', t:'crash', h:'黑色星期四', p:'全球流动性危机中，比特币单日从约 7,900 美元跌至 3,800 美元，跌幅超过 50%，与美股同步暴跌。加密市场当天蒸发数百亿美元。'},
+    {d:'2020.05.11', t:'tech', h:'第三次减半', p:'区块奖励降至 6.25 枚。在史无前例的货币宽松背景下，这次减半成为新一轮牛市叙事的起点。'},
+    {d:'2020 夏', t:'tech', h:'DeFi Summer', p:'流动性挖矿引爆链上借贷与交易协议，Uniswap、Compound、Aave 等协议的用户与锁仓规模指数级增长。加密第一次有了不依赖中心化平台的真实业务。'},
+    {d:'2020.10', t:'market', h:'PayPal 开放加密交易', p:'拥有数亿用户的支付巨头宣布支持比特币买卖。传统支付通道第一次向加密资产敞开，成为机构入场的前奏。'}
+  ],
+  lesson:'「312」这一天彻底改写了比特币的叙事：<b>它与美股同步暴跌，说明在当时它是一个被用来换取现金的高风险资产，而不是避险资产。</b>这个身份认知，此后被反复验证。'
+},
+{
+  id:'era5', no:'05', name:'机构牛市与全民狂热', years:'2021',
+  tag:'上市公司买币、头部交易所上市、一张图片拍出天价。这一年的所有利好都是真的，但利好是真的，不等于价格是合理的。',
+  price:'$29,000 → $69,000',
+  events:[
+    {d:'2021.02', t:'market', h:'特斯拉购入 15 亿美元比特币', p:'一家主流上市公司的资产负债表上出现比特币，被视为机构时代的正式开启。消息公布当天 BTC 大涨。'},
+    {d:'2021.03', t:'market', h:'NFT 出圈', p:'数字艺术家 Beeple 的作品在佳士得拍出 6,900 万美元，NFT 从小众玩具变成主流话题，大量资金涌入链上艺术与收藏品。'},
+    {d:'2021.04.14', t:'market', h:'Coinbase 登陆纳斯达克', p:'头部交易所完成上市，市值一度突破千亿美元。加密行业第一次以「合规公司」的身份进入传统资本市场。'},
+    {d:'2021.05.19', t:'reg', h:'中国全面收紧', p:'监管明确打击比特币挖矿与交易行为，矿工大规模外迁，全网算力短期内腰斩。市场当天出现极端暴跌，杠杆仓位集中爆仓。'},
+    {d:'2021.09', t:'reg', h:'萨尔瓦多采用比特币为法定货币', p:'成为全球第一个将比特币列为法定货币的国家。这一实验此后争议不断，国际货币基金组织多次就其风险发出提示。'},
+    {d:'2021.09.24', t:'reg', h:'十部委通知发布', p:'中国人民银行等十部门发布《关于进一步防范和处置虚拟货币交易炒作风险的通知》，明确「虚拟货币相关业务活动属于非法金融活动」，包括境外交易所向境内居民提供服务。'},
+    {d:'2021.11.10', t:'market', h:'历史高点 69,000 美元', p:'在 ETF 期货获批、机构持续买入的预期下，比特币创下当时的历史新高。此后进入长达一年的下行。'}
+  ],
+  lesson:'这一年的所有叙事都成立——机构真的来了，NFT 真的有了市场，交易所真的上市了。<b>但它们共同的问题是：价格已经提前消化了未来三年的好消息。</b>利好兑现的那一刻，往往就是买盘耗尽的那一刻。'
+},
+{
+  id:'era6', no:'06', name:'连环暴雷', years:'2022 — 2023',
+  tag:'一周之内，一个曾被称作「下一个以太坊」的生态归零；半年之后，行业第二大交易所轰然倒塌。这一年的关键词是：对手方风险。',
+  price:'$48,000 → $15,500',
+  events:[
+    {d:'2022.05', t:'crash', h:'Terra/Luna 崩盘', p:'算法稳定币 UST 脱锚引发死亡螺旋，LUNA 在几天内从 80 美元跌到接近归零，约 400 亿美元市值蒸发。整个行业的信心根基被动摇。'},
+    {d:'2022.06', t:'crash', h:'三箭资本爆雷', p:'这家曾被奉为「最聪明钱」的加密对冲基金因高杠杆头寸被清算而崩盘，连锁冲击多家借贷平台，引发行业性的流动性危机。'},
+    {d:'2022.07', t:'crash', h:'Celsius 等借贷平台破产', p:'以高息揽储的链上借贷平台相继冻结提现并申请破产。用户第一次直观感受到：承诺的收益率有多高，底层资产的风险就有多高。'},
+    {d:'2022.11.11', t:'crash', h:'FTX 申请破产', p:'行业第二大交易所在几天内从「流动性充足」走到破产，创始人被控欺诈。数十万用户的资金被冻结，无数机构被拖入深渊。这是继门头沟之后最严重的一次信任危机。'},
+    {d:'2023.03', t:'crash', h:'硅谷银行倒闭', p:'美国银行业危机波及加密友好银行，第二大稳定币 USDC 一度脱锚至 0.87 美元，市场再次经历短暂的连锁恐慌。'},
+    {d:'2023.06', t:'reg', h:'贝莱德申请比特币现货 ETF', p:'全球最大资产管理公司递交申请，被市场解读为「机构资金终于找到合规入口」。此后多家机构跟进，成为新一轮行情的起点。'},
+    {d:'2023.12', t:'market', h:'市场回暖', p:'比特币回升至 42,000 美元附近，市场情绪从寒冬中逐步修复，全年涨幅超过一倍。'}
+  ],
+  lesson:'2022 年暴雷的每一个平台，出事前都被称作「行业标杆」。<b>收益率异常、审计缺失、创始人个人光环——这三个信号在每一场崩盘前都出现过。</b>更重要的是：当交易所既是托管方又是交易对手时，你的资产从来没有真正属于过你。'
+},
+{
+  id:'era7', no:'07', name:'现货 ETF 与机构化', years:'2024 — 2025',
+  tag:'比特币第一次被装进合规的管道。主权基金、养老资金、上市公司资产负债表开始持续买入——同时，杠杆也从未如此密集。',
+  price:'$49,000 → $126,080',
+  events:[
+    {d:'2024.01.11', t:'reg', h:'美国首批比特币现货 ETF 获批上市', p:'SEC 批准多只现货 ETF，传统券商账户第一次可以合规持有比特币敞口，无需交易所、无需私钥。资金入口被彻底打开。'},
+    {d:'2024.03.14', t:'market', h:'突破 73,000 美元', p:'ETF 资金持续流入推动比特币创下历史新高，市值一度超越白银。'},
+    {d:'2024.04.20', t:'tech', h:'第四次减半', p:'区块奖励降至 3.125 枚。与前三轮不同的是，这一次叠加了 ETF 的机构买盘，供给收缩与合规需求同时出现。'},
+    {d:'2024.11', t:'market', h:'特朗普当选，比特币破 10 万美元', p:'亲加密的政策预期推动市场情绪高涨，比特币在年底首次站上六位数。'},
+    {d:'2025.01.20', t:'market', h:'逼近 110,000 美元', p:'就职前后市场情绪达到顶点，比特币市值突破 2 万亿美元。'},
+    {d:'2025.02.21', t:'hack', h:'Bybit 被盗 15 亿美元', p:'攻击者入侵多重签名钱包的签名环节，盗走约 40.1 万枚 ETH，成为加密史上金额最大的黑客事件。调查指向朝鲜背景的 Lazarus 组织。'},
+    {d:'2025.03', t:'reg', h:'美国设立比特币战略储备', p:'特朗普签署行政令，将政府通过执法缴获的约 20 万枚 BTC 纳入战略储备。国家级信用第一次与比特币产生直接关联。'},
+    {d:'2025.04', t:'market', h:'关税战引发回调', p:'全球贸易摩擦升级，风险资产集体承压，比特币一度回落至 74,508 美元。'},
+    {d:'2025.07.18', t:'reg', h:'GENIUS 稳定币法案签署', p:'美国首个针对稳定币的联邦监管框架落地，要求发行方保持 100% 高流动性储备并定期披露。稳定币正式进入合规时代。'},
+    {d:'2025.10.06', t:'market', h:'历史新高 126,080 美元', p:'机构资金、减半效应与政策红利叠加，比特币创下至今的最高纪录。'},
+    {d:'2025.10.11', t:'crash', h:'「1011」大清算', p:'宏观冲击引爆过度拥挤的杠杆仓位，全网爆仓规模接近 200 亿美元，被市场称为加密的「黑色星期五」。没有任何监管事件，纯粹是杠杆自身形成的踩踏。'},
+    {d:'2025.11.25', t:'reg', h:'首个州级比特币储备', p:'得克萨斯州动用 500 万美元购入现货比特币 ETF，成为美国第一个用公共资金配置比特币的州。'},
+    {d:'2025.11.30', t:'reg', h:'中国重申禁止性政策', p:'中国人民银行召开打击虚拟货币交易炒作工作协调机制会议，首次明确「稳定币是虚拟货币的一种形式」，重申继续坚持对虚拟货币的禁止性政策。'}
+  ],
+  lesson:'机构化解决了「谁来买」的问题，却没有解决「谁来接盘」的问题。<b>ETF 让上涨有了持续的资金来源，也让下跌有了持续的赎回压力。</b>2025 年 10 月的那次崩盘就是证据：好消息和坏消息之间的通道，比以往任何时候都短。'
+},
+{
+  id:'era8', no:'08', name:'宏观主导的调整', years:'2026',
+  tag:'这一轮下跌，没有交易所暴雷，没有稳定币脱锚。利率、战争和 AI 抢走了资金——加密货币终于变成了一个普通的、会跟着宏观一起波动的风险资产。',
+  price:'$97,861 → $57,748 → 回升',
+  events:[
+    {d:'2026.01', t:'market', h:'鹰派转向，年初冲高', p:'美联储政策预期转紧，全年降息预期收窄至两次以内。比特币一度冲高至约 97,861 美元，成为年内高点。'},
+    {d:'2026.02.06', t:'crash', h:'单日暴跌 15%', p:'比特币单日下跌 15%，触及 60,001 美元，创下有记录以来最糟糕的月度表现之一。'},
+    {d:'2026.02', t:'crash', h:'地缘冲突冲击', p:'美伊冲突升级，比特币在一小时内从 65,500 美元跌至 63,000 美元，单日超过 5.15 亿美元杠杆仓位被清算。'},
+    {d:'2026.02.11', t:'tech', h:'抗量子提案入库', p:'BIP-360 被合并进官方比特币改进提案库，引入首个抗量子地址类型，旨在消除链上公钥暴露风险。量子安全正式进入比特币的技术议程。'},
+    {d:'2026.03.09', t:'tech', h:'第 2,000 万枚比特币被挖出', p:'总量 2,100 万枚中已有 95% 进入流通，剩余不足 100 万枚将在未来一个世纪内缓慢释放。稀缺性叙事走到最后阶段。'},
+    {d:'2026.06 上旬', t:'crash', h:'ETF 连续 13 天净流出', p:'现货 ETF 连续 13 个交易日资金净流出，累计约 44 亿美元。赎回压力直接转化为对底层市场的持续卖压。'},
+    {d:'2026.06.03', t:'crash', h:'单日 18.6 亿美元爆仓', p:'又一轮杠杆清算，比特币进一步下探至 58,503 美元。值得注意的是：全程没有任何交易所出现偿付问题。'},
+    {d:'2026.07.01', t:'crash', h:'年内低点 57,748 美元', p:'较 2025 年 10 月的历史高点回撤约 54%，较年初高点下跌约 41%。机构持仓同样未能提供支撑。'},
+    {d:'2026.08.18', t:'reg', h:'SEC 提出加密资产监管新规', p:'美国证券交易委员会提出加密资产专门规则，旨在明确数字资产的证券属性边界。与此同时，界定监管职责分工的《清晰法案》仍在立法进程中。'},
+    {d:'2026.08.28', t:'market', h:'跌破 79,000 美元后反弹', p:'比特币一度失守 79,000 美元关键心理关口，创数月新低，随后在 80,000 美元上方企稳。'},
+    {d:'2026.09', t:'market', h:'ETF 资金强势回流', p:'现货比特币 ETF 录得年内最强单周净流入，约 24 亿美元；比特币回升至 83,000 美元附近，测试 82,000 美元支撑。'},
+    {d:'2026 年内', t:'market', h:'超 20 个项目关停', p:'加密借贷协议、NFT 平台、数字钱包、链游等多个赛道出现项目关闭或大幅收缩，行业总市值较峰值回落约 45%。'}
+  ],
+  lesson:'2026 年的下跌第一次不是因为「币圈自己出事」，而是因为利率、战争和资金向 AI 迁移。<b>这既是成熟的标志，也是想象力的天花板——当一个资产只能用宏观来解释自己，它就失去了独立行情。</b>'
+}
+];
+
+var FINAL = [
+  {n:'01', h:'周期没有消失，只是换了引擎', p:'三次减半对应三轮牛市，节奏清晰得近乎机械。但 2024 年之后，机构资金成为新的变量。周期还在，只是驱动它的东西变了——所以别再用上一轮的剧本预测这一轮。'},
+  {n:'02', h:'每一次顶部都有一个无法证伪的叙事', p:'2017 年是 ICO，2021 年是 DeFi 与 NFT，2025 年是 ETF 与国家级储备。故事的形态每一轮都不同，功能从未改变：给价格一个不需要算账的理由。'},
+  {n:'03', h:'最先暴雷的，一定是被称作最安全的', p:'Mt.Gox、Celsius、三箭、FTX——出事前全部是行业标杆。收益率的异常，永远是底层资产异常的先行指标。当你看到明显高于市场的稳定回报，先问它从哪来。'},
+  {n:'04', h:'杠杆总是先于价格崩掉', p:'2025 年 10 月单日近 200 亿美元爆仓，2026 年 6 月单日 18.6 亿。暴跌真正的燃料从来不是恐慌情绪，而是此前累积的杠杆密度。'},
+  {n:'05', h:'监管的节奏永远比逻辑更意外', p:'2013、2017、2021 三次收紧，每次都伴随深跌，但没有一次真正终结这个行业。方向可以判断，时点无法预测——所以别把仓位押在政策预期上。'},
+  {n:'06', h:'不是你的私钥，就不是你的币', p:'门头沟的 85 万枚、FTX 冻结的数十亿，都在反复讲同一个道理。托管带来的便利，本质上是用所有权交换的。这句话很老，但它每轮都被重新验证一次。'},
+  {n:'07', h:'下跌的原因在变，说明行业在长大', p:'早期下跌是因为黑客和监管，2026 年下跌是因为美联储和 AI 抢资金。当坏消息不再是「币圈的坏消息」，这本身就是一种进步。'},
+  {n:'08', h:'十七年，只有一件事从未失信', p:'交易所倒了，基金爆了，国家禁止了，天才和骗子轮番登场。但自 2009 年 1 月 3 日至今天，这条链没有停止过一次出块。整个行业唯一没有崩塌过的，是它的底层承诺。', hl:true}
+];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+(function render(){
+  var tl = document.getElementById('timeline');
+  var nav = document.getElementById('eranav');
+  var html = '', nhtml = '';
+
+  ERAS.forEach(function(era, i){
+    nhtml += '<a href="#' + era.id + '"><b>' + era.no + '</b>' + era.name + '</a>';
+
+    html += '<section class="era" id="' + era.id + '">';
+    html += '<div class="era-head">';
+    html += '<div class="era-no">' + era.no + '</div>';
+    html += '<div class="txt"><h3>' + esc(era.name) + '<span>' + esc(era.years) + '</span></h3>';
+    html += '<div class="tag">' + esc(era.tag) + '</div></div>';
+    html += '<div class="price">BTC 区间<b>' + esc(era.price) + '</b></div>';
+    html += '</div>';
+
+    html += '<div class="tl">';
+    era.events.forEach(function(ev){
+      var t = TYPES[ev.t];
+      html += '<article class="ev" data-type="' + ev.t + '" style="--tc:' + t.c + ';--tc-bg:' + t.bg + '">';
+      html += '<div class="ev-box">';
+      html += '<div class="ev-top"><span class="ev-date">' + esc(ev.d) + '</span>';
+      html += '<span class="tg">' + t.name + '</span></div>';
+      html += '<h4>' + esc(ev.h) + '</h4>';
+      html += '<p>' + esc(ev.p) + '</p>';
+      html += '</div></article>';
+    });
+    html += '</div>';
+
+    html += '<div class="lesson"><div class="lb">这一阶段的教训</div><p>' + era.lesson + '</p></div>';
+    html += '</section>';
+  });
+
+  tl.innerHTML = html;
+  nav.innerHTML = nhtml;
+
+  var fg = document.getElementById('finalGrid');
+  var fhtml = '';
+  FINAL.forEach(function(f){
+    fhtml += '<div class="fx' + (f.hl ? ' hl' : '') + '"><div class="n">' + f.n + '</div>';
+    fhtml += '<h4>' + esc(f.h) + '</h4><p>' + esc(f.p) + '</p></div>';
+  });
+  fg.innerHTML = fhtml;
+
+  var chips = document.querySelectorAll('.chip');
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      chips.forEach(function(x){ x.classList.remove('on'); });
+      c.classList.add('on');
+      var f = c.dataset.f;
+      document.querySelectorAll('.ev').forEach(function(ev){
+        if (f === 'all' || ev.dataset.type === f){
+          ev.classList.remove('hidden');
+        } else {
+          ev.classList.add('hidden');
+        }
+      });
+      document.querySelectorAll('.era').forEach(function(era){
+        var visible = era.querySelectorAll('.ev:not(.hidden)').length;
+        era.classList.toggle('hidden', visible === 0);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
