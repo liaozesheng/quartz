@@ -14,7 +14,7 @@ BTC 交易的判断卡与执行纪律记录。由 Hermes 的 `trade` profile 生
 
 | 目录 | 用途 |
 |---|---|
-| `判断卡` | 按交易日的行情判断，命名 `YYYY-MM-DD.md` |
+| `判断卡` | 按交易日的行情判断。markdown 版 `YYYY-MM-DD.md`，HTML 版 `YYYY-MM-DD-判断卡.html`（同一张卡的两种呈现） |
 | `知识卡` | 概念解释卡：一张卡讲透一个概念（入门向，先看这里） |
 | `方法` | 方法论详解，把某一层的原理与算式讲透（附可复现的数据） |
 | `复盘` | 按周期（每 10 笔或每月）的交易复盘 |
@@ -33,6 +33,10 @@ BTC 交易的判断卡与执行纪律记录。由 Hermes 的 `trade` profile 生
 | `rr_study.py` | 第5层实证研究：触发规则检验、+2R 时间窗口扫描、RR 可行性扫描 |
 | `find_pullback.py` | 检测「回调后站回」形态：严格口径扫描 + 逐根打印真实案例 |
 | `big_candle.py` | 大阳线实证：短期代价、位置分布、站回富集、期望对照、逐根案例 |
+| `card_html.py` | 生成 HTML 版判断卡（单文件、自带样式与 VA 图，与知识卡 HTML 同一套设计系统）；同时存当日快照供下期对比 |
+| `card_md.py` | 生成 markdown 版判断卡（复用 `daily_card.render` 的第1~5层与 VA 字符图，补第0层/评分/真金白银/变化/观察位/清单）；与 HTML 版同一份数据、同一批数字 |
+| `vault_upload.py` | 把本地文件上传到 vault（走 MCP HTTP 端点，避免大文件 base64 手抄出错） |
+| `vault_verify.py` | 回读 vault 文件并与本地逐字节比对（附件读数会带 `Base64 Content follows:` 前缀，已处理） |
 
 ## 当前交易参数
 
