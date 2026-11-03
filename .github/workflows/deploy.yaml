@@ -58,10 +58,10 @@ jobs:
           path: public
           retention-days: 1
 
-  # 国内站点：阿里云 OSS + CDN
+  # 国内站点：阿里云 OSS + ESA
   # 需要仓库变量 ALIYUN_DEPLOY=true 和以下 Secrets：
   # ALIYUN_ACCESS_KEY_ID / ALIYUN_ACCESS_KEY_SECRET / ALIYUN_OSS_BUCKET
-  # / ALIYUN_OSS_ENDPOINT / ALIYUN_CDN_DOMAIN
+  # / ALIYUN_OSS_ENDPOINT / ALIYUN_CDN_DOMAIN / ALIYUN_ESA_SITE_ID
   publish-aliyun:
     needs: build
     if: vars.ALIYUN_DEPLOY == 'true'
@@ -96,10 +96,11 @@ jobs:
           ossutil rm "oss://$ALIYUN_OSS_BUCKET" -r -f || true
           ossutil cp -r public/ "oss://$ALIYUN_OSS_BUCKET/" --update
 
-      - name: Refresh Aliyun CDN
+      - name: Purge ESA cache
         env:
           ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
           ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+          ALIYUN_ESA_SITE_ID: ${{ secrets.ALIYUN_ESA_SITE_ID }}
           ALIYUN_CDN_DOMAIN: ${{ secrets.ALIYUN_CDN_DOMAIN }}
         run: |
           set -euo pipefail
@@ -109,9 +110,11 @@ jobs:
             --access-key-id "$ALIYUN_ACCESS_KEY_ID" \
             --access-key-secret "$ALIYUN_ACCESS_KEY_SECRET" \
             --region cn-hangzhou
-          ./aliyun cdn RefreshObjectCaches \
-            --ObjectPath "https://$ALIYUN_CDN_DOMAIN/" \
-            --ObjectType Directory
+          ./aliyun esa PurgeCaches \
+            --region cn-hangzhou \
+            --SiteId "$ALIYUN_ESA_SITE_ID" \
+            --Type directory \
+            --Content "{\"Directories\":[\"https://$ALIYUN_CDN_DOMAIN/\"]}"
 
   deploy:
     environment:
