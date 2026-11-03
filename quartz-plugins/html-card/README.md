@@ -57,7 +57,7 @@
 > 否则 `parsePluginSource` 会把它当成 `owner/repo` 的 GitHub 简写。
 
 新增卡片无需改任何配置：把 `.html` 放进 `content/` 任意子目录即可
-（`sync-vault.sh` 同步来的卡片会自动生效）。
+（同步到 `content/` 的卡片会自动生效）。
 
 ## 配置项
 
