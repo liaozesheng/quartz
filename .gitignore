@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+public/
+
+# Quartz generated
+.quartz/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.quartz/
+
+# sync 代理配置（含本机代理地址，勿提交到公开仓库）
+.sync-proxy.env

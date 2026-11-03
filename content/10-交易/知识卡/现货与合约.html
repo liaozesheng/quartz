@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>现货 vs 合约 · 知识卡</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #F6F5F1;
+      --paper: #FFFFFF;
+      --ink: #1D1D1B;
+      --ink2: #5C5C57;
+      --ink3: #8E8E87;
+      --line: #E7E5DF;
+      --teal: #0F6E56;
+      --teal-bg: #E1F5EE;
+      --teal-line: #9FE1CB;
+      --amber: #854F0B;
+      --amber-bg: #FAEEDA;
+      --amber-line: #FAC775;
+      --up: #C0392B;
+      --up-bg: #FCEBEB;
+      --down: #2E7D4F;
+      --down-bg: #E8F5EC;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.7;
+      padding: 36px 20px 72px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px
+    }
+
+    .num {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum"
+    }
+
+    /* ---------- hero ---------- */
+    .hero {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 36px 36px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 50%;
+      width: 5px;
+      background: var(--teal);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      bottom: 0;
+      width: 5px;
+      background: var(--amber);
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--ink3);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: 34px;
+      line-height: 1.25;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      margin-bottom: 12px;
+    }
+
+    h1 .vs {
+      color: var(--ink3);
+      font-weight: 400;
+      font-size: 24px;
+      padding: 0 6px
+    }
+
+    .lede {
+      font-size: 15.5px;
+      color: var(--ink2);
+      max-width: 640px
+    }
+
+    .lede strong {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 26px
+    }
+
+    .stat {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 14px 16px
+    }
+
+    .stat .k {
+      font-size: 12px;
+      color: var(--ink3);
+      margin-bottom: 4px
+    }
+
+    .stat .v {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -.02em
+    }
+
+    .stat .v small {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink2);
+      margin-left: 3px
+    }
+
+    /* ---------- section ---------- */
+    .sec-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-left: 2px
+    }
+
+    .sec-title .idx {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--paper);
+      background: var(--ink);
+      border-radius: 6px;
+      padding: 2px 8px;
+      letter-spacing: .04em;
+    }
+
+    .sec-title h2 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -.01em
+    }
+
+    .sec-title .hint {
+      font-size: 12.5px;
+      color: var(--ink3);
+      margin-left: auto
+    }
+
+    /* ---------- two columns ---------- */
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .col {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+      border-top: 3px solid transparent;
+    }
+
+    .col.spot {
+      border-top-color: var(--teal)
+    }
+
+    .col.fut {
+      border-top-color: var(--amber)
+    }
+
+    .col h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px
+    }
+
+    .col.spot h3 {
+      color: var(--teal)
+    }
+
+    .col.fut h3 {
+      color: var(--amber)
+    }
+
+    .col .sub {
+      font-size: 12.5px;
+      color: var(--ink3);
+      margin-bottom: 18px
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      padding: 9px 0;
+      border-top: 1px dashed var(--line);
+      font-size: 13.5px
+    }
+
+    .row:first-of-type {
+      border-top: none
+    }
+
+    .row .lab {
+      color: var(--ink3);
+      min-width: 52px;
+      flex-shrink: 0;
+      font-size: 12.5px;
+      padding-top: 1px
+    }
+
+    .row .val {
+      color: var(--ink2)
+    }
+
+    .row .val b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    /* ---------- scenario ---------- */
+    .scen {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px
+    }
+
+    .scard {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px 20px 20px;
+    }
+
+    .scard .cond {
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+    }
+
+    .cond.up {
+      background: var(--up-bg);
+      color: var(--up)
+    }
+
+    .cond.down {
+      background: var(--down-bg);
+      color: var(--down)
+    }
+
+    .scard .line {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 13px;
+      padding: 6px 0
+    }
+
+    .scard .line .who {
+      color: var(--ink3);
+      font-size: 12.5px
+    }
+
+    .scard .line .amt {
+      font-weight: 600;
+      font-size: 14.5px
+    }
+
+    .amt.up {
+      color: var(--up)
+    }
+
+    .amt.down {
+      color: var(--down)
+    }
+
+    .amt.dead {
+      color: var(--ink3);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px
+    }
+
+    .scard .foot {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--ink3)
+    }
+
+    /* ---------- table ---------- */
+    .tbl-wrap {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink3);
+      padding: 14px 20px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+      letter-spacing: .02em;
+    }
+
+    thead th:nth-child(2) {
+      color: var(--teal)
+    }
+
+    thead th:nth-child(3) {
+      color: var(--amber)
+    }
+
+    tbody td {
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      color: var(--ink2)
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none
+    }
+
+    tbody td:first-child {
+      color: var(--ink3);
+      font-size: 12.5px;
+      white-space: nowrap;
+      width: 88px
+    }
+
+    tbody tr:nth-child(even) {
+      background: #FCFBF9
+    }
+
+    td b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    /* ---------- interactive ---------- */
+    .calc {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 26px 28px
+    }
+
+    .slider-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 6px
+    }
+
+    .slider-head .t {
+      font-size: 13.5px;
+      color: var(--ink2)
+    }
+
+    .slider-head .lv {
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--amber);
+      letter-spacing: -.02em
+    }
+
+    .slider-head .lv small {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink3);
+      margin-left: 2px
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--amber);
+      height: 26px;
+      cursor: pointer;
+      background: transparent;
+    }
+
+    .scale {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--ink3);
+      margin-top: -4px
+    }
+
+    .out {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 22px 0 18px
+    }
+
+    .out .cell {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 13px 15px
+    }
+
+    .out .cell .k {
+      font-size: 12px;
+      color: var(--ink3);
+      margin-bottom: 3px
+    }
+
+    .out .cell .v {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -.02em
+    }
+
+    .out .cell .v small {
+      font-size: 11.5px;
+      font-weight: 400;
+      color: var(--ink2);
+      margin-left: 2px
+    }
+
+    .bar {
+      height: 10px;
+      background: var(--bg);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 10px
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 50%;
+      border-radius: 99px;
+      transition: width .18s ease, background .18s ease
+    }
+
+    .verdict {
+      font-size: 13px;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border-left: 3px solid var(--line);
+      background: var(--bg);
+      color: var(--ink2);
+    }
+
+    .verdict.safe {
+      border-left-color: var(--teal);
+      color: #0B5544
+    }
+
+    .verdict.warn {
+      border-left-color: var(--amber);
+      color: #6E4008
+    }
+
+    .verdict.risk {
+      border-left-color: var(--up);
+      color: #8C2A21
+    }
+
+    .note {
+      font-size: 11.5px;
+      color: var(--ink3);
+      margin-top: 12px
+    }
+
+    /* ---------- choose ---------- */
+    .choose {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .ch {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+    }
+
+    .ch .head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px
+    }
+
+    .ch .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0
+    }
+
+    .ch.spot .dot {
+      background: var(--teal)
+    }
+
+    .ch.fut .dot {
+      background: var(--amber)
+    }
+
+    .ch .head b {
+      font-size: 14.5px;
+      font-weight: 600
+    }
+
+    .ch ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px
+    }
+
+    .ch li {
+      font-size: 13.5px;
+      color: var(--ink2);
+      padding-left: 16px;
+      position: relative
+    }
+
+    .ch li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 9px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--line);
+    }
+
+    .ch li b {
+      color: var(--ink);
+      font-weight: 600
+    }
+
+    .ch .warnbox {
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      background: var(--up-bg);
+      color: #8C2A21;
+      border-left: 3px solid var(--up);
+    }
+
+    /* ---------- pitfalls ---------- */
+    .pits {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .pit {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px 22px
+    }
+
+    .pit .n {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink3);
+      letter-spacing: .1em;
+      margin-bottom: 8px
+    }
+
+    .pit h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 7px;
+      color: var(--ink)
+    }
+
+    .pit p {
+      font-size: 13px;
+      color: var(--ink2)
+    }
+
+    /* ---------- footer ---------- */
+    footer {
+      border: 1px solid #EBD9C6;
+      background: #FDF6EC;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      font-size: 12.5px;
+      color: #7A5A32;
+      line-height: 1.75;
+    }
+
+    footer b {
+      color: #5C3F1B
+    }
+
+    footer .src {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #EBD9C6;
+      font-size: 11.5px;
+      color: #9C8462
+    }
+
+    @media (max-width:760px) {
+      body {
+        padding: 20px 12px 48px
+      }
+
+      h1 {
+        font-size: 26px
+      }
+
+      .hero {
+        padding: 26px 22px 24px
+      }
+
+      .stats,
+      .cols,
+      .scen,
+      .out,
+      .choose,
+      .pits {
+        grid-template-columns: 1fr
+      }
+
+      .out {
+        grid-template-columns: 1fr 1fr
+      }
+
+      thead th,
+      tbody td {
+        padding: 11px 14px
+      }
+
+      tbody td:first-child {
+        width: auto
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <header class="hero">
+      <div class="eyebrow">Crypto 101 · 交易机制</div>
+      <h1>现货 <span class="vs">vs</span> 合约</h1>
+      <p class="lede">同一笔钱，两条完全不同的路：<strong>买资产</strong>，还是<strong>买一纸关于价格的协议</strong>。前者你拥有东西，后者你用保证金赌方向。</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="k">现货的天然杠杆</div>
+          <div class="v num">1<small>倍</small></div>
+        </div>
+        <div class="stat">
+          <div class="k">合约最高可选杠杆</div>
+          <div class="v num">125<small>倍（视币种）</small></div>
+        </div>
+        <div class="stat">
+          <div class="k">永续合约资金费率结算</div>
+          <div class="v num">8<small>小时 / 次</small></div>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="sec-title">
+        <span class="idx">01</span>
+        <h2>机制差别：你到底拿到了什么</h2>
+      </div>
+      <div class="cols">
+        <div class="col spot">
+          <h3>现货 Spot</h3>
+          <div class="sub">买入并持有资产本身</div>
+          <div class="row"><span class="lab">你持有</span><span class="val">真实的币，<b>可以提到链上钱包</b></span></div>
+          <div class="row"><span class="lab">杠杆</span><span class="val">1 倍（另有杠杆/借贷产品可选）</span></div>
+          <div class="row"><span class="lab">方向</span><span class="val">只能做多：低买高卖</span></div>
+          <div class="row"><span class="lab">风险</span><span class="val"><b>没有强平</b>，跌 90% 币还在你手里</span></div>
+          <div class="row"><span class="lab">成本</span><span class="val">买卖各收一次手续费，<b>无资金费率</b></span></div>
+          <div class="row"><span class="lab">期限</span><span class="val">无限期，想拿多久拿多久</span></div>
+        </div>
+        <div class="col fut">
+          <h3>合约 Futures</h3>
+          <div class="sub">交易的是价格协议，不是币</div>
+          <div class="row"><span class="lab">你持有</span><span class="val">一份衍生品协议，<b>没有币的所有权</b></span></div>
+          <div class="row"><span class="lab">杠杆</span><span class="val">通常 1–125 倍自由选择</span></div>
+          <div class="row"><span class="lab">方向</span><span class="val"><b>多空双向</b>，做空不用先持币</span></div>
+          <div class="row"><span class="lab">风险</span><span class="val"><b>有强平</b>，反向约 1/杠杆 即归零</span></div>
+          <div class="row"><span class="lab">成本</span><span class="val">开平各一次手续费 + <b>资金费率</b></span></div>
+          <div class="row"><span class="lab">期限</span><span class="val">永续无到期；交割合约会到期结算</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">
+        <span class="idx">02</span>
+        <h2>同一笔钱，三条时间线</h2>
+        <span class="hint">本金 10,000 USDT · 合约按 10 倍杠杆</span>
+      </div>
+      <div class="scen">
+        <div class="scard">
+          <span class="cond up">价格 +5%</span>
+          <div class="line"><span class="who">现货</span><span class="amt up num">+500 USDT</span></div>
+          <div class="line"><span class="who">合约 10x</span><span class="amt up num">+5,000 USDT</span></div>
+          <div class="foot">合约这边的快乐确实是最直观的</div>
+        </div>
+        <div class="scard">
+          <span class="cond down">价格 −5%</span>
+          <div class="line"><span class="who">现货</span><span class="amt down num">−500 USDT</span></div>
+          <div class="line"><span class="who">合约 10x</span><span class="amt down num">−5,000 USDT</span></div>
+          <div class="foot">本金一半没了，而行情只是抖了一下</div>
+        </div>
+        <div class="scard">
+          <span class="cond down">价格 −10%</span>
+          <div class="line"><span class="who">现货</span><span class="amt down num">−1,000 USDT</span></div>
+          <div class="line"><span class="who">合约 10x</span><span class="amt dead num">0 USDT</span></div>
+          <div class="foot">现货的币还在，合约的保证金没了</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">
+        <span class="idx">03</span>
+        <h2>差异速查表</h2>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>维度</th>
+              <th>现货 Spot</th>
+              <th>合约 Futures</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>交易标的</td>
+              <td>真实的加密资产</td>
+              <td>以价格为标的的衍生品合约</td>
+            </tr>
+            <tr>
+              <td>杠杆</td>
+              <td>1 倍为主</td>
+              <td>1–125 倍可选，逐仓 / 全仓两种保证金模式</td>
+            </tr>
+            <tr>
+              <td>交易方向</td>
+              <td>只能做多</td>
+              <td>多空双向，做空无需借币</td>
+            </tr>
+            <tr>
+              <td>爆仓风险</td>
+              <td><b>不存在强平</b></td>
+              <td><b>存在</b>，触及维持保证金率即被强制平仓</td>
+            </tr>
+            <tr>
+              <td>持有成本</td>
+              <td>无，长期持有零成本</td>
+              <td>永续合约每 8 小时结算资金费率，持仓过夜需支付</td>
+            </tr>
+            <tr>
+              <td>到期日</td>
+              <td>无期限</td>
+              <td>永续合约无到期；季度交割合约到期结算</td>
+            </tr>
+            <tr>
+              <td>手续费</td>
+              <td>买入 + 卖出各一次</td>
+              <td>开仓 + 平仓各一次，另有资金费率</td>
+            </tr>
+            <tr>
+              <td>极端行情</td>
+              <td>浮亏，扛得住就还在</td>
+              <td>插针与连环清算可能瞬间归零，滑点大时甚至穿仓</td>
+            </tr>
+            <tr>
+              <td>资产用途</td>
+              <td>可提币、质押、参与理财与生态</td>
+              <td>保证金锁死在合约账户，无法他用</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">
+        <span class="idx">04</span>
+        <h2>杠杆放大镜</h2>
+        <span class="hint">拖动滑块，看看爆仓线离你有多近</span>
+      </div>
+      <div class="calc">
+        <div class="slider-head">
+          <span class="t">杠杆倍数</span>
+          <span class="lv num"><span id="lvOut">10</span><small>×</small></span>
+        </div>
+        <input type="range" id="lev" min="1" max="125" step="1" value="10" aria-label="杠杆倍数">
+        <div class="scale">
+          <span>1×</span><span>25×</span><span>50×</span><span>75×</span><span>100×</span><span>125×</span></div>
+
+        <div class="out">
+          <div class="cell">
+            <div class="k">你的本金</div>
+            <div class="v num">10,000<small>USDT</small></div>
+          </div>
+          <div class="cell">
+            <div class="k">控制的名义头寸</div>
+            <div class="v num"><span id="notional">100,000</span><small>USDT</small></div>
+          </div>
+          <div class="cell">
+            <div class="k">价格反向多少就归零</div>
+            <div class="v num" id="dropOut">10.0<small>%</small></div>
+          </div>
+        </div>
+
+        <div class="bar"><i id="barFill"></i></div>
+        <div class="verdict" id="verdict"></div>
+        <p class="note">说明：爆仓线按「反向跌幅 ≈ 1 / 杠杆倍数」简化估算。真实强平价还受维持保证金率、逐仓/全仓模式、资金费率与滑点影响，实际爆仓会来得更早。</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">
+        <span class="idx">05</span>
+        <h2>什么时候该用哪个</h2>
+      </div>
+      <div class="choose">
+        <div class="ch spot">
+          <div class="head"><span class="dot"></span><b>优先选现货</b></div>
+          <ul>
+            <li><b>长期看好，打算拿几个月到几年</b> —— 没有资金费率，也不用担心半夜被插针爆掉</li>
+            <li><b>刚入场、还在摸索</b> —— 先用现货熟悉撮合、滑点和挂单，别拿真金白银交杠杆的学费</li>
+            <li><b>这笔钱还有别的用途</b> —— 需要能随时提币、质押或参与生态</li>
+            <li><b>仓位本身已经不小</b> —— 满仓现货的风险已经够重，再加杠杆就是双重压力</li>
+            <li><b>不想被情绪绑架</b> —— 现货最大的好处不是收益，而是它不会在凌晨三点叫你起床补保证金</li>
+          </ul>
+        </div>
+        <div class="ch fut">
+          <div class="head"><span class="dot"></span><b>可以考虑合约</b></div>
+          <ul>
+            <li><b>明确看空</b> —— 现货做空要借币，成本高且麻烦；合约开空单即可</li>
+            <li><b>短线有清晰判断，且愿意用小仓位</b> —— 比如只用总资金的 1–2% 开 2–3 倍低倍单，止损纪律明确</li>
+            <li><b>对冲现有持仓</b> —— 手里拿着一堆币怕短期回调，可以开等量空单锁波动，而不用真的卖出</li>
+            <li><b>资金费率为负时的进阶套利</b> —— 极端行情下做空方收资金费，配合现货可吃这个差价</li>
+          </ul>
+          <div class="warnbox">只要出现任意一条就别碰合约：钱是借来的 · 亏光了会影响生活 · 止损纪律自己都知道守不住 · 被「百倍合约三天翻百倍」的故事打动过。</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-title">
+        <span class="idx">06</span>
+        <h2>四个最容易踩的坑</h2>
+      </div>
+      <div class="pits">
+        <div class="pit">
+          <div class="n">PITFALL 01</div>
+          <h4>资金费率是隐性成本</h4>
+          <p>永续合约每 8 小时结算一次，方向站错边，光费率就能把本金慢慢磨掉。行情火热时年化几十个百分点并不罕见。</p>
+        </div>
+        <div class="pit">
+          <div class="n">PITFALL 02</div>
+          <h4>低倍不等于安全</h4>
+          <p>2 倍杠杆下价格反向 50% 一样归零，只是速度慢一点。杠杆降的是斜率，不是终点。</p>
+        </div>
+        <div class="pit">
+          <div class="n">PITFALL 03</div>
+          <h4>全仓会拖垮整个账户</h4>
+          <p>逐仓亏完这一单就结束；全仓模式下，一笔亏损的单子会把合约账户里的余额一起拉下水。新手建议逐仓。</p>
+        </div>
+        <div class="pit">
+          <div class="n">PITFALL 04</div>
+          <h4>手续费与滑点是碎钞机</h4>
+          <p>日内频繁开平，买卖双边收费再加吃单滑点，长期算下来是一笔惊人的支出，尤其在震荡行情里。</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <b>合规提示：</b>在中国内地，虚拟货币相关业务活动属于非法金融活动，交易合同不受法律保护，交易平台亦不在境内监管范围内。本卡片仅为交易机制层面的知识梳理，不构成任何投资建议，也不构成对任何交易平台的推荐。<br>
+      加密资产价格波动极大，合约交易存在本金全部损失的风险。
+      <div class="src">制表时间：2026-10-03 · 内容为机制科普，具体费率、杠杆上限与规则以平台最新公告为准。</div>
+    </footer>
+
+  </div>
+
+  <script>
+    (function () {
+      var lev = document.getElementById('lev');
+      var lvOut = document.getElementById('lvOut');
+      var notional = document.getElementById('notional');
+      var dropOut = document.getElementById('dropOut');
+      var barFill = document.getElementById('barFill');
+      var verdict = document.getElementById('verdict');
+
+      var LOG_MIN = Math.log(0.8);
+      var LOG_MAX = Math.log(100);
+
+      function fmt(n) {
+        return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+
+      function render() {
+        var L = Number(lev.value);
+        var noti = 10000 * L;
+        var drop = 100 / L;
+
+        lvOut.textContent = L;
+        notional.textContent = fmt(noti);
+
+        var dropText = drop >= 10 ? drop.toFixed(1) : (drop >= 1 ? drop.toFixed(1) : drop.toFixed(2));
+        dropOut.innerHTML = dropText + '<small>%</small>';
+
+        var ratio = (Math.log(Math.max(drop, 0.8)) - LOG_MIN) / (LOG_MAX - LOG_MIN);
+        var width = Math.max(3, Math.min(100, ratio * 100));
+
+        var color, cls, text;
+        if (drop >= 20) {
+          color = '#0F6E56'; cls = 'safe';
+          text = '安全边际还算宽：' + dropText + '% 的反向波动通常需要一段像样的趋势才能走完。但记住，加密市场一次插针就够走 20%。';
+        } else if (drop >= 5) {
+          color = '#BA7517'; cls = 'warn';
+          text = '进入危险区：价格只要反向 ' + dropText + '% 就归零。在加密市场里，这级别波动属于日常，而不是意外。';
+        } else {
+          color = '#C0392B'; cls = 'risk';
+          text = '这已经是彩票：反向 ' + dropText + '% 就归零。一次普通的波动就能带走全部保证金，长期做下去几乎必然归零。';
+        }
+
+        barFill.style.width = width + '%';
+        barFill.style.background = color;
+        verdict.className = 'verdict ' + cls;
+        verdict.textContent = text;
+      }
+
+      lev.addEventListener('input', render);
+      render();
+    })();
+  </script>
+</body>
+
+</html>

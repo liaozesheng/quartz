@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美联储利率政策时间线 · 2021.11 — 2026.10</title>
+<style>
+  :root{
+    --bg:#f5f1ea;
+    --card:#ffffff;
+    --ink:#241f1a;
+    --ink-2:#4a423a;
+    --muted:#857d73;
+    --line:#e6dfd4;
+    --hike:#c4453a;
+    --hike-bg:#fbeeec;
+    --cut:#2a8a5e;
+    --cut-bg:#e9f6ef;
+    --hold:#7d766c;
+    --hold-bg:#f2efe9;
+    --gold:#b8892b;
+    --shadow:0 1px 2px rgba(60,45,30,.04), 0 8px 24px -12px rgba(60,45,30,.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(1200px 400px at 50% -120px, #ece4d6 0%, rgba(236,228,214,0) 70%),
+      var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;
+    line-height:1.65;
+    padding:44px 20px 70px;
+  }
+  .wrap{max-width:1100px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  header{margin-bottom:34px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;margin-bottom:14px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--gold);display:block}
+  h1{
+    font-size:clamp(26px,3.4vw,40px);
+    line-height:1.22;
+    letter-spacing:-.02em;
+    font-weight:800;
+    margin-bottom:12px;
+  }
+  h1 em{font-style:normal;color:var(--hike)}
+  .sub{color:var(--ink-2);font-size:15px;max-width:780px}
+  .sub b{color:var(--ink);font-weight:600}
+
+  /* ---------- stat strip ---------- */
+  .stats{
+    display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:26px;
+  }
+  .stat{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px 16px 15px;box-shadow:var(--shadow);
+  }
+  .stat .k{font-size:12px;color:var(--muted);letter-spacing:.04em;margin-bottom:6px}
+  .stat .v{font-size:21px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .n{font-size:12px;color:var(--muted);margin-top:3px}
+  .stat.now .v{color:var(--hike)}
+  .stat.up .v{color:var(--hike)}
+  .stat.down .v{color:var(--cut)}
+
+  /* ---------- chart ---------- */
+  .panel{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:20px 18px 12px;margin-top:26px;box-shadow:var(--shadow);
+  }
+  .panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:2px 6px 8px;flex-wrap:wrap}
+  .panel-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+  .panel-note{font-size:12px;color:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;padding:0 6px 6px}
+  .lg{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+  .lg i{width:10px;height:10px;border-radius:50%;display:block}
+  #chart{width:100%;height:auto;display:block}
+
+  /* ---------- phases ---------- */
+  .phases{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:26px}
+  .ph{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;
+    border-top:3px solid var(--c);box-shadow:var(--shadow);
+  }
+  .ph .t{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:5px}
+  .ph .h{font-size:13.5px;font-weight:700;line-height:1.45;margin-bottom:5px}
+  .ph .d{font-size:12px;color:var(--muted);line-height:1.55}
+
+  /* ---------- section title ---------- */
+  .sec{margin-top:52px}
+  .sec-t{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:6px}
+  .sec-h{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+  .sec-s{font-size:13.5px;color:var(--muted);margin-bottom:22px}
+
+  /* ---------- timeline ---------- */
+  .year-block{margin-bottom:30px}
+  .year-head{
+    display:flex;align-items:center;gap:14px;margin-bottom:12px;
+    padding-bottom:9px;border-bottom:1.5px solid var(--line);
+  }
+  .year-num{font-size:26px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .year-meta{font-size:12.5px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.02em}
+  .tag.h{background:var(--hike-bg);color:var(--hike)}
+  .tag.c{background:var(--cut-bg);color:var(--cut)}
+  .tag.ho{background:var(--hold-bg);color:var(--hold)}
+
+  .ev{
+    display:grid;grid-template-columns:62px 1fr;gap:16px;
+    background:var(--card);border:1px solid var(--line);border-left:3px solid var(--hold);
+    border-radius:10px;padding:11px 15px;margin-bottom:7px;
+    transition:transform .14s ease, box-shadow .14s ease;
+  }
+  .ev:hover{transform:translateX(3px);box-shadow:var(--shadow)}
+  .ev.hike{border-left-color:var(--hike)}
+  .ev.cut{border-left-color:var(--cut)}
+  .ev.hold{background:#fdfcfa;border-left-style:dashed}
+  .ev-date{
+    font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;
+    padding-top:2px;font-weight:600;letter-spacing:.01em;
+  }
+  .ev-main{min-width:0}
+  .ev-line{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:2px}
+  .bp{
+    font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;
+    padding:1.5px 8px;border-radius:6px;letter-spacing:-.01em;
+  }
+  .bp.h{background:var(--hike);color:#fff}
+  .bp.h.big{background:#9e2f26}
+  .bp.c{background:var(--cut);color:#fff}
+  .bp.ho{background:#e3ded5;color:#6d665c}
+  .rate{font-weight:800;font-size:14.5px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .flag{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:.04em}
+  .ev-desc{font-size:12.8px;color:var(--ink-2);line-height:1.6}
+  .ev-desc strong{color:var(--ink);font-weight:600}
+
+  /* ---------- table ---------- */
+  .tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#fbf9f5;font-weight:700}
+  td{font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:none}
+  tr.total td{background:#fbf9f5;font-weight:800}
+  .num-h{color:var(--hike);font-weight:700}
+  .num-c{color:var(--cut);font-weight:700}
+  .num-z{color:var(--muted)}
+
+  /* ---------- insights ---------- */
+  .insights{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .ins{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow)}
+  .ins .ih{font-size:13.5px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .ins .ih span{font-size:11px;color:var(--gold);font-variant-numeric:tabular-nums}
+  .ins .ib{font-size:13px;color:var(--ink-2);line-height:1.68}
+
+  footer{
+    margin-top:44px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--muted);line-height:1.8;
+  }
+  footer b{color:var(--ink-2);font-weight:600}
+
+  /* ---------- primer ---------- */
+  .primer{display:grid;gap:14px}
+  .pcard{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px 22px;box-shadow:var(--shadow);
+  }
+  .pnum{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:26px;height:26px;border-radius:8px;
+    background:var(--hike-bg);color:var(--hike);
+    font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums;
+    margin-bottom:11px;letter-spacing:.02em;
+  }
+  .pcard h3{font-size:16.5px;font-weight:800;letter-spacing:-.015em;margin-bottom:9px;line-height:1.4}
+  .pcard p{font-size:13.5px;color:var(--ink-2);line-height:1.78;margin-bottom:14px}
+  .pcard p:last-child{margin-bottom:0}
+  .pcard p strong{color:var(--ink);font-weight:600}
+  .pcard p em{font-style:normal;background:#fbf3e2;padding:1px 4px;border-radius:3px}
+  .diagram{max-width:700px;margin:4px auto 16px}
+  .diagram svg{width:100%;height:auto;display:block}
+  .pnote{
+    font-size:12.5px;color:var(--muted);line-height:1.75;
+    border-left:2px solid #e0d8ca;padding-left:12px;
+  }
+  .myths{display:grid;gap:7px;margin:4px 0 0}
+  .myth{
+    display:grid;grid-template-columns:16px 1fr;gap:10px;align-items:start;
+    font-size:13px;color:var(--ink-2);line-height:1.62;
+    background:#fdfcfa;border:1px solid var(--line);border-radius:9px;padding:9px 13px;
+  }
+  .myth .x{color:var(--hike);font-weight:800;line-height:1.55}
+  .myth b{color:var(--ink);font-weight:600}
+  .speed-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:4px 0 14px}
+  .speed{width:100%;border-collapse:collapse;font-size:13px}
+  .speed th,.speed td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--line)}
+  .speed th{
+    font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
+    background:#fbf9f5;font-weight:700;
+  }
+  .speed tr:last-child td{border-bottom:none}
+  .speed td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+  .speed td:last-child{color:var(--muted);font-size:12.5px}
+  .sp{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .sp::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;display:block}
+  .sp.fast{color:var(--hike)}
+  .sp.mid{color:var(--gold)}
+  .sp.slow{color:var(--muted)}
+
+  /* ---------- market compare ---------- */
+  .chart-note{
+    font-size:11.5px;color:var(--muted);line-height:1.65;
+    padding:6px 8px 4px;border-top:1px dashed var(--line);margin-top:4px;
+  }
+  .tbl-wrap + .moments{margin-top:16px}
+  .moments{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+  .mo{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px 18px;box-shadow:var(--shadow);border-left:3px solid var(--mc,var(--gold));
+  }
+  .mo .mt{font-size:11.5px;font-weight:800;color:var(--mc,var(--gold));letter-spacing:.03em;margin-bottom:5px;font-variant-numeric:tabular-nums}
+  .mo .mh{font-size:14px;font-weight:800;margin-bottom:6px;letter-spacing:-.01em}
+  .mo .mb{font-size:12.8px;color:var(--ink-2);line-height:1.68}
+  .mo .mb b{color:var(--ink);font-weight:600}
+
+  @media (max-width:900px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .phases{grid-template-columns:1fr 1fr}
+    .insights{grid-template-columns:1fr}
+    .pcard{padding:18px 16px}
+  }
+  @media (max-width:560px){
+    body{padding:28px 14px 50px}
+    .stats{grid-template-columns:1fr 1fr;gap:9px}
+    .stat .v{font-size:18px}
+    .phases{grid-template-columns:1fr}
+    .ev{grid-template-columns:1fr;gap:5px}
+    .ev-date{padding-top:0}
+    .diagram{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .diagram svg{min-width:540px}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .ev:hover{transform:none;box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Federal Reserve · Policy Timeline</div>
+    <h1>美联储利率政策时间线：<br>从零利率到 5.5%，再<em>重启加息</em></h1>
+    <p class="sub">2020 年 3 月新冠疫情紧急降息至今，六年半时间里美联储走完了一轮完整的「<b>零利率与无限 QE → 史诗级加息 → 高位平台 → 慢速降息 → 转向观望 → 重新加息</b>」。以下是每一次议息会议的关键动作。</p>
+
+    <div class="stats">
+      <div class="stat now">
+        <div class="k">当前目标区间</div>
+        <div class="v">3.75%–4.00%</div>
+        <div class="n">2026.9.16 加息后</div>
+      </div>
+      <div class="stat down">
+        <div class="k">2020 疫情降息</div>
+        <div class="v">2 次 / −150bp</div>
+        <div class="n">1.75% → 0.25%</div>
+      </div>
+      <div class="stat up">
+        <div class="k">2022–2023 加息</div>
+        <div class="v">11 次 / +525bp</div>
+        <div class="n">0.25% → 5.50%</div>
+      </div>
+      <div class="stat down">
+        <div class="k">2024–2025 降息</div>
+        <div class="v">6 次 / −175bp</div>
+        <div class="n">5.50% → 3.50%</div>
+      </div>
+      <div class="stat up">
+        <div class="k">2026 重启加息</div>
+        <div class="v">1 次 / +25bp</div>
+        <div class="n">3.50% → 4.00%</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= CHART ================= -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-title">联邦基金利率目标区间上限走势</div>
+      <div class="panel-note">2020.01 — 2026.10 · 单位 %</div>
+    </div>
+    <div class="legend">
+      <span class="lg"><i style="background:#c4453a"></i>加息</span>
+      <span class="lg"><i style="background:#2a8a5e"></i>降息</span>
+      <span class="lg"><i style="background:#7d766c"></i>维持不变（线段走平）</span>
+    </div>
+    <svg id="chart" viewBox="0 0 1160 470" preserveAspectRatio="xMidYMid meet" role="img" aria-label="美联储利率走势阶梯图"></svg>
+  </div>
+
+  <!-- ================= PHASES ================= -->
+  <div class="phases">
+    <div class="ph" style="--c:#7f8fa6">
+      <div class="t">2020.03 – 2022.02</div>
+      <div class="h">疫情救市 · 零利率</div>
+      <div class="d">两次紧急降息共 150bp 至 0–0.25%，启动无限 QE，利率钉死 23 个月。</div>
+    </div>
+    <div class="ph" style="--c:#c4453a">
+      <div class="t">2022.03 – 2023.07</div>
+      <div class="h">史诗级加息</div>
+      <div class="d">16 个月 11 次加息、累计 525bp，1980 年代以来最快。</div>
+    </div>
+    <div class="ph" style="--c:#b8892b">
+      <div class="t">2023.08 – 2024.08</div>
+      <div class="h">5.5% 高位平台</div>
+      <div class="d">峰值维持 14 个月，通胀缓慢回落，降息预期反复落空。</div>
+    </div>
+    <div class="ph" style="--c:#2a8a5e">
+      <div class="t">2024.09 – 2025.12</div>
+      <div class="h">慢速降息周期</div>
+      <div class="d">6 次降息累计 175bp，幅度远小于加息，终点 3.50%。</div>
+    </div>
+    <div class="ph" style="--c:#5b7a99">
+      <div class="t">2026.01 – 2026.10</div>
+      <div class="h">观望 → 转向加息</div>
+      <div class="d">沃什接任、删前瞻指引，连续 6 次按兵不动后 9 月加息。</div>
+    </div>
+  </div>
+
+  <!-- ================= PRIMER ================= -->
+  <div class="sec">
+    <div class="sec-t">Primer</div>
+    <div class="sec-h">先搞懂：加息加的是什么，QE 又是什么？</div>
+    <div class="sec-s">四张图讲清「概念」「传导」「量化宽松」和「退出路径」，再回头看历史就不晕了</div>
+
+    <div class="primer">
+
+      <div class="pcard">
+        <div class="pnum">01</div>
+        <h3>联邦基金利率：全美国钱的「批发价」</h3>
+        <p>严格说，美联储「加息」加的不是某一个数字，而是一个<strong>目标区间</strong>——现在就是 3.75%–4.00%。这个区间框住的，是<strong>银行之间隔夜互相借钱</strong>的利率。银行在美联储都有准备金账户，有的钱多、有的当天周转不开，钱多的就隔夜借给钱紧的，赚点利息。这笔「银行之间的隔夜拆借」，利息就是联邦基金利率。</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 680 292" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>联邦基金利率是银行之间隔夜互借准备金的利率</title>
+            <desc>银行A准备金有富余，隔夜借给准备金不足的银行B，这个借贷利率就是联邦基金利率，由美联储设定目标区间</desc>
+            <defs>
+              <marker id="arrowA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </marker>
+            </defs>
+            <g>
+              <rect x="66" y="46" width="176" height="62" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+              <text x="154" y="70" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#0C447C">商业银行 A</text>
+              <text x="154" y="89" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#185FA5">钱多，暂时用不完</text>
+            </g>
+            <g>
+              <rect x="438" y="46" width="176" height="62" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+              <text x="526" y="70" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#0C447C">商业银行 B</text>
+              <text x="526" y="89" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#185FA5">今天差一笔钱周转</text>
+            </g>
+            <line x1="246" y1="77" x2="353" y2="77" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrowA)"/>
+            <line x1="434" y1="77" x2="327" y2="77" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arrowA)"/>
+            <text x="340" y="44" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#888780">借一晚上，明天就还</text>
+            <text x="340" y="112" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#241F1A">这个利息就是「联邦基金利率」</text>
+            <line x1="252" y1="188" x2="158" y2="114" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="4 4"/>
+            <line x1="428" y1="188" x2="522" y2="114" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="4 4"/>
+            <g>
+              <rect x="228" y="188" width="224" height="66" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+              <text x="340" y="212" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#633806">美联储（FOMC）</text>
+              <text x="340" y="232" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#854F0B">只负责定区间，不参与放贷</text>
+            </g>
+            <text x="340" y="276" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#888780">现在这个区间是 3.75% – 4.00%</text>
+          </svg>
+        </div>
+
+        <p class="pnote" style="margin-bottom:16px">美联储<strong>并不是下行政命令</strong>规定银行必须收多少利息。它的做法是通过买卖短期国债、调整付给银行的准备金利息、用隔夜逆回购收放资金，让实际成交的市场利率始终落在目标区间里。所以官方表述一直是「目标区间」，而不是一个精确数字。</p>
+
+        <p style="margin-bottom:9px"><strong>三个最常见的误会：</strong></p>
+        <div class="myths">
+          <div class="myth"><span class="x">✕</span><span>它<strong>不是</strong>「美联储借钱给银行的利率」，那个叫<b>贴现窗口利率</b>，是另一回事</span></div>
+          <div class="myth"><span class="x">✕</span><span>它<strong>不等于</strong> 30 年房贷利率，后者主要看<b>10 年期国债</b>，反映的是未来几年的预期</span></div>
+          <div class="myth"><span class="x">✕</span><span>它<strong>不等于</strong>你存款拿到的利息，存款利率跟得慢，而且天生比它低</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pnum">02</div>
+        <h3>它怎么传到你的钱包：一条五级链条</h3>
+        <p>把「钱」当成商品，联邦基金利率就是<strong>批发价</strong>，你的房贷车贷信用卡是<strong>零售价</strong>。美联储管不了你的信用卡合同，但它调了批发价，零售价自然会跟着变。整条传导链长这样：</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 680 400" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>加息从银行间利率传导到普通人的五个步骤</title>
+            <desc>联邦基金利率上升后依次导致银行资金成本上升、各类贷款利率上升、消费与投资降温，最终通胀回落但增长和就业走弱</desc>
+            <defs>
+              <marker id="arrowB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </marker>
+            </defs>
+            <g>
+              <rect x="105" y="48" width="470" height="52" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+              <text x="137" y="74" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#A32D2D">01</text>
+              <text x="165" y="67" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#791F1F">美联储把目标区间调高 25 个基点</text>
+              <text x="165" y="87" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#A32D2D">批发价涨了</text>
+            </g>
+            <line x1="340" y1="100" x2="340" y2="114" stroke="#888780" stroke-width="1.5" marker-end="url(#arrowB)"/>
+            <g>
+              <rect x="105" y="118" width="470" height="52" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+              <text x="137" y="144" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#A32D2D">02</text>
+              <text x="165" y="137" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#791F1F">银行的资金来源变贵了</text>
+              <text x="165" y="157" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#A32D2D">它自己借钱的成本也上去了</text>
+            </g>
+            <line x1="340" y1="170" x2="340" y2="184" stroke="#888780" stroke-width="1.5" marker-end="url(#arrowB)"/>
+            <g>
+              <rect x="105" y="188" width="470" height="52" rx="8" fill="#F7C1C1" stroke="#A32D2D" stroke-width="0.5"/>
+              <text x="137" y="214" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#A32D2D">03</text>
+              <text x="165" y="207" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#791F1F">所有贷款跟着涨价</text>
+              <text x="165" y="227" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#791F1F">信用卡、车贷、企业贷、浮动房贷</text>
+            </g>
+            <line x1="340" y1="240" x2="340" y2="254" stroke="#888780" stroke-width="1.5" marker-end="url(#arrowB)"/>
+            <g>
+              <rect x="105" y="258" width="470" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+              <text x="137" y="284" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#0F6E56">04</text>
+              <text x="165" y="277" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#085041">大家开始推迟花钱和投资</text>
+              <text x="165" y="297" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#0F6E56">企业缓扩张，居民缓消费</text>
+            </g>
+            <line x1="340" y1="310" x2="340" y2="324" stroke="#888780" stroke-width="1.5" marker-end="url(#arrowB)"/>
+            <g>
+              <rect x="105" y="328" width="470" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+              <text x="137" y="354" text-anchor="middle" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#0F6E56">05</text>
+              <text x="165" y="347" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#085041">需求变少，物价涨不动了</text>
+              <text x="165" y="367" dominant-baseline="central" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="400" fill="#0F6E56">代价：增长变慢、招聘减少</text>
+            </g>
+          </svg>
+        </div>
+
+        <p>这条链有个关键细节：<strong>政策利率当天就变，但传到你身上有先后</strong>。这也是为什么很多人会觉得「美联储都降息了，我的房贷怎么没降」——</p>
+
+        <div class="speed-wrap">
+          <table class="speed">
+            <thead><tr><th>对象</th><th>跟随速度</th><th>原因</th></tr></thead>
+            <tbody>
+              <tr><td>信用卡 / 浮动利率贷款</td><td><span class="sp fast">很快</span></td><td>合同直接挂钩最优惠贷款利率</td></tr>
+              <tr><td>企业短期贷款、商业票据</td><td><span class="sp fast">较快</span></td><td>直接由短期市场定价</td></tr>
+              <tr><td>车贷、个人消费贷</td><td><span class="sp mid">中等</span></td><td>看银行竞争和资金成本</td></tr>
+              <tr><td>30 年固定房贷</td><td><span class="sp slow">慢且不完全</span></td><td>主要看 10 年期国债，反映未来几年预期</td></tr>
+              <tr><td>货币基金、现金管理类</td><td><span class="sp fast">很快</span></td><td>投的是短期国债和同业存单，直接吃政策利率</td></tr>
+              <tr><td>银行储蓄、定期存款</td><td><span class="sp slow">很慢</span></td><td>银行不靠它揽储，黏性最强，常年跑不过通胀</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-bottom:9px"><strong>另一侧：存钱的人受影响其实更大，而且方向正好相反。</strong>上面这张表讲的都是「借钱」，但你的钱大多是以存款形式趴在银行里的：</p>
+
+        <div class="speed-wrap">
+          <table class="speed">
+            <thead><tr><th>你的钱放在</th><th>加息时</th><th>降息时</th><th>为什么</th></tr></thead>
+            <tbody>
+              <tr><td>银行活期、普通储蓄</td><td><span class="sp slow">几乎不动</span></td><td><span class="sp slow">几乎不动</span></td><td>银行不靠它揽储，利率黏性最强</td></tr>
+              <tr><td>定期存款、大额存单</td><td><span class="sp mid">新存的涨</span></td><td><span class="sp mid">新存的降</span></td><td>利率锁定，到期才重定价，存量不动</td></tr>
+              <tr><td>货币基金、现金管理类</td><td><span class="sp fast">跟得最快</span></td><td><span class="sp fast">跟跌也快</span></td><td>投短期国债和同业存单，直接吃政策利率</td></tr>
+              <tr><td>已买的债券、债券基金</td><td><span class="sp slow">净值下跌</span></td><td><span class="sp slow">净值上涨</span></td><td>利率上升 = 手里的老债券价格下跌</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>但真正决定你赚不赚的，不是名义利率，而是 <strong>实际利率 ＝ 名义利率 − 通胀</strong>。同样是 5% 的利息，在 3% 的通胀下是赚钱，在 9% 的通胀下就是亏钱：</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:2px 0 16px">
+          <div style="background:var(--hike-bg);border:1px solid #f2d7d2;border-radius:10px;padding:13px 15px">
+            <div style="font-size:12px;color:var(--hike);font-weight:700;margin-bottom:7px">2022 年 · 存钱是亏的</div>
+            <div style="font-size:12.5px;color:var(--ink-2);line-height:1.78">储蓄账户利率 <strong>&lt; 0.5%</strong><br>同期 CPI 一度冲到 <strong>9.1%</strong><br>实际收益约 <strong style="color:var(--hike)">−8%</strong></div>
+          </div>
+          <div style="background:var(--cut-bg);border:1px solid #cfe8da;border-radius:10px;padding:13px 15px">
+            <div style="font-size:12px;color:var(--cut);font-weight:700;margin-bottom:7px">2024 年 · 存钱才赚钱</div>
+            <div style="font-size:12.5px;color:var(--ink-2);line-height:1.78">货币基金收益约 <strong>5%</strong><br>同期 CPI 降到 <strong>3%</strong><br>实际收益约 <strong style="color:var(--cut)">+2%</strong></div>
+          </div>
+        </div>
+
+        <p>这里还藏着一个反直觉的现象：<strong>加息时银行股往往先涨</strong>。因为贷款利率跟着市场走、涨得快，存款利率黏性强、涨得慢，中间这块利差（净息差）被拉开，银行赚的正是这个钱。但加息太猛也有代价——银行手里的老债券会浮亏，2023 年硅谷银行倒闭就是这个机理。</p>
+
+        <p class="pnote">最实在的一句话：<strong>加息是给整个经济踩刹车，降息是松刹车</strong>。踩刹车可以猛（2022–2023 用 16 个月加了 525bp），松刹车必须慢——通胀预期一旦形成就很难收回去，1970 年代美联储就是过早放松，结果通胀二次反弹，最后被迫把利率加到 20%。这正是本轮降息 15 个月只走了 175bp、而 2026 年通胀一反复就立刻掉头加息的原因。</p>
+      </div>
+
+      <div class="pcard">
+        <div class="pnum">03</div>
+        <h3>QE：利率降到 0 之后，美联储的第二只手</h3>
+        <p>QE 是 Quantitative Easing 的缩写，中文叫<strong>量化宽松</strong>，说穿了就是<strong>美联储直接印钱去买债券</strong>，往市场里塞进一批原本不存在的钱。名字要拆开看：<strong>量化（quantitative）</strong>是说它<strong>定的是购买金额</strong>（比如「我买 7000 亿」），不是一个利率数字；<strong>宽松（easing）</strong>是说它让钱变多、变便宜。</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 680 218" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>常规降息和量化宽松的区别</title>
+            <desc>常规降息调整的是借款的价格，市场货币总量不变；量化宽松直接印钱买债，增加市场里的货币数量</desc>
+            <defs>
+              <marker id="arrowC" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </marker>
+            </defs>
+            <rect x="40" y="28" width="288" height="170" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+            <text x="62" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">常规降息 · 调价格</text>
+            <text x="62" y="84" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#0C447C">只改借钱的价，不改钱的总量</text>
+            <text x="62" y="126" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="20" font-weight="500" fill="#185FA5">5.25% → 5.00%</text>
+            <text x="62" y="158" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#444441">银行之间借隔夜钱的价变了</text>
+            <text x="62" y="178" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#444441">但市场里的钱一点没多</text>
+            <rect x="352" y="28" width="288" height="170" rx="12" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="374" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#854F0B">QE · 量化宽松</text>
+            <text x="374" y="84" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#633806">直接改钱的数量</text>
+            <rect x="374" y="100" width="68" height="28" rx="14" fill="#FAC775" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="408" y="114" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#412402" text-anchor="middle" dominant-baseline="central">印钱</text>
+            <line x1="445" y1="114" x2="458" y2="114" stroke="#854F0B" stroke-width="1.5" marker-end="url(#arrowC)"/>
+            <rect x="462" y="100" width="68" height="28" rx="14" fill="#FAC775" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="496" y="114" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#412402" text-anchor="middle" dominant-baseline="central">买债</text>
+            <line x1="533" y1="114" x2="546" y2="114" stroke="#854F0B" stroke-width="1.5" marker-end="url(#arrowC)"/>
+            <rect x="550" y="100" width="68" height="28" rx="14" fill="#FAC775" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="584" y="114" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11" fill="#412402" text-anchor="middle" dominant-baseline="central">钱变多</text>
+            <text x="374" y="158" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#444441">美联储资产 4 万亿 → 近 9 万亿</text>
+            <text x="374" y="178" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#444441">多出来的全是凭空造的钱</text>
+          </svg>
+        </div>
+
+        <p>那为什么明明有利率工具，还要用 QE？因为<strong>利率有个下限</strong>：降到 0 附近就没法再往下压了（学术界叫「零利率下限」）。2020 年 3 月就是这种情况——12 天内利率从 1.75% 砍到 0.25%，再降就是负利率了。于是美联储换了一条路：<strong>既然价格调不动，就直接加量</strong>。</p>
+
+        <p class="pnote">2020 年 3 月 15 日，美联储宣布购买 7000 亿美元资产（5000 亿国债 + 2000 亿抵押支持证券）；3 月 23 日干脆改成<strong>「不设上限，按需购买」</strong>——这就是著名的「<strong>无限 QE</strong>」，也是你上面时间线里 2020 年那段最关键的转折点。</p>
+      </div>
+
+      <div class="pcard">
+        <div class="pnum">04</div>
+        <h3>钱是怎么流出来的，又会留下什么</h3>
+        <p>最关键的一点常被忽略：美联储买债付的钱，<strong>不是从税收或存款里拿的，而是凭空记出来的准备金</strong>——在卖方银行的账上加一笔数字，债就换手了。这笔钱不会停在银行金库里，它会一层层往外走：</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 680 330" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>量化宽松的四步传导过程</title>
+            <desc>美联储凭空创造准备金买入债券，卖方拿到现金，长期利率被压低，资金最终流向股票与房产推高资产价格</desc>
+            <line x1="60" y1="50" x2="60" y2="296" stroke="#B4B2A9" stroke-width="1"/>
+            <circle cx="60" cy="50" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="60" y="50" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#633806" text-anchor="middle" dominant-baseline="central">1</text>
+            <text x="88" y="44" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#241F1A">美联储凭空造钱买债</text>
+            <text x="88" y="64" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#888780">买长期国债和房贷证券，付的钱是记出来的</text>
+            <circle cx="60" cy="132" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="60" y="132" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#633806" text-anchor="middle" dominant-baseline="central">2</text>
+            <text x="88" y="126" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#241F1A">卖方账上多出一笔现金</text>
+            <text x="88" y="146" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#888780">银行和机构卖了债拿到钱，钱总得有地方去</text>
+            <circle cx="60" cy="214" r="13" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="60" y="214" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#633806" text-anchor="middle" dominant-baseline="central">3</text>
+            <text x="88" y="208" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#241F1A">长期利率被硬买下来</text>
+            <text x="88" y="228" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#888780">抢着买国债推高价格，10 年期收益率就往下走</text>
+            <circle cx="60" cy="296" r="13" fill="#FAC775" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="60" y="296" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#412402" text-anchor="middle" dominant-baseline="central">4</text>
+            <text x="88" y="290" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#241F1A">资金涌向股票和房子</text>
+            <text x="88" y="310" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#888780">存款利息近乎为零，钱被迫去追风险资产</text>
+          </svg>
+        </div>
+
+        <p>这四步走完，落到普通人身上最直接的后果是：<strong>存款收益被压到接近零，钱放在账户里等于慢慢贬值</strong>，于是被迫离开存款去追资产。这个过程有个通俗的名字叫「<strong>存款搬家</strong>」，学名是「<strong>金融压抑</strong>」。QE 之所以能救市，很大程度就是靠这个机制把钱从银行账户里赶出来。</p>
+
+        <p style="margin-bottom:9px"><strong>三个词别搞混，它们在时间线上是一串动作：</strong></p>
+        <div class="speed-wrap">
+          <table class="speed">
+            <thead><tr><th>名词</th><th>全称</th><th>干什么</th><th>好比</th></tr></thead>
+            <tbody>
+              <tr><td><b>QE</b></td><td>量化宽松</td><td>印钱买债，把资产负债表做大</td><td><span class="sp" style="color:#b8892b">踩油门</span></td></tr>
+              <tr><td><b>Taper</b></td><td>缩减购债</td><td>每月少买一点，先减速</td><td><span class="sp" style="color:#888780">松油门</span></td></tr>
+              <tr><td><b>QT</b></td><td>缩表</td><td>债券到期不续买，让表缩回去</td><td><span class="sp" style="color:#5b7a99">挂倒挡</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-bottom:9px"><strong>三个绕不开的副作用：</strong></p>
+        <div class="myths">
+          <div class="myth"><span class="x" style="color:#8a6618">1</span><span><b>资产先涨，差距拉大</b>：股票和房子先受益；只靠银行存款的人，拿到的是接近零的利息，还要承受后来的物价上涨</span></div>
+          <div class="myth"><span class="x" style="color:#8a6618">2</span><span><b>通胀滞后到账</b>：2020 年放出去的水，2021–2022 年才变成 8%~9% 的 CPI，这也正是后来不得不急加 525bp 的根源</span></div>
+          <div class="myth"><span class="x" style="color:#8a6618">3</span><span><b>退出比进入难</b>：2013 年伯南克只是暗示要减购，就引发「缩减恐慌」；2018 年缩表直接把美股砸进熊市</span></div>
+        </div>
+
+        <p class="pnote" style="margin-top:14px">回到你上面那张图：<strong>2020 年 3 月 23 日宣布无限 QE 当天，标普 500 收在 2237 点，正好是这轮熊市的最低点</strong>。所以市场反转靠的其实不是降息，而是「美联储愿意无限兜底」这个承诺本身。</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= TIMELINE ================= -->
+  <div class="sec">
+    <div class="sec-t">Timeline</div>
+    <div class="sec-h">逐次会议动作</div>
+    <div class="sec-s">加息 = 红，降息 = 绿，维持不变 = 灰（虚线卡片）</div>
+
+    <!-- 2020 -->
+    <div class="year-block">
+      <div class="year-head">
+        <div class="year-num">2020</div>
+        <div class="year-meta"><span class="tag c">2 次降息 · −150bp</span><span class="tag ho">7 次维持</span>年末 0–0.25%</div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">1月29日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">维持</span><span class="rate">1.50%–1.75%</span></div>
+          <div class="ev-desc">疫情前的最后一次常规会议，当时联储仍判断经济「温和扩张」。三周后市场开始崩。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">3月3日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−50bp</span><span class="rate">1.00%–1.25%</span><span class="flag">紧急降息</span></div>
+          <div class="ev-desc">未事先安排的紧急电话会议，2008 年 10 月以来首次「会议间降息」。市场当天先涨后跌、收跌 2.8%——被解读成「确认了情况比想象更糟」。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">3月15日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−100bp</span><span class="rate">0–0.25%</span><span class="flag">单次最大降幅 · 启动 7000 亿 QE</span></div>
+          <div class="ev-desc">周日紧急宣布，直接砍到零利率，同时启动 7000 亿美元资产购买。次日市场照样熔断——货币政策的常规弹药已经打光。</div>
+        </div>
+      </div>
+      <div class="ev">
+        <div class="ev-date">3月23日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">无限 QE</span><span class="rate">0–0.25%</span><span class="flag">恰好是股市底部当天</span></div>
+          <div class="ev-desc">宣布购买国债和 MBS「不设上限」，并首次绕过商业银行直接购买企业债。标普 500 当天收在 2237 点，正是本轮熊市最低点。</div>
+        </div>
+      </div>
+      <div class="ev">
+        <div class="ev-date">8月27日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">框架改革</span><span class="rate">0–0.25%</span><span class="flag">平均通胀目标制</span></div>
+          <div class="ev-desc">杰克逊霍尔年会宣布改用「平均通胀目标制」（AIT）：允许通胀在一段时间内略高于 2% 以补偿低迷期。事后看，这是 2021 年「通胀暂时论」失误的制度根源。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">9/16 起</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">连续 3 次维持</span><span class="rate">0–0.25%</span></div>
+          <div class="ev-desc">9/16、11/5、12/16 三次会议全部按兵不动，点阵图显示 2023 年前都不会加息。市场把「零利率」当成了长期常态。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2021 -->
+    <div class="year-block">
+      <div class="year-head">
+        <div class="year-num">2021</div>
+        <div class="year-meta"><span class="tag ho">0 次加息</span><span class="tag ho">0 次降息</span>年末 0–0.25%</div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">11月3日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">启动 Taper</span><span class="rate">0–0.25%</span><span class="flag">政策转向起点</span></div>
+          <div class="ev-desc">宣布每月缩减购债 150 亿美元（国债 100 亿 + MBS 50 亿），正式退出疫情时期的量化宽松。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">12月15日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">加速 Taper</span><span class="rate">0–0.25%</span></div>
+          <div class="ev-desc">缩债速度翻倍，购债计划提前至 2022 年 3 月结束；点阵图首次暗示 2022 年将加息 3 次——市场当时普遍不信。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2022 -->
+    <div class="year-block">
+      <div class="year-head">
+        <div class="year-num">2022</div>
+        <div class="year-meta"><span class="tag h">7 次加息 · +425bp</span>年末 4.25–4.50%</div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">3月16日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+25bp</span><span class="rate">0.25%–0.50%</span><span class="flag">加息周期开启</span></div>
+          <div class="ev-desc">2018 年 12 月以来首次加息。俄乌冲突爆发仅三周，联储仍选择起步，通胀当时已破 7%。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">5月4日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+50bp</span><span class="rate">0.75%–1.00%</span></div>
+          <div class="ev-desc">2000 年 5 月以来最大单次幅度，同时宣布 6 月起启动缩表。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">6月15日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h big">+75bp</span><span class="rate">1.50%–1.75%</span><span class="flag">超常规</span></div>
+          <div class="ev-desc">1994 年以来最大单次加息。5 月 CPI 同比 8.6% 创 40 年新高，联储被迫放弃「渐进」路线。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">7月27日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h big">+75bp</span><span class="rate">2.25%–2.50%</span><span class="flag">超常规</span></div>
+          <div class="ev-desc">连续第二次 75bp。6 月 CPI 触及 9.1%，为本轮通胀顶部。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">9月21日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h big">+75bp</span><span class="rate">3.00%–3.25%</span><span class="flag">超常规</span></div>
+          <div class="ev-desc">第三次 75bp，点阵图显示利率终点将升至 4.6%，鲍威尔直言软着陆难度上升。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">11月2日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h big">+75bp</span><span class="rate">3.75%–4.00%</span><span class="flag">超常规</span></div>
+          <div class="ev-desc">第四次 75bp，声明中新增强调「累积紧缩的滞后效应」，为放缓埋下伏笔。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">12月14日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+50bp</span><span class="rate">4.25%–4.50%</span></div>
+          <div class="ev-desc">加息幅度收窄。全年 7 次加息累计 425bp，为 1980 年代以来最陡峭的一年。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2023 -->
+    <div class="year-block">
+      <div class="year-head">
+        <div class="year-num">2023</div>
+        <div class="year-meta"><span class="tag h">4 次加息 · +100bp</span><span class="tag ho">4 次维持</span>年末 5.25–5.50%</div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">2月1日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+25bp</span><span class="rate">4.50%–4.75%</span></div>
+          <div class="ev-desc">放缓至 25bp 常规步幅，通胀连续 6 个月回落。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">3月22日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+25bp</span><span class="rate">4.75%–5.00%</span><span class="flag">银行业危机中加息</span></div>
+          <div class="ev-desc">硅谷银行（3/10）、签名银行接连倒闭，联储仍在「稳通胀」与「稳金融」之间选择加息 25bp，同时紧急开设 BTFP 流动性工具。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">5月3日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+25bp</span><span class="rate">5.00%–5.25%</span></div>
+          <div class="ev-desc">第一共和银行被接管后第十天，声明删除「一些额外紧缩可能合适」的措辞，暗示接近终点。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">6月14日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">维持</span><span class="rate">5.00%–5.25%</span></div>
+          <div class="ev-desc">本轮加息周期首次暂停，但点阵图显示年内还有 2 次加息——「跳过」而非「停止」。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">7月26日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+25bp</span><span class="rate">5.25%–5.50%</span><span class="flag">本轮最后一次加息 / 峰值确立</span></div>
+          <div class="ev-desc">累计加息 525bp，利率达 2001 年以来最高。此后连续 14 个月维持在这一峰值。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">9/20 起</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">连续 3 次维持</span><span class="rate">5.25%–5.50%</span></div>
+          <div class="ev-desc">11/1、12/13 两次会议继续按兵不动。「higher for longer」成为主线。10 年期美债收益率一度破 5%，金融条件自发收紧替代了加息。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2024 -->
+    <div class="year-block">
+      <div class="year-head">
+        <div class="year-num">2024</div>
+        <div class="year-meta"><span class="tag c">3 次降息 · −100bp</span><span class="tag ho">5 次维持</span>年末 4.25–4.50%</div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">1/31 起</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">连续 5 次维持</span><span class="rate">5.25%–5.50%</span></div>
+          <div class="ev-desc">年初市场预期年内降息 6 次，结果连续落空。核心通胀黏在 3% 以上，降息窗口被一再推后至 9 月。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">9月18日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−50bp</span><span class="rate">4.75%–5.00%</span><span class="flag">降息周期开启</span></div>
+          <div class="ev-desc">四年多来首次降息，且开局就是 50bp 的「超规格」幅度。触发点是 7 月失业率升至 4.3%，触发 Sahm 规则担忧。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">11月7日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−25bp</span><span class="rate">4.50%–4.75%</span></div>
+          <div class="ev-desc">美国大选结果公布两天后，联储按既定路径降息 25bp，回到常规步幅。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">12月18日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−25bp</span><span class="rate">4.25%–4.50%</span><span class="flag">鹰派降息</span></div>
+          <div class="ev-desc">第三次降息但点阵图大幅收缩，将 2025 年降息预期从 4 次砍到 2 次，美股当日大跌。全年累计降息 100bp。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2025 -->
+    <div class="year-block">
+      <div class="year-head">
+        <div class="year-num">2025</div>
+        <div class="year-meta"><span class="tag c">3 次降息 · −75bp</span><span class="tag ho">5 次维持</span>年末 3.50–3.75%</div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">1/29 起</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">连续 5 次维持</span><span class="rate">4.25%–4.50%</span></div>
+          <div class="ev-desc">关税冲击推高商品价格，通胀反弹至 3% 上方，降息被迫搁置。同期白宫持续公开施压鲍威尔，联储独立性成为市场议题。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">9月17日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−25bp</span><span class="rate">4.00%–4.25%</span><span class="flag">年内首降</span></div>
+          <div class="ev-desc">鲍威尔称之为「风险管理式降息」——重心从控通胀转向防就业下行，8 月非农数据大幅走弱是导火索。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">10月29日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−25bp</span><span class="rate">3.75%–4.00%</span></div>
+          <div class="ev-desc">连续第二次降息，同时宣布 12 月起停止缩表，货币政策全面转回中性甚至偏宽取向。</div>
+        </div>
+      </div>
+      <div class="ev cut">
+        <div class="ev-date">12月10日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp c">−25bp</span><span class="rate">3.50%–3.75%</span><span class="flag">本轮降息终点</span></div>
+          <div class="ev-desc">年内第三次降息，出现 3 张反对票（2019 年 9 月以来最多）。同时宣布每月购买 400 亿美元短债，技术性扩表。点阵图维持 2026 年再降 1 次的中值预期。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2026 -->
+    <div class="year-block">
+      <div class="year-head">
+        <div class="year-num">2026</div>
+        <div class="year-meta"><span class="tag h">1 次加息 · +25bp</span><span class="tag ho">6 次维持</span>当前 3.75–4.00%</div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">1月28日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">维持</span><span class="rate">3.50%–3.75%</span></div>
+          <div class="ev-desc">按兵不动开局。中东局势推升能源价格，通胀回落停滞。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">3月18日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">维持</span><span class="rate">3.50%–3.75%</span></div>
+          <div class="ev-desc">点阵图仍显示年内降息 1 次，12 人认为会降息——这是最后一次「鸽派」点阵图。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">4月29日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">维持</span><span class="rate">3.50%–3.75%</span><span class="flag">8:4 分歧 · 1992 年以来最大</span></div>
+          <div class="ev-desc">投票 8 比 4，内部裂成三派（降息 / 维持 / 加息），为本轮周期最撕裂的一次会议。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">6月17日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">维持</span><span class="rate">3.50%–3.75%</span><span class="flag">沃什首秀 · 12:0 一致</span></div>
+          <div class="ev-desc">凯文·沃什（Kevin Warsh）接任主席后首次主持。声明大幅精简、<strong>删除全部前瞻指引</strong>，只保留「委员会将实现物价稳定」一句核心承诺。点阵图剧变：9 人认为年内加息，仅 1 人认为降息。</div>
+        </div>
+      </div>
+      <div class="ev hold">
+        <div class="ev-date">7月29日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">维持</span><span class="rate">3.50%–3.75%</span><span class="flag">9:3 · 三票主张加息</span></div>
+          <div class="ev-desc">三位地区联储主席投反对票并要求立即加息 25bp，为 2016 年以来首次出现三张同向反对票，鹰派力量明显抬头。</div>
+        </div>
+      </div>
+      <div class="ev hike">
+        <div class="ev-date">9月16日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp h">+25bp</span><span class="rate">3.75%–4.00%</span><span class="flag">2023 年 7 月以来首次加息</span></div>
+          <div class="ev-desc">全体成员一致同意加息。理由：能源冲击叠加 AI 相关投资热潮推高物价，通胀连续数月无进展。纪要显示多数官员认为年底前可能还需再加一次。</div>
+        </div>
+      </div>
+      <div class="ev">
+        <div class="ev-date">10月28日</div>
+        <div class="ev-main">
+          <div class="ev-line"><span class="bp ho">下次会议</span><span class="rate">待定</span><span class="flag">市场焦点</span></div>
+          <div class="ev-desc">即将召开（本文数据截至 10 月 27 日）。核心看点：是否连续第二次加息，以及沃什治下「无前瞻指引」模式带来的波动放大。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TABLE ================= -->
+  <div class="sec">
+    <div class="sec-t">Summary</div>
+    <div class="sec-h">年度动作汇总</div>
+    <div class="sec-s">按年末目标区间统计（2026 年为截至 10 月 27 日）</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>年份</th><th>加息</th><th>降息</th><th>净变动</th><th>年末目标区间</th><th>阶段特征</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>2020</b></td><td class="num-z">—</td><td class="num-c">2 次 / −150bp</td><td class="num-c">−150bp</td>
+            <td>0 – 0.25%</td><td>疫情救市 · 无限 QE</td>
+          </tr>
+          <tr>
+            <td><b>2021</b></td><td class="num-z">—</td><td class="num-z">—</td><td class="num-z">0</td>
+            <td>0 – 0.25%</td><td>Taper 启动</td>
+          </tr>
+          <tr>
+            <td><b>2022</b></td><td class="num-h">7 次 / +425bp</td><td class="num-z">—</td><td class="num-h">+425bp</td>
+            <td>4.25 – 4.50%</td><td>激进加息</td>
+          </tr>
+          <tr>
+            <td><b>2023</b></td><td class="num-h">4 次 / +100bp</td><td class="num-z">—</td><td class="num-h">+100bp</td>
+            <td>5.25 – 5.50%</td><td>见顶 + 转向观望</td>
+          </tr>
+          <tr>
+            <td><b>2024</b></td><td class="num-z">—</td><td class="num-c">3 次 / −100bp</td><td class="num-c">−100bp</td>
+            <td>4.25 – 4.50%</td><td>降息开启</td>
+          </tr>
+          <tr>
+            <td><b>2025</b></td><td class="num-z">—</td><td class="num-c">3 次 / −75bp</td><td class="num-c">−75bp</td>
+            <td>3.50 – 3.75%</td><td>降息终点</td>
+          </tr>
+          <tr>
+            <td><b>2026</b></td><td class="num-h">1 次 / +25bp</td><td class="num-z">—</td><td class="num-h">+25bp</td>
+            <td>3.75 – 4.00%</td><td>观望 → 重启加息</td>
+          </tr>
+          <tr class="total">
+            <td>合计</td><td class="num-h">12 次 / +550bp</td><td class="num-c">8 次 / −325bp</td>
+            <td class="num-h">净 +225bp</td><td>—</td><td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ================= BOND ================= -->
+  <div class="sec">
+    <div class="sec-t">The Bond Market</div>
+    <div class="sec-h">中间那一环：利率涨了，债市先炸</div>
+    <div class="sec-s">从政策利率到股市之间，还隔着一个 40 万亿美元的市场</div>
+
+    <p style="font-size:14px;color:var(--ink-2);line-height:1.85;margin:0 0 18px;max-width:830px">上面那张表讲的是「利率」，但利率只是美联储定的价。真正在市场上被买卖、被定价的是债券的<strong>价格</strong>，而价格和收益率<strong>方向正好相反</strong>。这一步是从政策到股市的必经之路——先看债市怎么反应，再谈股市为什么反常。</p>
+
+    <div class="primer">
+
+      <div class="pcard">
+        <div class="pnum">05</div>
+        <h3>美国国债：一张最安全的借条，和一个最容易搞反的规律</h3>
+        <p>美债说穿了就是<strong>美国财政部开的一张借条</strong>。你把钱借给它，它承诺两件事：每隔半年付一次利息（票息），到期把本金还你。因为有美国政府的信用兜底、市场又足够深，它被当成全球最接近「无风险」的资产。</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 680 210" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>美国国债的三个要素</title>
+            <desc>一张美国国债包含面值、票息、期限三个要素，由美国政府信用担保，到期还本并定期付息</desc>
+            <rect x="40" y="26" width="600" height="158" rx="14" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+            <text x="64" y="54" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">美国财政部 · 借条</text>
+            <text x="64" y="84" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="500" fill="#0C447C">10 年期国债（T-Note）</text>
+            <line x1="64" y1="102" x2="616" y2="102" stroke="#B5D4F4" stroke-width="0.5"/>
+            <text x="64" y="126" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#0C447C">面值 100 美元</text>
+            <text x="64" y="148" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">到期一次性还本</text>
+            <text x="252" y="126" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#0C447C">票息 4.0%</text>
+            <text x="252" y="148" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">每半年付一次利息</text>
+            <text x="440" y="126" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#0C447C">期限 10 年</text>
+            <text x="440" y="148" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">到期日 2036 年</text>
+            <text x="64" y="172" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#378ADD">背后是美国政府的信用，理论上可以一直借新还旧</text>
+          </svg>
+        </div>
+
+        <p>但美债跟普通借条有个关键区别：<strong>它可以随时转手卖掉</strong>。一旦能买卖，就出现了一个大部分人想不通的规律——<strong>利率一涨，债券价格反而跌</strong>。</p>
+
+        <p>举个例子：你手里有一张 100 美元、每年只付 2 美元的旧债。现在新债能给 5%，你标价 100 卖掉，没人愿意接，因为同样花 100 美元，买新债每年能多拿 3 美元。你只能降价：</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 680 268" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>债券价格下跌时收益率上升的三步推演</title>
+            <desc>票息 2% 的旧债券在利率涨到 5% 后卖不掉，只能降价到 80 美元，此时买方的实际收益率升到约 5%</desc>
+            <defs>
+              <marker id="arrowD" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </marker>
+            </defs>
+            <rect x="40" y="34" width="176" height="112" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+            <text x="60" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">第一步 · 你手里有</text>
+            <text x="60" y="84" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#0C447C">一张 2% 的旧债</text>
+            <text x="60" y="108" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">面值 100 美元</text>
+            <text x="60" y="128" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5">每年只付你 2 美元</text>
+            <line x1="224" y1="90" x2="246" y2="90" stroke="#888780" stroke-width="1.5" marker-end="url(#arrowD)"/>
+            <rect x="252" y="34" width="176" height="112" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="272" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#854F0B">第二步 · 但市场变了</text>
+            <text x="272" y="84" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#633806">新债给到 5%</text>
+            <text x="272" y="108" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#854F0B">你标 100 美元卖</text>
+            <text x="272" y="128" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#854F0B">没人愿意接</text>
+            <line x1="436" y1="90" x2="458" y2="90" stroke="#888780" stroke-width="1.5" marker-end="url(#arrowD)"/>
+            <rect x="464" y="34" width="176" height="112" rx="10" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+            <text x="484" y="58" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#A32D2D">第三步 · 只能降价</text>
+            <text x="484" y="84" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" font-weight="500" fill="#791F1F">80 美元才卖得掉</text>
+            <text x="484" y="108" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#A32D2D">买方每年拿 2 美元</text>
+            <text x="484" y="128" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#A32D2D">到期还拿回 100 美元</text>
+            <rect x="40" y="170" width="600" height="78" rx="10" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+            <text x="340" y="200" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="17" font-weight="500" fill="#2C2C2A" text-anchor="middle">价格跌到 80　＝　收益率涨到约 5%</text>
+            <text x="340" y="228" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#5F5E5A" text-anchor="middle">收益率不是印在债券上的数字，是被价格算出来的：2 美元利息 ÷ 80 美元成本，再加到期价差</text>
+          </svg>
+        </div>
+
+        <p class="pnote">记住这一句就够了：<strong>债券价格和收益率是同一枚硬币的两面，永远反向</strong>。所以「美联储加息 → 收益率上涨 → 手里的老债跌价」是一条连贯的因果链。2022 年急加 525bp，美国债券综合指数跌了 13%，是四十年来最惨的一年——而这一轮 2026 年重启加息，同样的剧本正在重演。</p>
+      </div>
+
+      <div class="pcard">
+        <div class="pnum">06</div>
+        <h3>10 年期收益率：全球资产价格的地基</h3>
+        <p>美债有各种期限，但全世界每天盯的是<strong>10 年期</strong>这一个数字。原因很简单：它被当作「<strong>无风险利率</strong>」，所有投资都拿它当参照——风险更高的资产，只是在这个数字之上再加一块溢价。</p>
+
+        <div class="diagram">
+          <svg viewBox="0 0 680 258" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+            <title>10 年期美债收益率的四个传导去向</title>
+            <desc>10 年期美债收益率被视为无风险利率，它同时影响房贷利率、股票估值、美元汇率和企业发债成本</desc>
+            <defs>
+              <marker id="arrowE" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </marker>
+            </defs>
+            <rect x="40" y="60" width="200" height="100" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+            <text x="140" y="92" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#0C447C" text-anchor="middle">10 年期美债收益率</text>
+            <text x="140" y="120" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="22" font-weight="500" fill="#185FA5" text-anchor="middle">约 5.0%</text>
+            <text x="140" y="144" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" fill="#185FA5" text-anchor="middle">全世界的「无风险利率」</text>
+            <path d="M240 110H266L296 61" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrowE)"/>
+            <path d="M240 110H266L296 113" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrowE)"/>
+            <path d="M240 110H266L296 165" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrowE)"/>
+            <path d="M240 110H266L296 217" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arrowE)"/>
+            <rect x="300" y="40" width="340" height="42" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="318" y="57" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#633806">你的房贷</text>
+            <text x="318" y="73" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#854F0B">30 年房贷利率 ≈ 10 年期收益率 + 银行加点</text>
+            <rect x="300" y="92" width="340" height="42" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="318" y="109" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#633806">股票估值</text>
+            <text x="318" y="125" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#854F0B">它是折现率的分母，收益率一涨估值就压</text>
+            <rect x="300" y="144" width="340" height="42" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="318" y="161" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#633806">美元汇率</text>
+            <text x="318" y="177" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#854F0B">收益率高，全球资金回流美元，别国货币承压</text>
+            <rect x="300" y="196" width="340" height="42" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+            <text x="318" y="213" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="13" font-weight="500" fill="#633806">企业发债</text>
+            <text x="318" y="229" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#854F0B">公司债定价的基准，加多少个点看信用</text>
+          </svg>
+        </div>
+
+        <p style="margin-bottom:9px"><strong>期限不同，风险完全不是一个量级：</strong></p>
+        <div class="speed-wrap">
+          <table class="speed">
+            <thead><tr><th>品种</th><th>期限</th><th>特点</th></tr></thead>
+            <tbody>
+              <tr><td>T-Bill 短期国库券</td><td>1 年以内</td><td>折价发行，98 元买入、100 元到期拿回，不付息</td></tr>
+              <tr><td>T-Note 中期国债</td><td>2 / 3 / 5 / 7 / 10 年</td><td>每半年付息，10 年期就是最受关注的那个</td></tr>
+              <tr><td>T-Bond 长期国债</td><td>20 / 30 年</td><td>票息最高，价格波动也最剧烈</td></tr>
+              <tr><td>TIPS 通胀保值债</td><td>5 / 10 / 30 年</td><td>本金跟着 CPI 调整，专治通胀恐惧</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>关键差别在<strong>久期</strong>：期限越长，对利率越敏感。30 年期国债的久期大约 15–20，意思是利率只要涨 1 个百分点，价格就要跌 15%–20%。2022 年那波 13% 的亏损主要是长债砸出来的——买短债的人几乎没感觉，买长债的人直接懵了。</p>
+
+        <p style="margin-bottom:9px"><strong>风险到底在哪：</strong></p>
+        <div class="speed-wrap">
+          <table class="speed">
+            <thead><tr><th>风险类型</th><th>严重程度</th><th>说明</th></tr></thead>
+            <tbody>
+              <tr><td>利率风险</td><td><span class="sp" style="color:#c4453a">最主要</span></td><td>加息 = 手里的老债跌价，唯一真正会让人亏钱的风险</td></tr>
+              <tr><td>通胀风险</td><td><span class="sp" style="color:#b8892b">慢性</span></td><td>票息固定，物价涨了等于白拿，实际收益可能为负</td></tr>
+              <tr><td>汇率风险</td><td><span class="sp" style="color:#b8892b">对非美投资者</span></td><td>用人民币买美债，美元一跌，赚的利息全吐回去</td></tr>
+              <tr><td>供给风险</td><td><span class="sp" style="color:#b8892b">2026 年新问题</span></td><td>债务 40 万亿，发债量太大，市场吃不下就只能抬利率</td></tr>
+              <tr><td>违约风险</td><td><span class="sp" style="color:#857d73">极低但非零</span></td><td>2011 年标普、2023 年惠誉都下调过美国评级，债务上限也闹过几次</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="pnote">所以有句话值得记住：<strong>买美债最怕的不是美国政府赖账，而是利率往上走</strong>。违约风险接近于零，但价格波动的风险是实实在在的——而且它不会提前通知你。</p>
+      </div>
+
+    </div>
+
+    <div class="panel" style="margin-top:18px">
+      <div class="panel-head">
+        <div class="panel-title">10 年期美债收益率：2026 年一路向上</div>
+        <div class="panel-note">2026.01 — 2026.10 · 单位 %</div>
+      </div>
+      <div class="legend">
+        <span class="lg"><i style="background:#185FA5"></i>10 年期收益率</span>
+        <span class="lg"><i style="background:#c4453a"></i>9.16 美联储加息</span>
+      </div>
+      <svg viewBox="0 0 1160 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="2026年10年期美债收益率走势图">
+        <line x1="70" y1="248" x2="1100" y2="248" stroke="#e6dfd4" stroke-width="1"/>
+        <line x1="70" y1="182" x2="1100" y2="182" stroke="#e6dfd4" stroke-width="1"/>
+        <line x1="70" y1="116" x2="1100" y2="116" stroke="#e6dfd4" stroke-width="1"/>
+        <line x1="70" y1="49" x2="1100" y2="49" stroke="#e6dfd4" stroke-width="1"/>
+        <text x="58" y="252" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">4.0%</text>
+        <text x="58" y="186" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">4.5%</text>
+        <text x="58" y="120" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">5.0%</text>
+        <text x="58" y="53" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">5.5%</text>
+        <text x="70" y="272" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">2026.1</text>
+        <text x="375" y="272" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">2026.4</text>
+        <text x="683" y="272" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">2026.7</text>
+        <text x="995" y="272" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#857d73">2026.10</text>
+        <path d="M70 228 L1012 68 L1046 109 L1046 248 L70 248 Z" fill="#185FA5" opacity="0.07"/>
+        <line x1="944" y1="36" x2="944" y2="248" stroke="#c4453a" stroke-width="1" stroke-dasharray="4 4" opacity="0.55"/>
+        <text x="936" y="26" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#c4453a">9.16 美联储加息</text>
+        <polyline points="70,228 1012,68 1046,109" fill="none" stroke="#185FA5" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="70" cy="228" r="4.5" fill="#185FA5"/>
+        <circle cx="1012" cy="68" r="4.5" fill="#185FA5"/>
+        <circle cx="1046" cy="109" r="4.5" fill="#185FA5"/>
+        <text x="82" y="218" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#185FA5">4.15% · 年初</text>
+        <text x="1012" y="42" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#185FA5">5.36%</text>
+        <text x="1012" y="58" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="11.5" fill="#185FA5">2002 年以来最高</text>
+        <text x="1054" y="124" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif" font-size="12" font-weight="700" fill="#185FA5">5.05%</text>
+      </svg>
+      <div class="chart-note">为关键时点的实际水平连线，非逐日行情；9 月的跳升主要集中在议息会议前后，不代表全年匀速上涨。数据来源：美国财政部、彭博社、界面新闻等公开报道。</div>
+    </div>
+
+    <p>另一层压力来自财政本身：2026 年 8 月，美国联邦债务总额<strong>首次突破 40 万亿美元</strong>，仅利息支出一年就接近 1 万亿，占 GDP 的 3.3%，已经超过国防开支。发债越多、利率越高，利息负担就越重——这也是为什么这一轮收益率上行，市场并不完全相信它只是「暂时的」。</p>
+
+    <p class="pnote" style="margin-top:14px">把这一章串起来就是一条完整的链：<strong>美联储加息 → 新债收益率变高 → 老债价格必须跌 → 10 年期收益率被推高 → 房贷、企业融资、股票估值全部重算一遍</strong>。接下来那一章，我们就去看链条末端：股市到底有没有按这个逻辑走。</p>
+  </div>
+
+  <!-- ================= MARKET ================= -->
+  <div class="sec">
+    <div class="sec-t">Policy vs Market</div>
+    <div class="sec-h">对照：政策在收紧，股市为什么还能涨？</div>
+    <div class="sec-s">同一根时间轴，上为联邦基金利率，下为标普 500 收盘</div>
+
+    <div class="panel" style="margin-top:0">
+      <div class="panel-head">
+        <div class="panel-title">利率与股市的错位</div>
+        <div class="panel-note">2020.01 — 2026.10</div>
+      </div>
+      <div class="legend">
+        <span class="lg"><i style="background:#7a7268;width:14px;height:3px;border-radius:2px"></i>联邦基金利率（上限）</span>
+        <span class="lg"><i style="background:#185FA5"></i>标普 500 收盘</span>
+      </div>
+      <svg id="chart2" viewBox="0 0 1160 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="联邦基金利率与标普500走势对照图"></svg>
+      <div class="chart-note">标普 500 为各年度关键高低点与实际收盘点位连线，非逐日行情。数据来源：S&amp;P Dow Jones Indices、FRED。</div>
+    </div>
+
+    <div class="tbl-wrap" style="margin-top:14px">
+      <table>
+        <thead>
+          <tr><th>年份</th><th>年末目标利率</th><th>标普 500 年末</th><th>年度涨跌</th><th>市场当时在讲什么故事</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>2020</b></td><td>0 – 0.25%</td><td>3,756</td><td class="num-h">+16.3%</td>
+            <td>无限 QE 救市，33 天最短熊市后 V 型反转</td>
+          </tr>
+          <tr>
+            <td><b>2021</b></td><td>0 – 0.25%</td><td>4,766</td><td class="num-h">+26.9%</td>
+            <td>零利率 + 财政刺激，成长股与散户狂欢</td>
+          </tr>
+          <tr>
+            <td><b>2022</b></td><td>4.25 – 4.50%</td><td>3,840</td><td class="num-c">−19.4%</td>
+            <td>全年加息 425bp，估值杀 + 股债双杀</td>
+          </tr>
+          <tr>
+            <td><b>2023</b></td><td>5.25 – 5.50%</td><td>4,770</td><td class="num-h">+24.2%</td>
+            <td>AI 叙事启动，加息尾声反而催生牛市</td>
+          </tr>
+          <tr>
+            <td><b>2024</b></td><td>4.25 – 4.50%</td><td>5,882</td><td class="num-h">+23.3%</td>
+            <td>降息预期 + AI 资本开支，连续两年涨超 20%</td>
+          </tr>
+          <tr>
+            <td><b>2025</b></td><td>3.50 – 3.75%</td><td>6,846</td><td class="num-h">+16.4%</td>
+            <td>关税冲击后 V 型反弹，AI 继续主导</td>
+          </tr>
+          <tr>
+            <td><b>2026*</b></td><td>3.75 – 4.00%</td><td>7,677</td><td class="num-h">+12.1%</td>
+            <td>加息重启，但 AI 盈利撑住了估值</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-note" style="border-top:none;padding-top:8px">* 2026 年为 10 月 26 日收盘，非年末数据。</div>
+
+    <div class="moments">
+      <div class="mo" style="--mc:#185FA5">
+        <div class="mt">2020.03</div>
+        <div class="mh">政策底，正好就是市场底</div>
+        <div class="mb">无限 QE 宣布的当天（3/23），标普收在 <b>2237 点</b>——正是这轮熊市的最低点。此后不到 5 个月收复全部跌幅，创下史上最短熊市（33 天）。这次「药到病除」给市场留下了很深的肌肉记忆。</div>
+      </div>
+      <div class="mo" style="--mc:#c4453a">
+        <div class="mt">2022</div>
+        <div class="mh">唯一一次政策与市场同步向下</div>
+        <div class="mb">全年加息 425bp，标普从 4819 跌到 3492（<b>−27.5%</b>），纳斯达克跌 33%。这也是六年间唯一「教科书式」的一年：利率上、估值下，负相关干净利落。</div>
+      </div>
+      <div class="mo" style="--mc:#b8892b">
+        <div class="mt">2023 – 2025</div>
+        <div class="mh">利率趴在 5.5%，牛市自己走</div>
+        <div class="mb">利率在高位整整 14 个月没动，标普同期却涨了 <b>60% 以上</b>。原因是 AI 带来的盈利增长盖过了利率压力——市场开始用「盈利 &gt; 利率」的框架定价，而不是看美联储脸色。</div>
+      </div>
+      <div class="mo" style="--mc:#2a8a5e">
+        <div class="mt">2026.09</div>
+        <div class="mh">加息了，股市还在创新高</div>
+        <div class="mb">9 月加息 25bp，10 月 6 日标普反而创下 <b>7819</b> 的历史新高。市场定价的不是利率本身，而是 AI 资本开支能不能持续。这也解释了为什么本轮加息对股市的杀伤力远小于 2022 年。</div>
+      </div>
+    </div>
+
+    <div class="pnote" style="margin-top:16px">一句话总结这组对照：<strong>利率决定「钱的成本」，盈利决定「钱的去处」</strong>。当盈利增速跑得比利率快，加息只是逆风；当盈利跟不上，加息就是釜底抽薪。2022 年是后者，2026 年是前者。</div>
+  </div>
+
+  <!-- ================= INSIGHTS ================= -->
+  <div class="sec">
+    <div class="sec-t">Takeaways</div>
+    <div class="sec-h">五个值得注意的点</div>
+    <div class="sec-s">把这 5 年的路径放在一起看，节奏本身比单次决议更有信息量</div>
+    <div class="insights">
+      <div class="ins">
+        <div class="ih"><span>01</span>同样是降息，速度差了 40 倍</div>
+        <div class="ib">2020 年疫情救市，<b>12 天</b>就降了 150bp；2024–2025 的正常降息，<b>15 个月</b>才走完 175bp；而加息是 16 个月 525bp。结论很直白：危机模式踩油门敢踩到底，正常周期踩油门只敢轻点。</div>
+      </div>
+      <div class="ins">
+        <div class="ih"><span>02</span>预期管理彻底反转</div>
+        <div class="ib">3 月点阵图还有 12 人看降息，6 月就变成 9 人看加息，仅隔 3 个月。预期反转的幅度远超市场共识，也直接解释了 2026 年上半年美债与美元的剧烈波动。</div>
+      </div>
+      <div class="ins">
+        <div class="ih"><span>03</span>沟通方式本身成了变量</div>
+        <div class="ib">沃什删掉前瞻指引、精简声明、放弃提交个人点阵图预测。市场失去「官方剧本」后，只能靠数据交易——这会让每次数据发布的市场冲击变得更尖锐。</div>
+      </div>
+      <div class="ins">
+        <div class="ih"><span>04</span>通胀的来源换了</div>
+        <div class="ib">2022 年是需求过热 + 供应链；2026 年变成了<b>能源地缘冲击 + AI 资本开支热潮</b>。货币政策对供给型通胀本就低效，这也是联储「宁愿加息也不愿再等」的底层逻辑。</div>
+      </div>
+      <div class="ins" style="grid-column:span 2">
+        <div class="ih"><span>05</span>债市才是政策的第一个落点，而且它不再替股票挡刀</div>
+        <div class="ib">2022 年加息，美国债券综合指数跌了 <b>13%</b>，比 2008 年金融危机时还惨；2026 年重启加息，10 年期收益率又从 4.15% 冲到 <b>5.36%</b>。更值得警惕的是，传统「股跌债涨」的对冲关系正在失效——这两年多次出现股债同跌，靠债券给股票组合兜底的老办法，保护作用已经明显下降。</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <b>数据来源：</b>美联储 FOMC 政策声明与会议纪要（federalreserve.gov）、S&amp;P Dow Jones Indices / FRED（标普 500 收盘点位）、美国财政部债务数据、彭博社与界面新闻（美债收益率）、新华社 / 央视新闻、中国金融新闻网、华夏时报公开报道。<br>
+    <b>统计口径：</b>按美联储议息会议决议日计；利率为联邦基金利率目标区间；标普 500 与美债收益率均为对应时点的实际水平，非逐日行情。<br>
+    <b>更新时间：</b>2026 年 10 月 27 日 · 2026 年 10 月 28 日议息会议尚未召开，相关判断为市场预期，非既成事实。
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var svg = document.getElementById('chart');
+  var W = 1160, H = 470;
+  var ml = 56, mr = 34, mt = 78, mb = 58;
+  var t0 = Date.parse('2020-01-01');
+  var t1 = Date.parse('2026-11-01');
+  var yMax = 6;
+
+  function X(t){ return ml + (t - t0) / (t1 - t0) * (W - ml - mr); }
+  function Y(v){ return mt + (1 - v / yMax) * (H - mt - mb); }
+
+  var pts = [
+    ['2020-01-01', 1.75],
+    ['2020-03-03', 1.25],
+    ['2020-03-15', 0.25],
+    ['2022-03-16', 0.50],
+    ['2022-05-04', 1.00],
+    ['2022-06-15', 1.75],
+    ['2022-07-27', 2.50],
+    ['2022-09-21', 3.25],
+    ['2022-11-02', 4.00],
+    ['2022-12-14', 4.50],
+    ['2023-02-01', 4.75],
+    ['2023-03-22', 5.00],
+    ['2023-05-03', 5.25],
+    ['2023-07-26', 5.50],
+    ['2024-09-18', 5.00],
+    ['2024-11-07', 4.75],
+    ['2024-12-18', 4.50],
+    ['2025-09-17', 4.25],
+    ['2025-10-29', 4.00],
+    ['2025-12-10', 3.75],
+    ['2026-09-16', 4.00],
+    ['2026-10-27', 4.00]
+  ];
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(n, a){
+    var e = document.createElementNS(NS, n);
+    for (var k in a) e.setAttribute(k, a[k]);
+    return e;
+  }
+  function txt(x, y, s, o){
+    o = o || {};
+    var t = el('text', {
+      x: x, y: y,
+      'font-size': o.size || 12,
+      'font-family': '-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif',
+      fill: o.fill || '#857d73',
+      'text-anchor': o.anchor || 'start',
+      'font-weight': o.weight || 400,
+      'letter-spacing': o.ls || 0
+    });
+    t.textContent = s;
+    return t;
+  }
+
+  /* ---- defs ---- */
+  var defs = el('defs', {});
+  var lg = el('linearGradient', {id:'areaGrad', x1:'0', y1:'0', x2:'0', y2:'1'});
+  lg.appendChild(el('stop', {offset:'0%', 'stop-color':'#c4453a', 'stop-opacity':'0.20'}));
+  lg.appendChild(el('stop', {offset:'55%', 'stop-color':'#c4453a', 'stop-opacity':'0.07'}));
+  lg.appendChild(el('stop', {offset:'100%', 'stop-color':'#c4453a', 'stop-opacity':'0'}));
+  defs.appendChild(lg);
+  svg.appendChild(defs);
+
+  /* ---- phase band ---- */
+  var phases = [
+    ['2020-01-01','2022-03-01','疫情救市 · 零利率', '#e3e9ef','#46586d'],
+    ['2022-03-01','2023-08-01','激进加息',      '#f7e2de','#a8382e'],
+    ['2023-08-01','2024-09-01','5.5% 平台',     '#f5ecda','#8a6618'],
+    ['2024-09-01','2026-01-01','慢速降息',      '#e3f2e9','#1f6b48'],
+    ['2026-01-01','2026-11-01','转向加息',      '#e6edf4','#3f5c78']
+  ];
+  phases.forEach(function(p){
+    var x1 = X(Date.parse(p[0])), x2 = X(Date.parse(p[1]));
+    var g = el('g', {});
+    g.appendChild(el('rect', {
+      x: x1 + 1, y: 14, width: Math.max(x2 - x1 - 2, 2), height: 26,
+      rx: 4, fill: p[3]
+    }));
+    g.appendChild(txt((x1 + x2) / 2, 31, p[2], {size:11.5, fill:p[4], anchor:'middle', weight:700, ls:'0.02em'}));
+    svg.appendChild(g);
+  });
+
+  /* ---- y grid ---- */
+  for (var v = 0; v <= yMax; v++){
+    var y = Y(v);
+    var major = (v % 2 === 0);
+    svg.appendChild(el('line', {
+      x1: ml, y1: y, x2: W - mr, y2: y,
+      stroke: major ? '#e6dfd4' : '#f0ebe3',
+      'stroke-width': major ? 1 : 0.8,
+      'stroke-dasharray': v === 0 ? '0' : (major ? '0' : '3 4')
+    }));
+    if (major){
+      svg.appendChild(txt(ml - 12, y + 4, v + '%', {size:11.5, anchor:'end', fill:'#a39a8e', weight:600}));
+    }
+  }
+
+  /* ---- x year ticks ---- */
+  for (var yr = 2020; yr <= 2026; yr++){
+    var x = X(Date.parse(yr + '-01-01'));
+    svg.appendChild(el('line', {x1:x, y1:mt, x2:x, y2:H-mb, stroke:'#efe9e0', 'stroke-width':1}));
+    svg.appendChild(txt(x, H - mb + 22, String(yr), {size:12, anchor:'middle', fill:'#a39a8e', weight:600}));
+  }
+
+  /* ---- area + step line ---- */
+  var d = '', a = '';
+  var dots = [];
+  pts.forEach(function(p, i){
+    var px = X(Date.parse(p[0])), py = Y(p[1]);
+    var prevY = i === 0 ? py : Y(pts[i-1][1]);
+    if (i === 0){
+      d += 'M' + px + ',' + py;
+      a += 'M' + px + ',' + py;
+    } else {
+      d += 'L' + px + ',' + prevY + 'L' + px + ',' + py;
+      a += 'L' + px + ',' + prevY + 'L' + px + ',' + py;
+    }
+    if (i > 0 && i < pts.length - 1) dots.push({x:px, y:py, up:p[1] > pts[i-1][1], v:p[1]});
+  });
+  var endX = X(Date.parse('2026-10-27'));
+  a += 'L' + endX + ',' + Y(0) + 'L' + X(t0) + ',' + Y(0) + 'Z';
+
+  svg.appendChild(el('path', {d:a, fill:'url(#areaGrad)'}));
+  svg.appendChild(el('path', {
+    d:d, fill:'none', stroke:'#3a332b', 'stroke-width':2.2,
+    'stroke-linejoin':'round', 'stroke-linecap':'round'
+  }));
+
+  /* ---- dots ---- */
+  dots.forEach(function(p){
+    svg.appendChild(el('circle', {
+      cx:p.x, cy:p.y, r:3.4,
+      fill: p.up ? '#c4453a' : '#2a8a5e',
+      stroke:'#fff', 'stroke-width':1.4
+    }));
+  });
+
+  /* ---- annotations ---- */
+  var ax1 = (X(Date.parse('2023-07-26')) + X(Date.parse('2024-09-18'))) / 2;
+  svg.appendChild(el('line', {
+    x1:ax1, y1:Y(5.5) - 8, x2:ax1, y2:Y(5.5) - 20, stroke:'#c9b48c', 'stroke-width':1
+  }));
+  svg.appendChild(txt(ax1, Y(5.5) - 26, '峰值 5.25%–5.50%，维持 14 个月', {size:11.5, anchor:'middle', fill:'#8a6618', weight:700}));
+
+  var ax2 = X(Date.parse('2024-09-18'));
+  svg.appendChild(el('circle', {cx:ax2, cy:Y(5.0), r:5, fill:'none', stroke:'#2a8a5e', 'stroke-width':1.4, opacity:'0.55'}));
+  svg.appendChild(txt(ax2 + 14, Y(5.3), '2024.9 首次降息 −50bp', {size:11.5, fill:'#1f6b48', weight:700}));
+
+  var ax3 = X(Date.parse('2026-09-16'));
+  svg.appendChild(el('circle', {cx:ax3, cy:Y(4.0), r:5, fill:'none', stroke:'#c4453a', 'stroke-width':1.4, opacity:'0.55'}));
+  svg.appendChild(txt(ax3 - 12, Y(4.6), '2026.9 重启加息 +25bp', {size:11.5, anchor:'end', fill:'#a8382e', weight:700}));
+})();
+
+(function(){
+  var svg = document.getElementById('chart2');
+  if (!svg) return;
+
+  var W = 1160, H = 500;
+  var ml = 58, mr = 34;
+  var py0 = 74, py1 = 264;
+  var qy0 = 296, qy1 = 456;
+  var t0 = Date.parse('2020-01-01'), t1 = Date.parse('2026-11-01');
+
+  function X(t){ return ml + (t - t0) / (t1 - t0) * (W - ml - mr); }
+  function Yr(v){ return py1 - (v / 6) * (py1 - py0); }
+  function Ys(v){ return qy1 - (v / 9000) * (qy1 - qy0); }
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(n, a){
+    var e = document.createElementNS(NS, n);
+    for (var k in a) e.setAttribute(k, a[k]);
+    return e;
+  }
+  function txt(x, y, s, o){
+    o = o || {};
+    var t = el('text', {
+      x:x, y:y,
+      'font-size': o.size || 11.5,
+      'font-family':'-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif',
+      fill: o.fill || '#857d73',
+      'text-anchor': o.anchor || 'start',
+      'font-weight': o.weight || 400
+    });
+    t.textContent = s;
+    return t;
+  }
+
+  var defs = el('defs', {});
+  var g1 = el('linearGradient', {id:'spxGrad', x1:'0', y1:'0', x2:'0', y2:'1'});
+  g1.appendChild(el('stop', {offset:'0%', 'stop-color':'#185FA5', 'stop-opacity':'0.18'}));
+  g1.appendChild(el('stop', {offset:'100%', 'stop-color':'#185FA5', 'stop-opacity':'0.01'}));
+  defs.appendChild(g1);
+  svg.appendChild(defs);
+
+  for (var yr = 2020; yr <= 2026; yr++){
+    var x = X(Date.parse(yr + '-01-01'));
+    svg.appendChild(el('line', {x1:x, y1:py0, x2:x, y2:qy1, stroke:'#efe9e0', 'stroke-width':1}));
+    svg.appendChild(txt(x, qy1 + 22, String(yr), {size:11.5, anchor:'middle', fill:'#a39a8e', weight:600}));
+  }
+
+  [0, 2, 4, 6].forEach(function(v){
+    var y = Yr(v);
+    svg.appendChild(el('line', {x1:ml, y1:y, x2:W - mr, y2:y, stroke: v === 0 ? '#e6dfd4' : '#f4f0e9', 'stroke-width':1}));
+    svg.appendChild(txt(ml - 12, y + 4, v + '%', {size:11, anchor:'end', fill:'#a39a8e', weight:600}));
+  });
+
+  [0, 3000, 6000, 9000].forEach(function(v){
+    var y = Ys(v);
+    svg.appendChild(el('line', {x1:ml, y1:y, x2:W - mr, y2:y, stroke: v === 0 ? '#e6dfd4' : '#f4f0e9', 'stroke-width':1}));
+    svg.appendChild(txt(ml - 12, y + 4, v === 0 ? '0' : (v / 1000) + 'k', {size:11, anchor:'end', fill:'#a39a8e', weight:600}));
+  });
+
+  var rate = [
+    ['2020-01-01',1.75],['2020-03-03',1.25],['2020-03-15',0.25],['2022-03-16',0.50],
+    ['2022-05-04',1.00],['2022-06-15',1.75],['2022-07-27',2.50],['2022-09-21',3.25],
+    ['2022-11-02',4.00],['2022-12-14',4.50],['2023-02-01',4.75],['2023-03-22',5.00],
+    ['2023-05-03',5.25],['2023-07-26',5.50],['2024-09-18',5.00],['2024-11-07',4.75],
+    ['2024-12-18',4.50],['2025-09-17',4.25],['2025-10-29',4.00],['2025-12-10',3.75],
+    ['2026-09-16',4.00],['2026-10-26',4.00]
+  ];
+  var d = '', a = '';
+  rate.forEach(function(p, i){
+    var px = X(Date.parse(p[0])), py = Yr(p[1]);
+    var prev = i === 0 ? py : Yr(rate[i-1][1]);
+    if (i === 0){ d += 'M' + px + ',' + py; a += 'M' + px + ',' + py; }
+    else { d += 'L' + px + ',' + prev + 'L' + px + ',' + py; a += 'L' + px + ',' + prev + 'L' + px + ',' + py; }
+  });
+  var endX = X(Date.parse('2026-10-26'));
+  a += 'L' + endX + ',' + py1 + 'L' + X(t0) + ',' + py1 + 'Z';
+  svg.appendChild(el('path', {d:a, fill:'#7a7268', opacity:'0.09'}));
+  svg.appendChild(el('path', {d:d, fill:'none', stroke:'#7a7268', 'stroke-width':1.8, 'stroke-linejoin':'round'}));
+
+  var spx = [
+    ['2020-01-02',3230.78],['2020-02-19',3386.15],['2020-03-23',2237.40],['2020-08-18',3389.78],
+    ['2020-12-31',3756.07],['2021-12-31',4766.18],['2022-01-04',4818.62],['2022-10-13',3491.58],
+    ['2022-12-30',3839.50],['2023-12-29',4769.83],['2024-12-31',5881.63],['2025-04-07',4835.04],
+    ['2025-12-31',6845.50],['2026-03-06',6740.02],['2026-06-30',7499.36],['2026-09-25',7743.41],
+    ['2026-10-06',7818.93],['2026-10-26',7676.77]
+  ];
+  var d2 = '', a2 = '', first = true;
+  spx.forEach(function(p){
+    var px = X(Date.parse(p[0])), py = Ys(p[1]);
+    if (first){ d2 = 'M' + px + ',' + py; a2 = 'M' + px + ',' + qy1 + 'L' + px + ',' + py; first = false; }
+    else { d2 += 'L' + px + ',' + py; a2 += 'L' + px + ',' + py; }
+  });
+  a2 += 'L' + X(Date.parse('2026-10-26')) + ',' + qy1 + 'Z';
+  svg.appendChild(el('path', {d:a2, fill:'url(#spxGrad)'}));
+  svg.appendChild(el('path', {d:d2, fill:'none', stroke:'#185FA5', 'stroke-width':2, 'stroke-linejoin':'round', 'stroke-linecap':'round'}));
+
+  var evs = [
+    ['2022-03-16','加息起点','#c4453a'],
+    ['2024-09-18','降息起点','#2a8a5e'],
+    ['2026-09-16','重启加息','#c4453a']
+  ];
+  evs.forEach(function(e){
+    var ex = X(Date.parse(e[0]));
+    svg.appendChild(el('line', {x1:ex, y1:py0, x2:ex, y2:qy1, stroke:e[2], 'stroke-width':1, 'stroke-dasharray':'3 4', opacity:'0.4'}));
+    svg.appendChild(txt(ex, 285, e[1], {size:10, anchor:'middle', fill:e[2], weight:700}));
+  });
+
+  var m1 = X(Date.parse('2020-03-23'));
+  svg.appendChild(el('circle', {cx:m1, cy:Ys(2237.4), r:3.6, fill:'#185FA5', stroke:'#fff', 'stroke-width':1.4}));
+  svg.appendChild(txt(m1 + 8, Ys(2237.4) + 17, '疫情底 2237', {size:10.5, fill:'#185FA5', weight:700}));
+
+  var m2 = X(Date.parse('2022-10-13'));
+  svg.appendChild(el('circle', {cx:m2, cy:Ys(3491.58), r:3.6, fill:'#185FA5', stroke:'#fff', 'stroke-width':1.4}));
+  svg.appendChild(txt(m2 + 8, Ys(3491.58) + 17, '加息熊市底 3492', {size:10.5, fill:'#185FA5', weight:700}));
+
+  var m3 = X(Date.parse('2026-10-06'));
+  svg.appendChild(el('circle', {cx:m3, cy:Ys(7818.93), r:3.6, fill:'#c4453a', stroke:'#fff', 'stroke-width':1.4}));
+  svg.appendChild(txt(W - mr - 6, Ys(8300), '历史新高 7819', {size:10.5, anchor:'end', fill:'#a8382e', weight:700}));
+})();
+</script>
+</body>
+</html>

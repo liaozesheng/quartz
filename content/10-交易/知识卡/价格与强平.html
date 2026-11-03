@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>最新价 · 标记价 · 强平价 —— 你的仓位按哪个价格爆</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F5F1;
+  --paper:#FFFFFF;
+  --ink:#1D1D1B;
+  --ink2:#5C5C57;
+  --ink3:#8E8E87;
+  --line:#E7E5DF;
+  --blue:#185FA5;
+  --blue-bg:#E6F1FB;
+  --blue-line:#B5D4F4;
+  --blue-dk:#0C447C;
+  --blue-mid:#378ADD;
+  --amber:#BA7517;
+  --amber-bg:#FAEEDA;
+  --amber-line:#FAC775;
+  --amber-dk:#854F0B;
+  --gray:#444441;
+  --gray-bg:#F1EFE8;
+  --gray-line:#D3D1C7;
+  --danger:#C0392B;
+  --danger-bg:#FCEBEB;
+  --ok:#2E7D4F;
+  --ok-bg:#E8F5EC;
+  --radius:14px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.7;
+  padding:36px 20px 72px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.mono{font-family:var(--mono)}
+
+/* ---------- hero ---------- */
+.hero{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:36px 36px 30px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;left:0;top:0;height:50%;width:5px;background:var(--blue)}
+.hero::after{content:"";position:absolute;left:0;top:50%;bottom:0;width:5px;background:var(--amber)}
+.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--ink3);text-transform:uppercase;font-weight:600;margin-bottom:14px}
+h1{font-size:34px;line-height:1.25;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+h1 .sub{color:var(--ink3);font-weight:400;font-size:20px;padding:0 4px}
+.lede{font-size:15.5px;color:var(--ink2);max-width:700px}
+.lede strong{color:var(--ink);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+.stat{background:var(--bg);border-radius:10px;padding:14px 16px}
+.stat .k{font-size:12px;color:var(--ink3);margin-bottom:4px;line-height:1.4}
+.stat .v{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.stat .v small{font-size:12px;font-weight:400;color:var(--ink2);margin-left:3px}
+.stat.hi{background:var(--blue-bg)}
+.stat.hi .k{color:#4A82BE}
+.stat.hi .v{color:var(--blue)}
+.stat.hi2{background:var(--amber-bg)}
+.stat.hi2 .k{color:#9A7434}
+.stat.hi2 .v{color:var(--amber)}
+
+/* ---------- section ---------- */
+.sec-title{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:2px}
+.sec-title .idx{font-size:12px;font-weight:600;color:var(--paper);background:var(--ink);border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+.sec-title h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.sec-title .hint{font-size:12.5px;color:var(--ink3);margin-left:auto}
+
+/* ---------- generic ---------- */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.trip{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.col{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;border-top:3px solid transparent}
+.col.c1{border-top-color:var(--amber)}
+.col.c2{border-top-color:var(--blue)}
+.col.c3{border-top-color:var(--gray)}
+.col h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.col.c1 h3{color:var(--amber)}
+.col.c2 h3{color:var(--blue)}
+.col.c3 h3{color:var(--gray)}
+.col .sub{font-size:12.5px;color:var(--ink3);margin-bottom:14px}
+.row{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px}
+.row:first-of-type{border-top:none}
+.row .lab{color:var(--ink3);min-width:64px;flex-shrink:0;font-size:12.5px;padding-top:1px}
+.row .val{color:var(--ink2)}
+.row .val b{color:var(--ink);font-weight:600}
+
+.tcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;border-top:3px solid transparent}
+.tcard.t1{border-top-color:var(--amber)}
+.tcard.t2{border-top-color:var(--gray)}
+.tcard.t3{border-top-color:var(--blue)}
+.tcard h3{font-size:14.5px;font-weight:600;margin-bottom:2px}
+.tcard.t1 h3{color:var(--amber)}
+.tcard.t2 h3{color:var(--gray)}
+.tcard.t3 h3{color:var(--blue)}
+.tcard .sub{font-size:12px;color:var(--ink3);margin-bottom:13px}
+.tcard .li{font-size:12.8px;color:var(--ink2);padding:7px 0;border-top:1px dashed var(--line);line-height:1.6}
+.tcard .li:first-of-type{border-top:none}
+.tcard .li b{color:var(--ink);font-weight:600}
+
+/* ---------- formula ---------- */
+.formula{background:var(--gray-bg);border:1px solid var(--gray-line);border-radius:12px;padding:20px 24px;font-family:var(--mono);font-size:13px;line-height:2.1;color:var(--ink2);overflow-x:auto}
+.formula .ln{white-space:nowrap}
+.formula .cm{color:var(--ink3)}
+.formula .hl{color:var(--blue);font-weight:600}
+.formula .hl2{color:var(--amber);font-weight:600}
+
+/* ---------- median demo ---------- */
+.med{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+.medrow{display:flex;align-items:center;gap:14px;padding:11px 0;border-top:1px dashed var(--line)}
+.medrow:first-of-type{border-top:none}
+.medrow .ml{font-family:var(--mono);font-size:12.3px;color:var(--ink3);width:104px;flex-shrink:0}
+.medrow .mtrack{flex:1;height:22px;background:var(--bg);border-radius:6px;overflow:hidden;position:relative}
+.medrow .mbar{height:100%;border-radius:6px;background:var(--gray-line)}
+.medrow .mv{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink2);width:76px;text-align:right;flex-shrink:0}
+.medrow.pick .ml{color:var(--blue);font-weight:600}
+.medrow.pick .mbar{background:var(--blue-mid)}
+.medrow.pick .mv{color:var(--blue-dk)}
+.medrow.drop .mbar{background:var(--amber-line)}
+.medrow.drop .mv{color:var(--amber)}
+.medwin{margin-top:16px;padding:14px 18px;background:var(--blue-bg);border-left:3px solid var(--blue);border-radius:10px;font-size:13.5px;color:var(--blue-dk)}
+.medwin b{font-weight:600}
+
+/* ---------- simulator ---------- */
+.sim{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+.sim-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.sim-bar:last-of-type{border-bottom:none}
+.sim-bar .lb{font-size:13px;color:var(--ink2);font-weight:600;flex-shrink:0}
+.slider{display:flex;align-items:center;gap:10px;flex:1;min-width:200px}
+.slider input[type=range]{flex:1;accent-color:var(--blue);height:4px;cursor:pointer}
+.slider .lv{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--blue-dk);width:58px;text-align:right;flex-shrink:0}
+.sim-bar button{font:inherit;font-size:12.3px;padding:7px 13px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink2);cursor:pointer;transition:all .15s}
+.sim-bar button:hover{border-color:var(--ink3);color:var(--ink)}
+.sim-bar button.pri{background:var(--blue-bg);border-color:var(--blue-line);color:var(--blue);font-weight:600}
+.sim-bar button.pri:hover{border-color:var(--blue)}
+
+.sim-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+.sbox{border:1px solid var(--line);border-radius:11px;padding:16px 18px;background:var(--bg);border-left:3px solid var(--gray-line)}
+.sbox.liq{border-left-color:var(--danger);background:var(--danger-bg)}
+.sbox.last{border-left-color:var(--amber);background:var(--amber-bg)}
+.sbox.mark{border-left-color:var(--blue);background:var(--blue-bg)}
+.sbox .sk{font-size:11.5px;color:var(--ink3);margin-bottom:5px;letter-spacing:.02em}
+.sbox.liq .sk{color:#9E4A40}
+.sbox.last .sk{color:#9A7434}
+.sbox.mark .sk{color:#4A82BE}
+.sbox .sv{font-family:var(--mono);font-size:23px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.sbox.liq .sv{color:var(--danger)}
+.sbox.last .sv{color:var(--amber-dk)}
+.sbox.mark .sv{color:var(--blue-dk)}
+.sbox .sf{font-size:12px;margin-top:6px;color:var(--ink2);line-height:1.5}
+.sbox .sf b{font-weight:600}
+.sf .tag-ok{color:var(--ok);font-weight:600}
+.sf .tag-bad{color:var(--danger);font-weight:600}
+
+/* ---------- axis ---------- */
+.axis{position:relative;height:120px;margin-top:26px}
+.ax-track{position:absolute;top:52px;left:0;right:0;height:2px;background:var(--line);border-radius:2px}
+.ax-m{position:absolute;top:0;transform:translateX(-50%);text-align:center;width:100px}
+.ax-m.dn{top:58px}
+.ax-m .ax-dot{width:11px;height:11px;border-radius:50%;margin:0 auto 7px;border:2px solid var(--paper)}
+.ax-m .ax-t{font-size:11px;line-height:1.45;color:var(--ink2);font-family:var(--mono)}
+.ax-m .ax-t em{font-style:normal;display:block;color:var(--ink3);font-family:inherit}
+
+.sim-msg{margin-top:20px;padding:15px 18px;border-radius:10px;font-size:13.5px;line-height:1.75;background:var(--bg);color:var(--ink2);border-left:3px solid var(--ink3)}
+.sim-msg b{font-weight:600}
+.sim-msg .mono{font-size:12.8px}
+.sim-msg.ok{background:var(--ok-bg);color:#1D6B42;border-left-color:var(--ok)}
+.sim-msg.bad{background:var(--danger-bg);color:#8C2A21;border-left-color:var(--danger)}
+.sim-msg.warn{background:var(--amber-bg);color:#7A4A0A;border-left-color:var(--amber)}
+
+/* ---------- table ---------- */
+.tbl-wrap{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{text-align:left;font-size:12.5px;font-weight:600;color:var(--ink3);padding:14px 18px;background:var(--bg);border-bottom:1px solid var(--line);letter-spacing:.02em}
+tbody td{padding:12px 18px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+tbody tr:last-child td{border-bottom:none}
+tbody td:first-child{color:var(--ink);font-size:13px;white-space:nowrap;width:170px}
+tbody tr:nth-child(even){background:#FCFBF9}
+td b{color:var(--ink);font-weight:600}
+td .mono{font-size:12.8px}
+.no{color:var(--danger);font-weight:600}
+.yes{color:var(--ok);font-weight:600}
+
+/* ---------- callouts ---------- */
+.counter{background:#1D1D1B;color:#EDECE7;border-radius:var(--radius);padding:28px 30px}
+.counter .tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8E8E87;font-weight:600;margin-bottom:12px}
+.counter h3{font-size:19px;font-weight:600;color:#fff;margin-bottom:12px;letter-spacing:-.01em}
+.counter p{font-size:14px;color:#B9B8B2;max-width:760px}
+.counter p+p{margin-top:10px}
+.counter b{color:#fff;font-weight:600}
+.counter .hl{color:#85B7EB;font-weight:600}
+.counter .hl2{color:#FAC775;font-weight:600}
+.counter .numrow{display:flex;gap:28px;flex-wrap:wrap;margin:18px 0 4px}
+.counter .numrow div{border-left:2px solid #444441;padding-left:14px}
+.counter .numrow .k{font-size:11.5px;color:#8E8E87;margin-bottom:2px}
+.counter .numrow .v{font-size:19px;font-weight:600;color:#fff}
+
+.warnbox{margin-top:14px;padding:13px 16px;border-radius:10px;font-size:12.8px;background:var(--danger-bg);color:#8C2A21;border-left:3px solid var(--danger);line-height:1.75}
+.warnbox b{font-weight:600}
+.normbox{margin-top:14px;padding:13px 16px;border-radius:10px;font-size:12.8px;background:var(--gray-bg);color:var(--gray);border-left:3px solid var(--gray);line-height:1.75}
+.normbox b{font-weight:600}
+
+/* ---------- checklist ---------- */
+.chk{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:8px 26px}
+.chk .ci{display:flex;gap:14px;padding:18px 0;border-top:1px dashed var(--line);align-items:flex-start}
+.chk .ci:first-child{border-top:none}
+.chk .cn{width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.chk .ct{font-size:13.5px;color:var(--ink2)}
+.chk .ct b{color:var(--ink);font-weight:600;display:block;margin-bottom:3px;font-size:14px}
+.chk .ct code{font-family:var(--mono);font-size:12.3px;background:var(--bg);padding:1px 6px;border-radius:5px;color:var(--blue-dk)}
+
+/* ---------- footer ---------- */
+footer{border:1px solid #CFE0F2;background:#F4F9FE;border-radius:var(--radius);padding:20px 24px;font-size:12.5px;color:#3F5A78;line-height:1.75}
+footer b{color:#22405F}
+footer .src{margin-top:12px;padding-top:12px;border-top:1px dashed #CFE0F2;font-size:11.5px;color:#6C86A3}
+
+@media (max-width:760px){
+  body{padding:20px 12px 48px}
+  h1{font-size:26px}
+  h1 .sub{font-size:16px}
+  .hero{padding:26px 22px 24px}
+  .stats{grid-template-columns:1fr 1fr}
+  .cols,.trip{grid-template-columns:1fr}
+  .sim-grid3{grid-template-columns:1fr}
+  thead th,tbody td{padding:11px 13px}
+  tbody td:first-child{width:auto}
+  .sim,.card,.med,.chk{padding:20px 18px}
+  .counter{padding:24px 20px}
+  .sbox .sv{font-size:20px}
+  .ax-m{width:56px}
+  .ax-m .ax-t em{display:none}
+  .slider{min-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Futures Pricing · 合约定价机制</div>
+    <h1>最新价 · 标记价 · 强平价<span class="sub">·</span>你的仓位按哪个价格爆</h1>
+    <p class="lede">
+      屏幕上那个跳得最欢的数字，和真正决定你生死的数字，<strong>根本不是同一个</strong>。强平只认<strong>标记价格</strong>——它是多源合成的公允价值，单一市场推不动它。把这两个搞混，你会在一次几秒钟的插针里被冤枉清仓。
+    </p>
+    <div class="stats">
+      <div class="stat hi">
+        <div class="k">同时存在的价格</div>
+        <div class="v">3 个</div>
+      </div>
+      <div class="stat hi">
+        <div class="k">决定强平的</div>
+        <div class="v">1 个<small>标记价格</small></div>
+      </div>
+      <div class="stat hi2">
+        <div class="k">BTC 首档维持保证金率</div>
+        <div class="v">0.5%<small>示例值</small></div>
+      </div>
+      <div class="stat hi2">
+        <div class="k">50 倍杠杆的反向容忍度</div>
+        <div class="v">1.5%</div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">01</span>
+      <h2>三种价格，各管一摊</h2>
+      <span class="hint">同一时刻，界面上同时跑着三个价格</span>
+    </div>
+    <div class="trip">
+      <div class="tcard t1">
+        <h3>最新价格</h3>
+        <div class="sub">Last Price</div>
+        <div class="li"><b>是什么</b><br>本所合约最后一笔成交价</div>
+        <div class="li"><b>能不能被操纵</b><br>能。一笔大单就能砸出插针</div>
+        <div class="li"><b>决定什么</b><br>K 线显示 · 已实现盈亏</div>
+      </div>
+      <div class="tcard t2">
+        <h3>指数价格</h3>
+        <div class="sub">Index Price</div>
+        <div class="li"><b>是什么</b><br>多家主流现货交易所加权平均</div>
+        <div class="li"><b>能不能被操纵</b><br>难。需同时操纵多个市场，异常报价会被自动剔除</div>
+        <div class="li"><b>决定什么</b><br>只作为锚，<b>不直接触发强平</b></div>
+      </div>
+      <div class="tcard t3">
+        <h3>标记价格</h3>
+        <div class="sub">Mark Price</div>
+        <div class="li"><b>是什么</b><br>三个来源取中位数</div>
+        <div class="li"><b>能不能被操纵</b><br>很难。三个值里取中间那个，拉爆任意一个都取不到</div>
+        <div class="li"><b>决定什么</b><br><b>触发强制平仓</b> · 未实现盈亏</div>
+      </div>
+    </div>
+    <div class="normbox">
+      <b>最容易误读的一点：</b>指数价格本身<strong>不触发强平</strong>。它只是标记价格的计算基准之一。所以在持仓页面看到"指数价格和标记价格差距拉大"时，那不是风险信号——风险只在你仓位的<strong>强平价被标记价格触及</strong>的那一刻才出现。
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">02</span>
+      <h2>标记价格是怎么合出来的</h2>
+      <span class="hint">抗操纵靠的不是防作弊技术，是结构性冗余</span>
+    </div>
+    <div class="formula">
+      <div class="ln"><span class="cm">// 第一步：算出一个"公允基准"</span></div>
+      <div class="ln"><span class="hl2">指数价格</span> = 多家主流现货所价格加权平均 <span class="cm">（异常报价自动剔除）</span></div>
+      <div class="ln">&nbsp;</div>
+      <div class="ln"><span class="cm">// 第二步：从两个角度各修正一次</span></div>
+      <div class="ln">Price 1 = <span class="hl2">指数价格</span> × (1 + 资金费率 × 距结算时间 / 8)</div>
+      <div class="ln">Price 2 = <span class="hl2">指数价格</span> + 30 秒基差移动平均</div>
+      <div class="ln">&nbsp;</div>
+      <div class="ln"><span class="cm">// 第三步：三个值取中位数</span></div>
+      <div class="ln"><span class="hl">标记价格</span> = Median( Price 1 , Price 2 , 合约最新成交价 )</div>
+    </div>
+    <div class="med" style="margin-top:16px">
+      <div class="medrow drop">
+        <span class="ml">Price 1</span>
+        <span class="mtrack"><span class="mbar" style="width:94.5%"></span></span>
+        <span class="mv">84,990</span>
+      </div>
+      <div class="medrow pick">
+        <span class="ml">Price 2</span>
+        <span class="mtrack"><span class="mbar" style="width:94.3%"></span></span>
+        <span class="mv">84,985</span>
+      </div>
+      <div class="medrow drop">
+        <span class="ml">最新成交价</span>
+        <span class="mtrack"><span class="mbar" style="width:5%"></span></span>
+        <span class="mv">83,200</span>
+      </div>
+      <div class="medwin">
+        上图中最新价被一笔大单砸到 83,200，但中位数取的是 <b>84,985</b>——因为它排在最中间。<b>被拉爆的那个值，会被自动挤到边缘去，取不到它。</b>这就是"抗操纵"的全部原理。
+      </div>
+    </div>
+    <div class="warnbox">
+      <b>一个容易踩的时效坑：</b>币安自 2026-08-31 起，把<strong>TradFi 永续</strong>（美股 / 商品类）的 Price 2 基差窗口从 30 秒改成了 <strong>1 分钟</strong>；但<strong>加密永续仍然是 30 秒</strong>。两条产品线的参数已经不一样了，跨品种套利或写策略时要分别对待。
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">03</span>
+      <h2>插针模拟器</h2>
+      <span class="hint">拖动滑块，看谁会被穿破</span>
+    </div>
+    <div class="sim">
+      <div class="sim-bar">
+        <span class="lb">杠杆</span>
+        <span class="slider">
+          <input type="range" id="lev" min="1" max="125" step="1" value="50">
+          <span class="lv" id="levV">50×</span>
+        </span>
+        <span class="lb">插针深度</span>
+        <span class="slider">
+          <input type="range" id="spk" min="0" max="5" step="0.1" value="1.8">
+          <span class="lv" id="spkV">1.8%</span>
+        </span>
+      </div>
+      <div class="sim-bar">
+        <span class="lb">方向</span>
+        <button class="pri" data-dir="long">做多</button>
+        <button data-dir="short">做空</button>
+        <span class="lb" style="margin-left:14px">情形</span>
+        <button class="pri" data-mode="local">单所插针</button>
+        <button data-mode="global">全市场下跌</button>
+      </div>
+
+      <div class="sim-grid3">
+        <div class="sbox liq">
+          <div class="sk">你的强平价</div>
+          <div class="sv" id="vLiq">—</div>
+          <div class="sf" id="fLiq">按标记价格计算</div>
+        </div>
+        <div class="sbox last">
+          <div class="sk">插针后的最新价</div>
+          <div class="sv" id="vLast">—</div>
+          <div class="sf" id="fLast">—</div>
+        </div>
+        <div class="sbox mark">
+          <div class="sk">插针后的标记价</div>
+          <div class="sv" id="vMark">—</div>
+          <div class="sf" id="fMark">—</div>
+        </div>
+      </div>
+
+      <div class="axis" id="axis">
+        <div class="ax-track"></div>
+      </div>
+
+      <div class="sim-msg" id="msg"></div>
+      <div class="normbox" style="margin-top:14px">
+        <b>模型说明：</b>开仓价固定 85,000，维持保证金率取 0.5%（BTC 首档示例值）。「单所插针」假设只有本所合约出现异常报价，冲击仅 15% 传导到多源合成价格；「全市场下跌」假设所有现货交易所同步下跌，冲击 100% 传导。<b>这两个比例是教学假设，不是官方参数。</b>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">04</span>
+      <h2>强平价与破产价格之间，有一条缓冲带</h2>
+      <span class="hint">杠杆越高，缓冲带越窄</span>
+    </div>
+    <div class="cols">
+      <div class="col c1">
+        <h3>强平价格</h3>
+        <div class="sub">Liquidation Price · 触发条件</div>
+        <div class="row"><span class="lab">定义</span><span class="val">保证金余额恰好跌到<b>维持保证金</b>要求时的价格</span></div>
+        <div class="row"><span class="lab">到达时</span><span class="val">强制平仓程序<b>启动</b>，不是立刻清零</span></div>
+        <div class="row"><span class="lab">参考价</span><span class="val"><b>标记价格</b>，不是最新价格</span></div>
+      </div>
+      <div class="col c2">
+        <h3>破产价格</h3>
+        <div class="sub">Bankruptcy Price · 清算价格</div>
+        <div class="row"><span class="lab">定义</span><span class="val">初始保证金<b>全部亏完</b>的价格点</span></div>
+        <div class="row"><span class="lab">到达时</span><span class="val">保证金余额<b>归零</b></span></div>
+        <div class="row"><span class="lab">顺序</span><span class="val">强平价<b>总是先于</b>破产价格被触及</span></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px">缓冲带宽度 = 1 ÷ 杠杆 − 维持保证金率</div>
+      <div class="row"><span class="lab">100 倍</span><span class="val">1% − 0.5% = <b>0.5%</b> 的价格波动空间（初始保证金率仅 1%）</span></div>
+      <div class="row"><span class="lab">50 倍</span><span class="val">2% − 0.5% = <b>1.5%</b></span></div>
+      <div class="row"><span class="lab">20 倍</span><span class="val">5% − 0.5% = <b>4.5%</b></span></div>
+      <div class="row"><span class="lab">10 倍</span><span class="val">10% − 0.5% = <b>9.5%</b></span></div>
+      <div style="font-size:12.8px;color:var(--ink2);margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)">
+        这条窄缝是交易所风险引擎的操作区间——它必须在这段距离内完成清算。区间越窄，清算越容易滑出预想价位，这也是高杠杆更容易引发<b>连环清算</b>的结构性原因。
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">05</span>
+      <h2>一个下拉菜单，决定你会不会被扫损</h2>
+      <span class="hint">实操性最强的一节</span>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;margin-bottom:8px">下单模块底部的【触发条件】</div>
+      <div style="font-size:13px;color:var(--ink2);margin-bottom:16px">设置止损单时，币安允许你选择用哪个价格作为触发依据。这个默认选项，直接决定你的止损会不会被插针扫掉。</div>
+      <div class="cols">
+        <div class="col c1" style="padding:18px 20px">
+          <h3 style="font-size:14px">用「最新价格」触发</h3>
+          <div class="sub">风险最高</div>
+          <div class="row"><span class="lab">过程</span><span class="val">价格插针跌破止损位 → 你的止损被触发成交 → <b>3 秒后价格弹回原位</b></span></div>
+          <div class="row"><span class="lab">结果</span><span class="val">你被止损了，但市场<b>根本没跌</b></span></div>
+          <div class="row"><span class="lab">俗称</span><span class="val">被扫损 / 被插针扫出场</span></div>
+        </div>
+        <div class="col c2" style="padding:18px 20px">
+          <h3 style="font-size:14px">用「标记价格」触发</h3>
+          <div class="sub">更稳的选择</div>
+          <div class="row"><span class="lab">过程</span><span class="val">本所插针 → 多源合成的标记价格<b>基本没动</b> → 止损不触发</span></div>
+          <div class="row"><span class="lab">结果</span><span class="val">仓位保住，价格弹回后<b>你还在车上</b></span></div>
+          <div class="row"><span class="lab">代价</span><span class="val">真实的全市场下跌中，标记价格会跟随，止损照常生效</span></div>
+        </div>
+      </div>
+      <div class="normbox">
+        <b>怎么改：</b>在下单模块底部找到【触发条件】下拉菜单，把「最新价格」改成「标记价格」。改动是一次性的，之后所有止损单都会沿用这个选择。
+      </div>
+      <div class="warnbox">
+        <b>为什么这件事比想象中重要：</b>50 倍杠杆下你的反向容忍度只有 <strong>1.5%</strong>，而单所插针 2%–5% 在加密市场属于家常便饭。<strong>用最新价做触发条件，等于把止损主动挂在了插针的射程之内。</strong>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">06</span>
+      <h2>谁决定什么 · 一张表收口</h2>
+      <span class="hint">收藏这一页就够了</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>项目</th><th>最新价格</th><th>标记价格</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>数据来源</td><td>本所合约最后一笔成交</td><td>多源合成，三值取中位数</td></tr>
+          <tr><td>决定强制平仓</td><td class="no">否</td><td class="yes">是</td></tr>
+          <tr><td>决定未实现盈亏</td><td class="no">否</td><td class="yes">是</td></tr>
+          <tr><td>决定已实现盈亏</td><td class="yes">是（平仓成交价）</td><td class="no">否</td></tr>
+          <tr><td>K 线显示</td><td class="yes">是</td><td class="no">否</td></tr>
+          <tr><td>抗操纵能力</td><td>弱，单笔大单即可推动</td><td>强，需同时操纵多个现货市场</td></tr>
+          <tr><td>止损触发（可自选）</td><td>容易被插针扫损</td><td>更稳，推荐</td></tr>
+          <tr><td>极端行情下是否保护你</td><td>—</td><td>只挡孤立异常，全市场同步下跌时无效</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">07</span>
+      <h2>标记价格的保护边界在哪</h2>
+      <span class="hint">它不是保险，只是减震器</span>
+    </div>
+    <div class="counter">
+      <div class="tag">Protection Boundary</div>
+      <h3>挡住的是孤立的异常，不是真实的下跌</h3>
+      <p>
+        标记价格防的是<b>单点故障</b>：一家交易所闪崩、一笔大单砸盘、某所指数报价失真——这些都能被多源中位数过滤掉。
+      </p>
+      <p>
+        但它挡不住<b>所有市场一起跌</b>。当每家现货交易所同步下移，<span class="hl">指数价格跟着走</span>，标记价格也会一路跟下去。这时候该爆还是爆，标记价格什么都没保护。
+      </p>
+      <div class="numrow">
+        <div><div class="k">24 小时全市场清算</div><div class="v">$2.796 亿</div></div>
+        <div><div class="k">其中多单占</div><div class="v">77.4%</div></div>
+        <div><div class="k">资金费率年化</div><div class="v">18% → 0.0084%</div></div>
+      </div>
+      <p style="margin-top:16px">
+        这是 <span class="hl2">2026 年 10 月 5 日</span>刚发生的一轮去杠杆：一次清算级联把场内积累的多头杠杆一次性冲掉，全市场未平仓量回落到约 <b>$253 亿</b>。这类<b>全市场同步</b>的下跌，正是标记价格体系完全无能为力的场景。
+      </p>
+    </div>
+    <div class="normbox">
+      <b>另一个常被误解的点：</b>指数价格自身出现异常偏离（某所闪崩超过阈值）时，平台会截断该来源、降低权重甚至暂时剔除。<strong>这种情况下标记价格反而会变得更稳定</strong>——指数的异常是对你的保护，不是风险。
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-title">
+      <span class="idx">08</span>
+      <h2>落地检查清单</h2>
+      <span class="hint">开仓前后各看一遍</span>
+    </div>
+    <div class="chk">
+      <div class="ci">
+        <span class="cn">1</span>
+        <span class="ct"><b>确认你的强平价是按标记价格显示的</b>持仓页面上那个数字，对应的就是标记价格。别用图表上的最新价去推算"我还有多少空间"。</span>
+      </div>
+      <div class="ci">
+        <span class="cn">2</span>
+        <span class="ct"><b>把止损的触发条件改成「标记价格」</b>位置在下单模块底部的 <code>触发条件</code> 下拉菜单。这是本卡里性价比最高的一次设置改动。</span>
+      </div>
+      <div class="ci">
+        <span class="cn">3</span>
+        <span class="ct"><b>记住自己的缓冲带有多宽</b><code>1 ÷ 杠杆 − 维持保证金率</code>。50 倍是 1.5%，100 倍只剩 0.5%——这个数字决定了你是在做交易，还是在赌插针的方向。</span>
+      </div>
+      <div class="ci">
+        <span class="cn">4</span>
+        <span class="ct"><b>不要用最新价去判断风险，也不要因为它安全就放心</b>真正需要警惕的两个信号是：<b>标记价格在向强平价靠近</b>，以及<b>指数价格开始整体下移</b>。前者是个股问题，后者是水位问题。</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>性质说明：</b>本卡片为合约定价与强平机制的科普梳理，不构成任何投资建议。在中国内地，虚拟货币相关业务活动属于非法金融活动，交易合同不受法律保护，交易平台亦不在境内监管范围内。
+    <div class="src">制卡时间：2026-10-06 · 标记价格公式参考币安官方帮助文档（USDⓈ-M 永续 / COIN-M 永续）；维持保证金率 0.5% 与开仓价 85,000 为教学示例值，实际数值随仓位档位与保证金模式变化；「单所插针 15% 传导」为模型假设，非官方参数；强平价公式为简化估算，未计入手续费与资金费用 · 清偿数据参考 2026-10-05 衍生品市场公开统计，不同来源口径略有差异。</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var ENTRY = 85000;
+  var MMR = 0.005;
+  var K_LOCAL = 0.15;
+
+  var lev = 50, spk = 1.8, dir = 'long', mode = 'local';
+
+  var elLev = document.getElementById('lev');
+  var elSpk = document.getElementById('spk');
+  var elLevV = document.getElementById('levV');
+  var elSpkV = document.getElementById('spkV');
+  var elLiq = document.getElementById('vLiq');
+  var elLast = document.getElementById('vLast');
+  var elMark = document.getElementById('vMark');
+  var elFLiq = document.getElementById('fLiq');
+  var elFLast = document.getElementById('fLast');
+  var elFMark = document.getElementById('fMark');
+  var elAxis = document.getElementById('axis');
+  var elMsg = document.getElementById('msg');
+
+  function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
+  function pct(n){ return (n * 100).toFixed(2) + '%'; }
+
+  function calc(){
+    var k = mode === 'local' ? K_LOCAL : 1.0;
+    var s = spk / 100;
+    var liq, last, mark;
+    if (dir === 'long'){
+      liq  = ENTRY * (1 - 1 / lev + MMR);
+      last = ENTRY * (1 - s);
+      mark = ENTRY * (1 - s * k);
+    } else {
+      liq  = ENTRY * (1 + 1 / lev - MMR);
+      last = ENTRY * (1 + s);
+      mark = ENTRY * (1 + s * k);
+    }
+    return { liq: liq, last: last, mark: mark, k: k };
+  }
+
+  function breached(price, liq){
+    return dir === 'long' ? price <= liq : price >= liq;
+  }
+
+  function renderAxis(r){
+    var vals = [ENTRY, r.liq, r.last, r.mark];
+    var lo = Math.min.apply(null, vals);
+    var hi = Math.max.apply(null, vals);
+    var pad = (hi - lo) * 0.18;
+    if (pad < 20) pad = 20;
+    lo -= pad; hi += pad;
+    var span = hi - lo;
+    function pos(v){ return ((v - lo) / span) * 100; }
+
+    var liqPos = pos(r.liq), lastPos = pos(r.last);
+    var w = elAxis.clientWidth || 828;
+    var stagger = Math.abs(liqPos - lastPos) / 100 * w < 104;
+    var liqTop = 58, lastTop = 58;
+    if (stagger){
+      if (liqPos <= lastPos){ lastTop = 100; } else { liqTop = 100; }
+    }
+    elAxis.style.height = stagger ? '174px' : '120px';
+
+    var marks = [
+      { v: r.mark, n: '标记价', c: '#185FA5', top: 0 },
+      { v: r.liq,  n: '强平价', c: '#C0392B', top: liqTop },
+      { v: r.last, n: '最新价', c: '#BA7517', top: lastTop }
+    ];
+
+    var html = '<div class="ax-track"></div>';
+    for (var i = 0; i < marks.length; i++){
+      var m = marks[i];
+      html += '<div class="ax-m" style="left:' + pos(m.v) + '%;top:' + m.top + 'px">' +
+                '<div class="ax-dot" style="background:' + m.c + '"></div>' +
+                '<div class="ax-t"><em>' + m.n + '</em>' + fmt(m.v) + '</div>' +
+              '</div>';
+    }
+    elAxis.innerHTML = html;
+  }
+
+  function render(){
+    lev = Number(elLev.value);
+    spk = Number(elSpk.value);
+    elLevV.textContent = lev + '×';
+    elSpkV.textContent = spk.toFixed(1) + '%';
+
+    var r = calc();
+    var lastHit = breached(r.last, r.liq);
+    var markHit = breached(r.mark, r.liq);
+
+    elLiq.textContent = fmt(r.liq);
+    elLast.textContent = fmt(r.last);
+    elMark.textContent = fmt(r.mark);
+
+    var room = Math.abs(r.liq - ENTRY) / ENTRY;
+    elFLiq.innerHTML = '按标记价格计算';
+
+    elFLast.innerHTML = lastHit
+      ? '<span class="tag-bad">已穿破强平价</span>'
+      : '距强平价还有 ' + fmt(Math.abs(r.last - r.liq));
+
+    elFMark.innerHTML = markHit
+      ? '<span class="tag-bad">已穿破强平价</span>'
+      : '距强平价还有 ' + fmt(Math.abs(r.liq - r.mark));
+
+    renderAxis(r);
+
+    var msg, cls;
+    if (lastHit && !markHit){
+      msg = '最新价已经被砸穿了强平价，但标记价格还在安全区。' +
+            '<b>如果这次只是本所的单点插针，你就会被冤枉强平</b>——按最新价成交、按标记价没事。' +
+            '这正是标记价格存在的全部意义：把孤立的异常波动挡在强平判定之外。';
+      cls = 'bad';
+    } else if (lastHit && markHit){
+      msg = '<b>这次保护不了你。</b>所有现货市场同步下跌时，指数价格一起下移，标记价格会跟着走——' +
+            '它挡的是孤立的异常，不是真实的下跌。' +
+            '注意此刻的真实原因：不是插针，是<b>全市场的水位在降</b>。';
+      cls = 'warn';
+    } else {
+      msg = '插针深度 ' + spk.toFixed(1) + '% 还没触及你的强平线，两个价格都在安全区。' +
+            '顺带记住这个数字：' + lev + ' 倍杠杆下，你的反向容忍度是 <b>' + pct(room) + '</b>' +
+            '（即 1÷' + lev + ' − 0.5%）。';
+      cls = 'ok';
+    }
+    elMsg.className = 'sim-msg ' + cls;
+    elMsg.innerHTML = msg;
+  }
+
+  elLev.addEventListener('input', render);
+  elSpk.addEventListener('input', render);
+
+  var dirBtns = document.querySelectorAll('[data-dir]');
+  for (var i = 0; i < dirBtns.length; i++){
+    dirBtns[i].addEventListener('click', function(){
+      dir = this.dataset.dir;
+      for (var j = 0; j < dirBtns.length; j++) dirBtns[j].classList.remove('pri');
+      this.classList.add('pri');
+      render();
+    });
+  }
+
+  var modeBtns = document.querySelectorAll('[data-mode]');
+  for (var m = 0; m < modeBtns.length; m++){
+    modeBtns[m].addEventListener('click', function(){
+      mode = this.dataset.mode;
+      for (var n = 0; n < modeBtns.length; n++) modeBtns[n].classList.remove('pri');
+      this.classList.add('pri');
+      render();
+    });
+  }
+
+  window.addEventListener('resize', render);
+  render();
+})();
+</script>
+</body>
+</html>

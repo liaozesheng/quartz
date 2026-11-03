@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>比特币底层 · 币到底是什么</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F5F1;
+  --paper:#FFFFFF;
+  --ink:#1D1D1B;
+  --ink2:#5C5C57;
+  --ink3:#8E8E87;
+  --line:#E7E5DF;
+  --amber:#854F0B;
+  --amber-bg:#FAEEDA;
+  --amber-line:#FAC775;
+  --amber-dk:#633806;
+  --amber-mid:#BA7517;
+  --purple:#3C3489;
+  --purple-bg:#EEEDFE;
+  --purple-line:#CECBF6;
+  --teal:#0F6E56;
+  --teal-bg:#E1F5EE;
+  --teal-line:#9FE1CB;
+  --teal-dk:#085041;
+  --gray:#444441;
+  --gray-bg:#F1EFE8;
+  --gray-line:#D3D1C7;
+  --up:#C0392B;
+  --up-bg:#FCEBEB;
+  --ok:#2E7D4F;
+  --ok-bg:#E8F5EC;
+  --radius:14px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.7;
+  padding:36px 20px 72px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.mono{font-family:var(--mono)}
+
+/* ---------- hero ---------- */
+.hero{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:36px 36px 30px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;left:0;top:0;height:50%;width:5px;background:var(--amber)}
+.hero::after{content:"";position:absolute;left:0;top:50%;bottom:0;width:5px;background:var(--purple)}
+.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--ink3);text-transform:uppercase;font-weight:600;margin-bottom:14px}
+h1{font-size:34px;line-height:1.25;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+h1 .sub{color:var(--ink3);font-weight:400;font-size:20px;padding:0 4px}
+.lede{font-size:15.5px;color:var(--ink2);max-width:680px}
+.lede strong{color:var(--ink);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+.stat{background:var(--bg);border-radius:10px;padding:14px 16px}
+.stat .k{font-size:12px;color:var(--ink3);margin-bottom:4px;line-height:1.4}
+.stat .v{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.stat .v small{font-size:12px;font-weight:400;color:var(--ink2);margin-left:3px}
+.stat.hi{background:var(--amber-bg)}
+.stat.hi .k{color:#9A7434}
+.stat.hi .v{color:var(--amber)}
+.stat.hi2{background:var(--purple-bg)}
+.stat.hi2 .k{color:#7F77DD}
+.stat.hi2 .v{color:var(--purple)}
+
+/* ---------- section ---------- */
+.sec-title{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:2px}
+.sec-title .idx{font-size:12px;font-weight:600;color:var(--paper);background:var(--ink);border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+.sec-title h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.sec-title .hint{font-size:12.5px;color:var(--ink3);margin-left:auto}
+
+/* ---------- generic card ---------- */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+
+/* ---------- two-up ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;border-top:3px solid transparent}
+.col.c1{border-top-color:var(--amber)}
+.col.c2{border-top-color:var(--purple)}
+.col h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.col.c1 h3{color:var(--amber)}
+.col.c2 h3{color:var(--purple)}
+.col .sub{font-size:12.5px;color:var(--ink3);margin-bottom:14px}
+.row{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px}
+.row:first-of-type{border-top:none}
+.row .lab{color:var(--ink3);min-width:62px;flex-shrink:0;font-size:12.5px;padding-top:1px}
+.row .val{color:var(--ink2)}
+.row .val b{color:var(--ink);font-weight:600}
+
+/* ---------- bank vs utxo visual ---------- */
+.model{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;border-top:3px solid transparent}
+.model.m1{border-top-color:#185FA5}
+.model.m2{border-top-color:var(--amber)}
+.model h3{font-size:15px;font-weight:600;margin-bottom:3px}
+.model.m1 h3{color:#0C447C}
+.model.m2 h3{color:var(--amber-dk)}
+.model .sub{font-size:12.5px;color:var(--ink3);margin-bottom:16px}
+.acct{background:#E6F1FB;border:1px solid #B5D4F4;border-radius:10px;padding:16px 18px}
+.acct .an{font-size:12.5px;color:#185FA5;font-family:var(--mono)}
+.acct .av{font-size:30px;font-weight:600;color:#0C447C;letter-spacing:-.02em;margin-top:2px}
+.acct .af{font-size:11.5px;color:#185FA5;margin-top:4px}
+.uline{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--amber-bg);border:1px solid var(--amber-line);border-radius:9px;padding:11px 14px;margin-bottom:8px}
+.uline .lid{font-family:var(--mono);font-size:11.5px;color:var(--amber)}
+.uline .lamt{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--amber-dk)}
+.uline.sum{background:var(--bg);border-color:var(--line);border-style:dashed}
+.uline.sum .lid{color:var(--ink3)}
+.uline.sum .lamt{color:var(--ink)}
+.model .note{font-size:12.8px;color:var(--ink2);margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.model .note b{color:var(--ink);font-weight:600}
+
+/* ---------- layered bands ---------- */
+.lyr{display:flex;flex-direction:column;gap:12px}
+.band{border-radius:var(--radius);padding:18px 20px;border:1px solid}
+.band .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.band .hd b{font-size:15px;font-weight:600}
+.band .hd em{font-size:12.5px;font-style:normal;opacity:.78}
+.chps{display:flex;flex-wrap:wrap;gap:8px}
+.chp{font-size:12.5px;padding:5px 12px;border-radius:99px;border:1px solid;background:var(--paper);color:var(--ink2)}
+.b1{background:var(--amber-bg);border-color:var(--amber-line)}
+.b1 .hd b,.b1 .hd em{color:var(--amber-dk)}
+.b2{background:var(--purple-bg);border-color:var(--purple-line)}
+.b2 .hd b,.b2 .hd em{color:var(--purple)}
+.b3{background:var(--teal-bg);border-color:var(--teal-line)}
+.b3 .hd b,.b3 .hd em{color:var(--teal-dk)}
+.b4{background:var(--gray-bg);border-color:var(--gray-line)}
+.b4 .hd b,.b4 .hd em{color:var(--gray)}
+
+/* ---------- three-up ---------- */
+.trip{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;border-top:3px solid transparent}
+.tcard.t1{border-top-color:var(--amber)}
+.tcard.t2{border-top-color:var(--purple)}
+.tcard.t3{border-top-color:var(--teal)}
+.tcard h3{font-size:14.5px;font-weight:600;margin-bottom:2px}
+.tcard.t1 h3{color:var(--amber)}
+.tcard.t2 h3{color:var(--purple)}
+.tcard.t3 h3{color:var(--teal)}
+.tcard .sub{font-size:12px;color:var(--ink3);margin-bottom:13px}
+.tcard .li{font-size:12.8px;color:var(--ink2);padding:6px 0;border-top:1px dashed var(--line);line-height:1.6}
+.tcard .li:first-of-type{border-top:none}
+.tcard .li b{color:var(--ink);font-weight:600}
+
+/* ---------- flow stepper ---------- */
+.flow{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+.pipe{display:flex;align-items:stretch;margin-bottom:20px}
+.pnode{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:13px 9px;background:var(--paper);cursor:pointer;text-align:center;transition:background .15s,border-color .15s}
+.pnode .pn{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.08em;margin-bottom:6px}
+.pnode .pt{font-size:12.3px;color:var(--ink2);line-height:1.45}
+.pnode.on{background:var(--amber-bg);border-color:var(--amber)}
+.pnode.on .pn{color:#9A7434}
+.pnode.on .pt{color:var(--amber-dk);font-weight:600}
+.parr{display:flex;align-items:center;justify-content:center;width:24px;flex-shrink:0;color:var(--ink3);font-size:15px}
+.pdetail{background:var(--bg);border-radius:10px;padding:18px 20px;border-left:3px solid var(--amber)}
+.pdetail h4{font-size:14px;font-weight:600;margin-bottom:8px}
+.pdetail p{font-size:13.5px;color:var(--ink2)}
+.pdetail b{color:var(--ink);font-weight:600}
+.pnote{font-size:11.5px;color:var(--ink3);margin-top:12px}
+
+/* ---------- utxo anatomy ---------- */
+.utxo{border:1px solid var(--amber-line);background:var(--amber-bg);border-radius:12px;padding:20px 22px}
+.utxo .uh{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--amber-dk);margin-bottom:6px;padding-bottom:12px;border-bottom:1px dashed var(--amber-line)}
+.utxo .ur{display:flex;gap:14px;padding:9px 0;font-size:13.5px;border-top:1px dashed rgba(133,79,11,.18)}
+.utxo .ur:first-of-type{border-top:none}
+.utxo .ur .k{color:#9A7434;min-width:92px;flex-shrink:0;font-size:12.5px;padding-top:2px}
+.utxo .ur .v{color:#4A3212;font-weight:600}
+.utxo .ur .v .mono{font-size:13px}
+.lockline{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+.lockline h4{font-size:13.5px;font-weight:600;margin-bottom:4px}
+.lockline .sub{font-size:12.3px;color:var(--ink3);margin-bottom:14px}
+.step-line{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px dashed var(--line)}
+.step-line:first-of-type{border-top:none}
+.step-line .n{width:22px;height:22px;border-radius:50%;background:var(--amber);color:#fff;font-size:11.5px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:3px}
+.step-line .tx{font-size:13px;color:var(--ink2)}
+.step-line .tx b{color:var(--ink);font-weight:600}
+.step-line .tx code{font-family:var(--mono);font-size:12.3px;background:var(--bg);padding:1px 6px;border-radius:5px;color:var(--amber-dk)}
+
+/* ---------- simulator ---------- */
+.sim{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px}
+.sim-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.sim-bar .lb{font-size:13px;color:var(--ink2);font-weight:600}
+.sim-bar input[type=number]{font:inherit;font-family:var(--mono);font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;width:158px;background:var(--bg);color:var(--ink)}
+.sim-bar input[type=number]:focus{outline:none;border-color:var(--amber);background:var(--paper)}
+.sim-bar .unit{font-size:12.5px;color:var(--ink3);margin-left:-4px}
+.sim-bar button{font:inherit;font-size:12.3px;padding:7px 13px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink2);cursor:pointer;transition:all .15s}
+.sim-bar button:hover{border-color:var(--ink3);color:var(--ink)}
+.sim-bar button.pri{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber);font-weight:600}
+.sim-bar button.pri:hover{border-color:var(--amber)}
+
+.sim-grid{display:grid;grid-template-columns:1.05fr 1fr 1fr;gap:16px}
+.scol h4{font-size:11.5px;font-weight:600;color:var(--ink3);letter-spacing:.07em;margin-bottom:11px;text-transform:uppercase}
+.u{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:8px;cursor:pointer;background:var(--paper);display:flex;justify-content:space-between;align-items:center;gap:8px;transition:all .15s;user-select:none}
+.u:hover{border-color:var(--ink3)}
+.u.on{background:var(--amber-bg);border-color:var(--amber)}
+.u .uid{font-family:var(--mono);font-size:11.5px;color:var(--ink3)}
+.u.on .uid{color:#9A7434}
+.u .uamt{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink2)}
+.u.on .uamt{color:var(--amber-dk)}
+.usum{font-size:12.3px;color:var(--ink3);padding:8px 2px 0;display:flex;justify-content:space-between}
+.usum b{color:var(--ink);font-weight:600;font-family:var(--mono);font-size:12.5px}
+.tx{background:var(--bg);border-radius:9px;padding:6px 12px 10px}
+.txrow{display:flex;justify-content:space-between;gap:8px;font-size:12.3px;padding:7px 0;border-bottom:1px dashed var(--line);color:var(--ink2)}
+.txrow:last-child{border-bottom:none}
+.txrow .tl{color:var(--ink3)}
+.txrow .tv{font-family:var(--mono);font-size:12.3px;font-weight:600;color:var(--ink)}
+.txrow.total .tv{color:var(--amber-dk)}
+.res{border-radius:9px;padding:10px 12px;margin-bottom:8px;font-size:12.3px;border:1px solid;display:flex;justify-content:space-between;gap:8px}
+.res .rid{font-family:var(--mono);font-size:11.5px}
+.res .ramt{font-family:var(--mono);font-weight:600}
+.res.dead{background:var(--gray-bg);border-color:var(--gray-line);color:var(--ink3)}
+.res.dead .rid,.res.dead .ramt{text-decoration:line-through}
+.res.new{background:var(--teal-bg);border-color:var(--teal-line);color:var(--teal-dk)}
+.res.new .rid{color:var(--teal)}
+.res.empty{background:var(--bg);border-color:var(--line);border-style:dashed;color:var(--ink3);justify-content:center;font-size:12px}
+
+.sim-msg{margin-top:20px;padding:14px 17px;border-radius:10px;font-size:13px;line-height:1.75;background:var(--bg);color:var(--ink2);border-left:3px solid var(--ink3)}
+.sim-msg b{font-weight:600}
+.sim-msg .mono{font-size:12.5px}
+.sim-msg.ok{background:var(--ok-bg);color:#1D6B42;border-left-color:var(--ok)}
+.sim-msg.bad{background:var(--up-bg);color:#8C2A21;border-left-color:var(--up)}
+.sim-msg.warn{background:var(--amber-bg);color:#7A4A0A;border-left-color:var(--amber)}
+
+/* ---------- table ---------- */
+.tbl-wrap{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{text-align:left;font-size:12.5px;font-weight:600;color:var(--ink3);padding:14px 18px;background:var(--bg);border-bottom:1px solid var(--line);letter-spacing:.02em}
+tbody td{padding:12px 18px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+tbody tr:last-child td{border-bottom:none}
+tbody td:first-child{color:var(--ink3);font-size:12.5px;white-space:nowrap;width:150px}
+tbody tr:nth-child(even){background:#FCFBF9}
+td b{color:var(--ink);font-weight:600}
+td .mono{font-size:12.8px}
+.no{color:var(--up);font-weight:600}
+.yes{color:var(--ok);font-weight:600}
+
+/* ---------- callouts ---------- */
+.counter{background:#1D1D1B;color:#EDECE7;border-radius:var(--radius);padding:28px 30px}
+.counter .tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8E8E87;font-weight:600;margin-bottom:12px}
+.counter h3{font-size:19px;font-weight:600;color:#fff;margin-bottom:12px;letter-spacing:-.01em}
+.counter p{font-size:14px;color:#B9B8B2;max-width:740px}
+.counter p+p{margin-top:10px}
+.counter b{color:#fff;font-weight:600}
+.counter .hl{color:#FAC775;font-weight:600}
+.counter .hl2{color:#AFA9EC;font-weight:600}
+.counter .numrow{display:flex;gap:28px;flex-wrap:wrap;margin:18px 0 4px}
+.counter .numrow div{border-left:2px solid #444441;padding-left:14px}
+.counter .numrow .k{font-size:11.5px;color:#8E8E87;margin-bottom:2px}
+.counter .numrow .v{font-size:19px;font-weight:600;color:#fff}
+
+.warnbox{margin-top:14px;padding:13px 16px;border-radius:10px;font-size:12.8px;background:var(--up-bg);color:#8C2A21;border-left:3px solid var(--up);line-height:1.75}
+.warnbox b{font-weight:600}
+.normbox{margin-top:14px;padding:13px 16px;border-radius:10px;font-size:12.8px;background:var(--gray-bg);color:var(--gray);border-left:3px solid var(--gray);line-height:1.75}
+.normbox b{font-weight:600}
+
+/* ---------- footer ---------- */
+footer{border:1px solid #EBD9C6;background:#FDF6EC;border-radius:var(--radius);padding:20px 24px;font-size:12.5px;color:#7A5A32;line-height:1.75}
+footer b{color:#5C3F1B}
+footer .src{margin-top:12px;padding-top:12px;border-top:1px dashed #EBD9C6;font-size:11.5px;color:#9C8462}
+
+@media (max-width:760px){
+  body{padding:20px 12px 48px}
+  h1{font-size:26px}
+  h1 .sub{font-size:16px}
+  .hero{padding:26px 22px 24px}
+  .stats{grid-template-columns:1fr 1fr}
+  .cols,.trip{grid-template-columns:1fr}
+  .sim-grid{grid-template-columns:1fr}
+  thead th,tbody td{padding:11px 13px}
+  tbody td:first-child{width:auto}
+  .flow,.sim,.card{padding:20px 18px}
+  .pipe{flex-direction:column;gap:8px}
+  .parr{width:100%;height:20px;transform:rotate(90deg)}
+  .counter{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Bitcoin Internals · 底层原理</div>
+    <h1>比特币的"币"<span class="sub">·</span>到底存放在哪里</h1>
+    <p class="lede">
+      私钥、公钥都懂了，但"币"是个具象的东西——它到底在哪？答案有点反直觉：<strong>链上从来没有"币"这个物件</strong>。有的只是一条条写着"谁能花"的记录；你钱包里的余额，是<strong>算出来的</strong>，不是存着的。
+    </p>
+    <div class="stats">
+      <div class="stat hi">
+        <div class="k">1 BTC 等于</div>
+        <div class="v num">1<small>亿聪</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">账本里真正的存储单位</div>
+        <div class="v num">整数<small>聪</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">已发行（约 95.7%）</div>
+        <div class="v num">2,009<small>万枚</small></div>
+      </div>
+      <div class="stat hi2">
+        <div class="k">永久无法动用（估算）</div>
+        <div class="v num">300<small>万+ 枚</small></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">01</span>
+      <h2>先把最大的误会拆掉：币不是一个"东西"</h2>
+      <span class="hint">余额是查询，不是存储</span>
+    </div>
+    <div class="cols">
+      <div class="model m1">
+        <h3>银行账户模型</h3>
+        <div class="sub">余额是一个真实存储的字段</div>
+        <div class="acct">
+          <div class="an">账户 #6222…8811</div>
+          <div class="av num">1,700.00</div>
+          <div class="af">这个数字就躺在这一个格子里</div>
+        </div>
+        <div class="note">
+          转账时，银行做的事是<b>把两个格子里的数字改一改</b>。数字是实体，币是账户的附属属性。
+        </div>
+      </div>
+      <div class="model m2">
+        <h3>比特币模型</h3>
+        <div class="sub">链上只有一条条未花费记录</div>
+        <div class="uline"><span class="lid">UTXO #a3f7</span><span class="lamt">0.50000000</span></div>
+        <div class="uline"><span class="lid">UTXO #b8c1</span><span class="lamt">1.20000000</span></div>
+        <div class="uline"><span class="lid">UTXO #c04e</span><span class="lamt">0.30000000</span></div>
+        <div class="uline sum"><span class="lid">钱包显示：余额</span><span class="lamt">2.00000000</span></div>
+        <div class="note">
+          那三行是<b>真实存在于链上的东西</b>；最下面那行"余额"是钱包<b>临时加出来</b>给你看的——它不在任何地方。
+        </div>
+      </div>
+    </div>
+
+    <div class="counter" style="margin-top:16px">
+      <div class="tag">The Key Rewrite</div>
+      <h3>你的钱包不是"装币的钱包"，是"装印鉴的钥匙包"</h3>
+      <p>wallet 这个词本身就是个误导。硬件钱包、纸钱包、助记词——<b>它们保管的从头到尾只有私钥</b>，币从来没有进过那个设备一步。</p>
+      <p>所以"把币转进冷钱包"这句话严格来说是错的。你真正做的事是：<span class="hl">把那些记录的控制权，转移到另一个私钥名下</span>。</p>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">02</span>
+      <h2>比特币 = 区块链 + 另外三层</h2>
+      <span class="hint">区块链只是最底下的账本层</span>
+    </div>
+    <div class="lyr">
+      <div class="band b1">
+        <div class="hd"><b>① 数据层 · 区块链</b><em>一页页账，每页锁住上一页</em></div>
+        <div class="chps">
+          <span class="chp">区块头存前一块的指纹</span>
+          <span class="chp">改一处则后面全对不上</span>
+          <span class="chp">公开可查、人人可验证</span>
+        </div>
+      </div>
+      <div class="band b2">
+        <div class="hd"><b>② 共识层 · 工作量证明</b><em>用算力投票，决定谁写下一页</em></div>
+        <div class="chps">
+          <span class="chp">没有老板</span>
+          <span class="chp">靠抽奖产生秩序</span>
+          <span class="chp">难度每 2016 块自动调整</span>
+        </div>
+      </div>
+      <div class="band b3">
+        <div class="hd"><b>③ 网络层 · P2P 全节点</b><em>上万个节点，各存一份完整账本</em></div>
+        <div class="chps">
+          <span class="chp">不需要信任任何人</span>
+          <span class="chp">自己拿账本核对一遍</span>
+          <span class="chp">Don't trust, verify</span>
+        </div>
+      </div>
+      <div class="band b4">
+        <div class="hd"><b>④ 经济层 · 奖励与惩罚</b><em>让"老实记账"比"作弊"更赚钱</em></div>
+        <div class="chps">
+          <span class="chp">2,100 万硬上限</span>
+          <span class="chp">区块奖励 3.125 BTC</span>
+          <span class="chp">手续费竞价</span>
+        </div>
+      </div>
+    </div>
+    <div class="normbox">
+      <b>一个冷知识：</b>中本聪的白皮书里<b>根本没有 "blockchain" 这个词</b>。他写的原文是 "chain of blocks"（两个词）。把它合成一个词、包装成独立概念，是 2014 年前后的事——也就是币圈开始讲"区块链不止能做货币"的那个阶段。
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">03</span>
+      <h2>账本长什么样：区块与链</h2>
+      <span class="hint">区块头存指纹，区块体装内容</span>
+    </div>
+    <div class="card">
+      <svg viewBox="0 0 864 292" width="100%" role="img" aria-labelledby="bkT bkdD" style="display:block">
+        <title id="bkT">三个连续区块通过哈希指针相连的结构图</title>
+        <desc id="bkdD">每个区块分为区块头和区块体，区块头存放前一个区块的指纹与全部交易的指纹，区块体存放交易列表，从而形成一环扣一环的链条。</desc>
+        <defs>
+          <marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <rect x="24" y="16" width="252" height="124" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+        <rect x="24" y="140" width="252" height="112" rx="10" fill="#FFFFFF" stroke="#854F0B" stroke-width="0.5"/>
+        <text x="42" y="42" font-size="13" font-weight="600" fill="#633806">区块 #969,648</text>
+        <text x="42" y="68" font-size="11.5" fill="#854F0B">前一块的指纹</text>
+        <text x="42" y="86" font-size="11.5" font-family="ui-monospace,Menlo,monospace" fill="#BA7517">0x00000000…a91c</text>
+        <text x="42" y="112" font-size="11.5" fill="#854F0B">全部交易的指纹</text>
+        <text x="42" y="130" font-size="11.5" font-family="ui-monospace,Menlo,monospace" fill="#BA7517">0x3d7f4b…21e8</text>
+        <text x="42" y="164" font-size="11.5" font-weight="600" fill="#854F0B">交易列表 · 约 2,400 笔</text>
+        <rect x="42" y="176" width="216" height="9" rx="2" fill="#FAC775"/>
+        <rect x="42" y="191" width="164" height="9" rx="2" fill="#FAC775"/>
+        <rect x="42" y="206" width="216" height="9" rx="2" fill="#FAC775"/>
+        <rect x="42" y="221" width="130" height="9" rx="2" fill="#FAC775"/>
+
+        <line x1="278" y1="78" x2="304" y2="78" stroke="#854F0B" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <rect x="308" y="16" width="252" height="124" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+        <rect x="308" y="140" width="252" height="112" rx="10" fill="#FFFFFF" stroke="#854F0B" stroke-width="0.5"/>
+        <text x="326" y="42" font-size="13" font-weight="600" fill="#633806">区块 #969,649</text>
+        <text x="326" y="68" font-size="11.5" fill="#854F0B">前一块的指纹</text>
+        <text x="326" y="86" font-size="11.5" font-family="ui-monospace,Menlo,monospace" fill="#BA7517">0x00000000…7b02</text>
+        <text x="326" y="112" font-size="11.5" fill="#854F0B">全部交易的指纹</text>
+        <text x="326" y="130" font-size="11.5" font-family="ui-monospace,Menlo,monospace" fill="#BA7517">0x91ac07…55d3</text>
+        <text x="326" y="164" font-size="11.5" font-weight="600" fill="#854F0B">交易列表 · 约 3,100 笔</text>
+        <rect x="326" y="176" width="216" height="9" rx="2" fill="#FAC775"/>
+        <rect x="326" y="191" width="112" height="9" rx="2" fill="#FAC775"/>
+        <rect x="326" y="206" width="216" height="9" rx="2" fill="#FAC775"/>
+        <rect x="326" y="221" width="180" height="9" rx="2" fill="#FAC775"/>
+
+        <line x1="562" y1="78" x2="588" y2="78" stroke="#854F0B" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <rect x="592" y="16" width="252" height="124" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+        <rect x="592" y="140" width="252" height="112" rx="10" fill="#FFFFFF" stroke="#854F0B" stroke-width="0.5"/>
+        <text x="610" y="42" font-size="13" font-weight="600" fill="#633806">区块 #969,650（最新）</text>
+        <text x="610" y="68" font-size="11.5" fill="#854F0B">前一块的指纹</text>
+        <text x="610" y="86" font-size="11.5" font-family="ui-monospace,Menlo,monospace" fill="#BA7517">0x00000000…c4e7</text>
+        <text x="610" y="112" font-size="11.5" fill="#854F0B">全部交易的指纹</text>
+        <text x="610" y="130" font-size="11.5" font-family="ui-monospace,Menlo,monospace" fill="#BA7517">0x6fe208…08ba</text>
+        <text x="610" y="164" font-size="11.5" font-weight="600" fill="#854F0B">交易列表 · 约 2,050 笔</text>
+        <rect x="610" y="176" width="216" height="9" rx="2" fill="#FAC775"/>
+        <rect x="610" y="191" width="142" height="9" rx="2" fill="#FAC775"/>
+        <rect x="610" y="206" width="216" height="9" rx="2" fill="#FAC775"/>
+        <rect x="610" y="221" width="96" height="9" rx="2" fill="#FAC775"/>
+
+        <text x="24" y="280" font-size="12.5" fill="#5C5C57">箭头 = 后一块里存着前一块的指纹。改任何一块，"后面全部对不上"就是这么来的</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">04</span>
+      <h2>三个核心零件</h2>
+      <span class="hint">指纹机 · 抽奖 · 印鉴</span>
+    </div>
+    <div class="trip">
+      <div class="tcard t1">
+        <h3>哈希 = 指纹机</h3>
+        <div class="sub">为什么"改不了"</div>
+        <div class="li">同一个内容永远得出同一个指纹 → <b>谁都能验证</b></div>
+        <div class="li">内容改一个标点，指纹面目全非 → <b>改了藏不住</b></div>
+        <div class="li">只能正着算，没法反推 → <b>指纹不泄露内容</b></div>
+      </div>
+      <div class="tcard t2">
+        <h3>挖矿 = 全世界抽奖</h3>
+        <div class="sub">为什么有人愿意记账</div>
+        <div class="li">不停换随机数去撞，直到撞出一个够小的结果</div>
+        <div class="li"><b>这道题没有任何捷径</b>，纯粹是为了制造成本</div>
+        <div class="li">撞中就写得下一页，领 3.125 BTC</div>
+      </div>
+      <div class="tcard t3">
+        <h3>私钥 = 印鉴，不是钥匙</h3>
+        <div class="sub">为什么丢私钥等于丢币</div>
+        <div class="li">它不"打开"任何箱子，它只负责<b>生成签名</b></div>
+        <div class="li">签名能通过记录上的"锁定条件"，账本才认</div>
+        <div class="li">没有客服、没有找回密码、<b>没有冻结</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">05</span>
+      <h2>一笔交易的旅程</h2>
+      <span class="hint">点击任一环节查看细节</span>
+    </div>
+    <div class="flow">
+      <div class="pipe" id="pipe"></div>
+      <div class="pdetail">
+        <h4 id="pdTitle"></h4>
+        <p id="pdText"></p>
+      </div>
+      <div class="pnote">注意第 3 步：区块奖励是比特币唯一被"新造出来"的方式。除此之外，币只会在旧记录和新记录之间搬家。</div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">06</span>
+      <h2>"币"的具体形态：一条带条件的记录</h2>
+      <span class="hint">金额 + 锁定条件</span>
+    </div>
+    <div class="cols">
+      <div class="utxo">
+        <div class="uh">UTXO #b8c1</div>
+        <div class="ur"><span class="k">金额</span><span class="v"><span class="mono">1.20000000 BTC</span></span></div>
+        <div class="ur"><span class="k">锁定条件</span><span class="v"><span class="mono">&lt;你的公钥哈希&gt; OP_CHECKSIG</span></span></div>
+        <div class="ur"><span class="k">状态</span><span class="v">未花费 · 等被解锁</span></div>
+        <div class="ur"><span class="k">链上存了多久</span><span class="v">自 2026-03-18 起没动过</span></div>
+      </div>
+      <div class="lockline">
+        <h4>要花掉它，你得提供解锁数据</h4>
+        <div class="sub">然后由全网节点当场验算</div>
+        <div class="step-line"><span class="n">1</span><span class="tx">交出<code>签名</code>和<code>公钥</code></span></div>
+        <div class="step-line"><span class="n">2</span><span class="tx">节点检查签名是不是这个公钥生成的</span></div>
+        <div class="step-line"><span class="n">3</span><span class="tx">再检查公钥的哈希，是否等于记录里写死的那串</span></div>
+        <div class="step-line"><span class="n">4</span><span class="tx">全部通过 → <b>新记录诞生</b>；有一条不对 → 直接丢弃</span></div>
+      </div>
+    </div>
+    <div class="normbox">
+      这就是私钥和币之间的全部关系：<b>私钥不打开任何箱子，它只生成签名；是签名通过了条件检查，账本才愿意把这笔记到新主人名下。</b>链上没有任何一处存放着"币"，存放的是"谁有权处置"。
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">07</span>
+      <h2>亲手发一笔：UTXO 花费模拟器</h2>
+      <span class="hint">点选记录，看币是怎么"搬家"的</span>
+    </div>
+    <div class="sim">
+      <div class="sim-bar">
+        <span class="lb">收款金额</span>
+        <input type="number" id="amt" value="0.5" step="0.0001" min="0">
+        <span class="unit">BTC</span>
+        <button data-v="0.0008">0.0008</button>
+        <button data-v="0.5">0.5</button>
+        <button data-v="1.8">1.8</button>
+        <button class="pri" id="auto">自动选币</button>
+      </div>
+      <div class="sim-grid">
+        <div class="scol">
+          <h4>你的钱包 · 4 条记录</h4>
+          <div id="wallet"></div>
+          <div class="usum"><span>已选作输入</span><b id="inSum">0.00000000</b></div>
+        </div>
+        <div class="scol">
+          <h4>这笔交易</h4>
+          <div class="tx" id="txBox"></div>
+        </div>
+        <div class="scol">
+          <h4>花之后</h4>
+          <div id="resBox"></div>
+        </div>
+      </div>
+      <div class="sim-msg" id="msg"></div>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">08</span>
+      <h2>五个最常见的误解</h2>
+      <span class="hint">听过其中三个以上很正常</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>常见说法</th><th>实际情况</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>比特币就是区块链</td>
+            <td>区块链只是它的<b>账本层</b>。没有算力竞赛和经济激励，这个账本没人愿意维护。中本聪白皮书里甚至没有 "blockchain" 这个词</td>
+          </tr>
+          <tr>
+            <td>币存在电脑里，可以拷贝</td>
+            <td>链上<b>没有"币文件"</b>。你的钱包只存私钥。私钥可以复制一万份，但它们花的是同一笔钱——谁先花，剩下的全部失效</td>
+          </tr>
+          <tr>
+            <td>挖矿是在解一道有意义的数学题</td>
+            <td>那道题<b>本身毫无意义</b>。它的唯一作用是制造成本，让"记账权"变成稀缺资源。这是比特币最反直觉、也最天才的一处设计</td>
+          </tr>
+          <tr>
+            <td>区块链不可篡改</td>
+            <td>准确说是<b>篡改成本极高</b>。历史上越深越贵，但不是数学上绝对不可能。理论上掌握 51% 算力就能改写——只是代价远大于收益</td>
+          </tr>
+          <tr>
+            <td>比特币是匿名的</td>
+            <td>它是<b>化名（pseudonymous）</b>，不是匿名。所有交易公开可查，一旦某个地址和你的身份关联上，你<b>全部历史</b>一览无余</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 09 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">09</span>
+      <h2>最能说明问题的一件事：丢失的币</h2>
+      <span class="hint">币还在，只是没人能解锁了</span>
+    </div>
+    <div class="counter">
+      <div class="tag">Lost, Not Gone</div>
+      <h3>那几百万枚币，一枚都没少</h3>
+      <p>大约 <span class="hl">300 万枚以上</span>的 BTC 因为私钥永久丢失而再也无法动用，其中光是那位把硬盘扔进垃圾场的英国程序员就占了 7,500 枚。</p>
+      <p>关键在于——<b>这些币还好端端地躺在账本上。</b>变的只有一件事：<span class="hl2">再也没有人能生成那个签名了</span>。</p>
+      <div class="numrow">
+        <div><div class="k">丢失的币在哪</div><div class="v">还在链上，一条不少</div></div>
+        <div><div class="k">总量变了吗</div><div class="v">没有，仍是 2,100 万上限</div></div>
+        <div><div class="k">真正消失的是什么</div><div class="v">能解锁它的印鉴</div></div>
+      </div>
+      <p style="margin-top:14px">如果币是一个实物，丢进海里就是真的没了。但在这里，它<b>还在原地，只是被永远锁住了</b>。这就是"币不是一个东西"这件事最硬的证据。</p>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">10</span>
+      <h2>三个由此推出的实用结论</h2>
+      <span class="hint">这些细节真会花到你的钱</span>
+    </div>
+    <div class="cols">
+      <div class="col c1">
+        <h3>① 硬件钱包里其实没有币</h3>
+        <div class="sub">它只是个离线保险箱，装的是印鉴</div>
+        <div class="row"><span class="lab">它存什么</span><span class="val">只有私钥，<b>币从头到尾没进过那个设备</b></span></div>
+        <div class="row"><span class="lab">所以</span><span class="val">"把币转进冷钱包"这句说法是错的，你只是把控制权换到了一个更安全的私钥名下</span></div>
+        <div class="row"><span class="lab">反过来说</span><span class="val">设备坏了、丢了，只要助记词在，<b>币一枚不会少</b></span></div>
+      </div>
+      <div class="col c2">
+        <h3>② 手续费按体积算，不按金额算</h3>
+        <div class="sub">这是 UTXO 模型最容易被忽视的代价</div>
+        <div class="row"><span class="lab">规则</span><span class="val">费用 = <b>交易字节数 × 费率</b>，跟你转多少钱毫无关系</span></div>
+        <div class="row"><span class="lab">后果</span><span class="val">钱包里攒了 200 笔小额收款，想一次花出去就要引用 200 条记录，<b>手续费可能比要转的钱还贵</b></span></div>
+        <div class="row"><span class="lab">对策</span><span class="val">趁链上不堵的时候<b>合并 UTXO</b>——把一堆小额记录合成一笔大的，这个操作在模拟器里能看到效果</span></div>
+      </div>
+    </div>
+    <div class="warnbox">
+      <b>③ 找零也会泄露隐私。</b>每笔找零都会生成一条新记录（新地址），本来是为了隐私。但如果你的钱包把找零都挂在同一个"账户"下，链上分析师顺着这些地址一分析，你的全部流水就串起来了——<b>这正是"比特币不匿名"的技术根源</b>，跟交易所实名无关。
+    </div>
+  </section>
+
+  <footer>
+    <b>性质说明：</b>本卡片为比特币底层机制的科普梳理，不构成任何投资建议，也不构成对任何加密资产的推荐。在中国内地，虚拟货币相关业务活动属于非法金融活动，交易合同不受法律保护，交易平台亦不在境内监管范围内。
+    <div class="src">制表时间：2026-10-06 · 区块高度、发行量等数据参考公开链上口径；"永久丢失"为社区估算（含中本聪早期地址是否计入存在争议），不同来源差异较大 · 手续费与粉尘阈值均为机制说明，实际数值随链上拥堵程度浮动。</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  /* ---------- 05 交易旅程 ---------- */
+  var TRIP = [
+    { n:'STEP 1', t:'你签名并广播', h:'用私钥给交易盖章，发给周围节点',
+      d:'私钥在这一步只做一件事：<b>生成签名</b>。它不"打开"任何东西，只是证明"这条记录该由我处置"。广播之后，这笔交易还完全不算数。' },
+    { n:'STEP 2', t:'进入内存池排队', h:'躺在候车厅，等矿工来挑',
+      d:'所有未确认交易都堆在内存池里。矿工按<b>手续费率</b>排序挑单——给得高的先上车，这是唯一的插队方式。链上不堵的时候，这个"候车厅"可能只有几万笔；堵起来能有几十万笔。' },
+    { n:'STEP 3', t:'矿工打包进新区块', h:'顺手领走 3.125 BTC',
+      d:'这是比特币<b>唯一被"新造出来"的时刻</b>。除此之外，币只会在旧记录和新记录之间搬家，一枚都不会凭空多出来。这也是为什么 2,100 万的上限能被守住——新币的出口只有一个，而且每 21 万个区块就砍半。' },
+    { n:'STEP 4', t:'全网节点逐条验证', h:'每个人都是审计员',
+      d:'上万个节点各自把新区块检查一遍：签名对不对？金额够不够？<b>有没有重复花费同一笔钱？</b>只要有一条不通过，整块直接丢弃——不是"投票否决"，是<b>根本不会接受</b>。' },
+    { n:'STEP 5', t:'每多一块，多一层确认', h:'6 层之后基本不可逆',
+      d:'每多一个区块压在上面，想回滚这笔交易的成本就翻一番。6 层确认（约一小时）之后，所需算力已经高到不现实。<b>比特币的安全从来不是"不能改"，而是"改不起"。</b>' }
+  ];
+  var pipe = document.getElementById('pipe');
+  var pdTitle = document.getElementById('pdTitle');
+  var pdText = document.getElementById('pdText');
+  var tIdx = 0;
+
+  function renderPipe(){
+    var html = '';
+    for (var i = 0; i < TRIP.length; i++){
+      if (i > 0) html += '<div class="parr">&#8594;</div>';
+      html += '<div class="pnode' + (i === tIdx ? ' on' : '') + '" data-i="' + i + '">' +
+              '<div class="pn">' + TRIP[i].n + '</div>' +
+              '<div class="pt">' + TRIP[i].t + '</div></div>';
+    }
+    pipe.innerHTML = html;
+    var ns = pipe.querySelectorAll('.pnode');
+    for (var j = 0; j < ns.length; j++){
+      ns[j].addEventListener('click', function(){
+        tIdx = Number(this.dataset.i);
+        renderPipe();
+        renderDetail();
+      });
+    }
+  }
+  function renderDetail(){
+    pdTitle.textContent = TRIP[tIdx].n + ' · ' + TRIP[tIdx].h;
+    pdText.innerHTML = TRIP[tIdx].d;
+  }
+  renderPipe();
+  renderDetail();
+
+  /* ---------- 07 UTXO 模拟器 ---------- */
+  var W = [
+    { id:'a3f7', sats:  50000000 },
+    { id:'b8c1', sats: 120000000 },
+    { id:'c04e', sats:  30000000 },
+    { id:'d9e2', sats:   5000000 }
+  ];
+  var RATE   = 10;    /* sat/vB */
+  var BASEVB = 200;   /* 1 输入 2 输出 */
+  var PER_IN = 68;    /* 每多一个输入 */
+  var DUST   = 546;   /* 粉尘阈值，聪 */
+
+  var sel = [0, 2];
+
+  var amtEl  = document.getElementById('amt');
+  var walletEl = document.getElementById('wallet');
+  var inSumEl  = document.getElementById('inSum');
+  var txEl   = document.getElementById('txBox');
+  var resEl  = document.getElementById('resBox');
+  var msgEl  = document.getElementById('msg');
+
+  function comma(n){
+    var s = String(n), out = '', c = 0;
+    for (var i = s.length - 1; i >= 0; i--){
+      out = s.charAt(i) + out; c++;
+      if (c % 3 === 0 && i > 0) out = ',' + out;
+    }
+    return out;
+  }
+  function btc(sats){
+    if (sats < 0) return '\u2212' + btc(-sats);
+    var i = Math.floor(sats / 1e8), f = sats % 1e8;
+    var fs = String(f);
+    while (fs.length < 8) fs = '0' + fs;
+    return comma(i) + '.' + fs;
+  }
+  function sat(n){ return comma(n) + ' 聪'; }
+  function vb(n){ return BASEVB + PER_IN * (n - 1); }
+  function feeOf(n){ return vb(n) * RATE; }
+  function parseSats(v){
+    var f = parseFloat(v);
+    if (isNaN(f) || f < 0) return 0;
+    return Math.round(f * 1e8);
+  }
+  function newId(i){
+    var pool = ['e91d','f27a','7c40','2b85','5ad1','83ef','c6b4','0d92'];
+    return pool[i % pool.length];
+  }
+
+  function renderWallet(){
+    var html = '';
+    for (var i = 0; i < W.length; i++){
+      html += '<div class="u' + (sel.indexOf(i) > -1 ? ' on' : '') + '" data-i="' + i + '">' +
+              '<span class="uid">UTXO #' + W[i].id + '</span>' +
+              '<span class="uamt">' + btc(W[i].sats) + '</span></div>';
+    }
+    walletEl.innerHTML = html;
+    var ns = walletEl.querySelectorAll('.u');
+    for (var j = 0; j < ns.length; j++){
+      ns[j].addEventListener('click', function(){
+        var i = Number(this.dataset.i);
+        var p = sel.indexOf(i);
+        if (p > -1) sel.splice(p, 1); else sel.push(i);
+        sel.sort(function(a,b){ return a - b; });
+        render();
+      });
+    }
+  }
+
+  function render(){
+    var n = sel.length;
+    var inSum = 0;
+    for (var i = 0; i < n; i++) inSum += W[sel[i]].sats;
+    var amt  = parseSats(amtEl.value);
+    var fee  = n > 0 ? feeOf(n) : 0;
+    var chg  = n > 0 ? inSum - amt - fee : 0;
+    var need = amt + fee;
+
+    inSumEl.textContent = btc(inSum);
+
+    /* 中间栏 */
+    var txh = '';
+    txh += '<div class="txrow"><span class="tl">输入 · ' + n + ' 条记录作废</span><span class="tv">' + btc(inSum) + '</span></div>';
+    txh += '<div class="txrow"><span class="tl">输出 · 付给收款方</span><span class="tv">' + btc(amt) + '</span></div>';
+    if (n > 0 && chg > 0){
+      txh += '<div class="txrow"><span class="tl">输出 · 找零给自己</span><span class="tv">' + btc(chg) + '</span></div>';
+    }
+    txh += '<div class="txrow"><span class="tl">矿工手续费</span><span class="tv">' + sat(fee) + '</span></div>';
+    if (n > 0){
+      txh += '<div class="txrow"><span class="tl">预计体积</span><span class="tv">' + vb(n) + ' vB</span></div>';
+      txh += '<div class="txrow total"><span class="tl">输入必须 ≥</span><span class="tv">' + btc(need) + '</span></div>';
+    }
+    txEl.innerHTML = txh;
+
+    /* 右栏 */
+    var rh = '';
+    if (n === 0){
+      rh = '<div class="res empty">还没选记录</div>';
+    } else {
+      for (var k = 0; k < n; k++){
+        rh += '<div class="res dead"><span class="rid">#' + W[sel[k]].id + '</span><span class="ramt">' + btc(W[sel[k]].sats) + '</span></div>';
+      }
+      if (chg > 0){
+        rh += '<div class="res new"><span class="rid">#' + newId(0) + ' → 收款方</span><span class="ramt">' + btc(amt) + '</span></div>';
+        rh += '<div class="res new"><span class="rid">#' + newId(1) + ' → 找零</span><span class="ramt">' + btc(chg) + '</span></div>';
+      } else if (chg === 0){
+        rh += '<div class="res new"><span class="rid">#' + newId(0) + ' → 收款方</span><span class="ramt">' + btc(amt) + '</span></div>';
+        rh += '<div class="res empty">没有找零</div>';
+      }
+    }
+    resEl.innerHTML = rh;
+
+    /* 提示 */
+    var cls = '', m = '';
+    if (n === 0){
+      msgEl.className = 'sim-msg';
+      msgEl.innerHTML = '至少点选一条记录作为输入。比特币没有"从余额里扣"这回事——<b>必须先指定要花掉哪几条记录</b>。';
+    } else if (chg < 0){
+      cls = 'bad';
+      m = '<b>输入不够。</b>需要 <span class="mono">' + btc(need) + '</span>（' + btc(amt) + ' 收款 + ' + sat(fee) + ' 手续费），但选中的记录只有 <span class="mono">' + btc(inSum) + '</span>，还差 <span class="mono">' + btc(need - inSum) + '</span>。再勾几条记录试试。';
+    } else if (chg === 0){
+      cls = 'ok';
+      m = '<b>刚好用完，没有找零。</b>输入的 ' + btc(inSum) + ' 被完全分配给了收款方和矿工。这是最"干净"的一笔交易——但现实中极难凑出来。';
+    } else if (chg < DUST){
+      cls = 'warn';
+      m = '<b>找零太小了。</b>只剩 ' + sat(chg) + '，低于比特币的粉尘阈值 <b>546 聪</b>。这种找零连自己再花一次都不划算，大多数钱包会直接把它<b>当作手续费送给矿工</b>。';
+    } else {
+      cls = 'ok';
+      m = '<b>交易成立。</b>' + n + ' 条旧记录作废，生成 2 条新记录：' + btc(amt) + ' 给收款方，' + btc(chg) + ' 找零回到你自己名下。全程没有任何"币"被移动过。';
+    }
+
+    if (n >= 3 && chg >= 0){
+      var solo = feeOf(1);
+      var pct = Math.round((fee - solo) / solo * 100);
+      m += '<br>你引用了 <b>' + n + ' 条记录</b>，交易体积 ' + vb(n) + ' vB，手续费比单条输入贵了 <b>' + pct + '%</b>。这就是"合并 UTXO"存在的原因。';
+    }
+    if (cls) msgEl.className = 'sim-msg ' + cls;
+    msgEl.innerHTML = m;
+  }
+
+  function autoSelect(target){
+    var order = [];
+    for (var i = 0; i < W.length; i++) order.push(i);
+    order.sort(function(a,b){ return W[a].sats - W[b].sats; });
+    var picked = [], sum = 0;
+    for (var j = 0; j < order.length; j++){
+      picked.push(order[j]);
+      sum += W[order[j]].sats;
+      if (sum >= target + feeOf(picked.length)) return picked;
+    }
+    return picked;
+  }
+
+  var presetBtns = document.querySelectorAll('.sim-bar button[data-v]');
+  for (var p = 0; p < presetBtns.length; p++){
+    presetBtns[p].addEventListener('click', function(){
+      amtEl.value = this.dataset.v;
+      render();
+    });
+  }
+  document.getElementById('auto').addEventListener('click', function(){
+    sel = autoSelect(parseSats(amtEl.value));
+    render();
+  });
+  amtEl.addEventListener('input', render);
+
+  renderWallet();
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+# yaml-language-server: $schema=./quartz/plugins/quartz-plugins.schema.json
+configuration:
+  pageTitle: zesheng 的数字花园
+  pageTitleSuffix: "· 运维知识库"
+  enableSPA: true
+  enablePopovers: true
+  locale: zh-CN
+  baseUrl: liaozesheng.github.io
+  ignorePatterns:
+    - private
+    - templates
+    - .obsidian
+  theme:
+    fontOrigin: googleFonts
+    cdnCaching: true
+    typography:
+      header: "Noto Sans SC"
+      body: "Noto Sans SC"
+      code: "JetBrains Mono"
+    colors:
+      lightMode:
+        light: "#fafaf9"
+        lightgray: "#e7e5e4"
+        gray: "#a8a29e"
+        darkgray: "#44403c"
+        dark: "#292524"
+        secondary: "#0f766e"
+        tertiary: "#14b8a6"
+        highlight: rgba(15, 118, 110, 0.12)
+        textHighlight: "#fde68a88"
+      darkMode:
+        light: "#1c1917"
+        lightgray: "#292524"
+        gray: "#78716c"
+        darkgray: "#e7e5e4"
+        dark: "#f5f5f4"
+        secondary: "#2dd4bf"
+        tertiary: "#5eead4"
+        highlight: rgba(45, 212, 191, 0.15)
+        textHighlight: "#facc1588"
+plugins:
+  - source: "@quartz-community/created-modified-date"
+    enabled: true
+    options:
+      defaultDateType: modified
+      priority:
+        - frontmatter
+        - git
+        - filesystem
+    order: 10
+  - source: "@quartz-community/syntax-highlighting"
+    enabled: true
+    options:
+      theme:
+        light: github-light
+        dark: github-dark
+      keepBackground: false
+    order: 20
+  - source: "@quartz-community/obsidian-flavored-markdown"
+    enabled: true
+    options:
+      enableInHtmlEmbed: false
+      enableCheckbox: true
+    order: 30
+  - source: "@quartz-community/github-flavored-markdown"
+    enabled: true
+    order: 40
+# 笔记的目录
+  - source: "@quartz-community/table-of-contents"
+    enabled: true
+    order: 50
+    options:
+      maxDepth: 4              # 显示到第几级,默认 3
+      minEntries: 1            # 至少几个标题才显示目录,默认 1
+      collapseByDefault: true  # 默认折叠目录,默认 false
+      layout: modern           # modern(新版)/ legacy(旧版)
+    layout:
+      position: right
+      priority: 30
+  - source: "@quartz-community/crawl-links"
+    enabled: true
+    options:
+      markdownLinkResolution: shortest
+    order: 60
+  - source: "@quartz-community/description"
+    enabled: true
+    order: 70
+  - source: "@quartz-community/latex"
+    enabled: true
+    options:
+      renderEngine: katex
+    order: 80
+  - source: "@quartz-community/quartz-fonts"
+    enabled: true
+  - source: "@quartz-community/remove-draft"
+    enabled: true
+  - source: "@quartz-community/alias-redirects"
+    enabled: true
+  - source: "@quartz-community/content-index"
+    enabled: true
+    options:
+      enableSiteMap: true
+      enableRSS: true
+  - source: "@quartz-community/favicon"
+    enabled: true
+  - source: "@quartz-community/og-image"
+    enabled: true
+  - source: "@quartz-community/cname"
+    enabled: false
+  - source: "@quartz-community/canvas-page"
+    enabled: true
+# 原生 HTML 卡片：把 content/ 下的独立 .html 渲染成带 Quartz 外壳的页面
+# 实现见 quartz-plugins/html-card/，通过 package.json 的 file: 依赖链接为本地 npm 包
+# （不要写成 "./quartz-plugins/html-card"：loader 对本地路径会 symlink，
+#   Windows 无开发者模式时会 EPERM 导致插件被静默跳过）
+  - source: "@liaozesheng/quartz-plugin-html-card"
+    enabled: true
+    order: 95
+    options:
+      # 只接管匹配该正则的文件（相对 content 目录）
+      pattern: "\\.html$"
+      # CSS 作用域容器类名：卡片样式会被加上这个前缀，避免污染站点主题
+      scopeClass: html-card
+      # <title> 缺失时回退到文件名
+      titleFrom: title
+      # 需要给卡片加标签时打开（会生成对应的标签页）
+      # frontmatter:
+      #   tags:
+      #     - 知识卡
+  - source: "@quartz-community/content-page"
+    enabled: true
+  - source: "@quartz-community/folder-page"
+    enabled: true
+  - source: "@quartz-community/tag-page"
+    enabled: true
+  - source: "@quartz-community/explorer"
+    enabled: true
+    layout:
+      position: left
+      priority: 50
+# 关掉关系图谱
+  - source: "@quartz-community/graph"
+    enabled: false
+    layout:
+      position: right
+      priority: 10
+  - source: "@quartz-community/search"
+    enabled: true
+    layout:
+      position: left
+      priority: 20
+      group: toolbar
+      groupOptions:
+        grow: true
+# 反向链接
+  - source: "@quartz-community/backlinks"
+    enabled: false
+    layout:
+      position: right
+      priority: 50
+  - source: "@quartz-community/article-title"
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 10
+  - source: "@quartz-community/content-meta"
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 20
+  - source: "@quartz-community/page-title"
+    enabled: true
+    layout:
+      position: left
+      priority: 10
+  - source: "@quartz-community/darkmode"
+    enabled: true
+    layout:
+      position: left
+      priority: 30
+      group: toolbar
+  - source: "@quartz-community/reader-mode"
+    enabled: true
+    layout:
+      position: left
+      priority: 35
+      group: toolbar
+  - source: "@quartz-community/breadcrumbs"
+    enabled: true
+    layout:
+      position: beforeBody
+      priority: 5
+      condition: not-index
+  - source: "@quartz-community/footer"
+    enabled: true
+    options:
+      links:
+        GitHub: https://github.com/liaozesheng
+        RSS: /index.xml
+  - source: "@quartz-community/spacer"
+    enabled: true
+    options: {}
+    order: 25
+    layout:
+      position: left
+      priority: 25
+      display: mobile-only
+  - source: "@quartz-community/note-properties"
+    enabled: true
+    options:
+      includeAll: false
+      includedProperties:
+        - description
+        - tags
+        - aliases
+      excludedProperties: []
+      hidePropertiesView: false
+      delimiters: ---
+      language: yaml
+    order: 5
+    layout:
+      position: beforeBody
+      priority: 15
+      display: all
+  - source: "@quartz-community/unlisted-pages"
+    enabled: true
+    options: {}
+    order: 45
+layout:
+  groups:
+    toolbar:
+      priority: 35
+      direction: row
+      gap: 0.5rem
+  byPageType:
+    "404":
+      positions:
+        beforeBody: []
+        left: []
+        right: []
+    content: {}
+    folder:
+      exclude:
+        - reader-mode
+      positions:
+        right: []
+    tag:
+      exclude:
+        - reader-mode
+      positions:
+        right: []
+    canvas: {}
+    # 原生 HTML 卡片页：卡片自带 hero 标题，故去掉重复的 article-title、
+    # 没有日期的 content-meta，以及空的 note-properties。
+    # 注意：exclude 里的名字必须是**完整 source 串**——loader 的
+    # extractPluginName() 对 npm 包不做去 scope 处理，
+    # 写 "article-title" 是匹配不上的（现存 folder/tag 的 reader-mode 同理为空操作）。
+    "html-card":
+      exclude:
+        - "@quartz-community/article-title"
+        - "@quartz-community/content-meta"
+        - "@quartz-community/note-properties"

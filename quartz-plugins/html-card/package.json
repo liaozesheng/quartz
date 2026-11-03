@@ -1,0 +1,28 @@
+{
+  "name": "@liaozesheng/quartz-plugin-html-card",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Quartz v5 pageType 插件：把 content/ 下的原生 HTML 文件渲染为带完整 Quartz 外壳的页面",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "preact": "*",
+    "@quartz-community/utils": "*"
+  },
+  "quartz": {
+    "name": "html-card",
+    "displayName": "HTML Card",
+    "description": "将 content/ 下的独立 HTML 文件渲染为 Quartz 页面（带侧边栏、搜索、暗色模式，并支持 SPA 下的内联脚本重放）",
+    "version": "1.0.0",
+    "category": "pageType",
+    "quartzVersion": "4.5.0"
+  }
+}

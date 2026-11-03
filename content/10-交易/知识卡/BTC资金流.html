@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BTC 资金流 · 知识卡</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F6F5F1;
+  --paper:#FFFFFF;
+  --ink:#1D1D1B;
+  --ink2:#5C5C57;
+  --ink3:#8E8E87;
+  --line:#E7E5DF;
+  --coral:#993C1D;
+  --coral-bg:#FAECE7;
+  --coral-line:#F5C4B3;
+  --coral-dk:#712B13;
+  --amber:#854F0B;
+  --amber-bg:#FAEEDA;
+  --amber-line:#FAC775;
+  --gray:#444441;
+  --gray-bg:#F1EFE8;
+  --gray-line:#D3D1C7;
+  --purple:#3C3489;
+  --purple-bg:#EEEDFE;
+  --purple-line:#CECBF6;
+  --up:#C0392B;
+  --up-bg:#FCEBEB;
+  --down:#2E7D4F;
+  --down-bg:#E8F5EC;
+  --radius:14px;
+}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  padding:36px 20px 72px;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+/* ---------- hero ---------- */
+.hero{
+  background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);padding:36px 36px 30px;position:relative;overflow:hidden;
+}
+.hero::before{content:"";position:absolute;left:0;top:0;height:50%;width:5px;background:var(--coral)}
+.hero::after{content:"";position:absolute;left:0;top:50%;bottom:0;width:5px;background:var(--purple)}
+.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--ink3);text-transform:uppercase;font-weight:600;margin-bottom:14px}
+h1{font-size:34px;line-height:1.25;font-weight:600;letter-spacing:-.01em;margin-bottom:12px}
+h1 .sub{color:var(--ink3);font-weight:400;font-size:20px;padding:0 4px}
+.lede{font-size:15.5px;color:var(--ink2);max-width:670px}
+.lede strong{color:var(--ink);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+.stat{background:var(--bg);border-radius:10px;padding:14px 16px}
+.stat .k{font-size:12px;color:var(--ink3);margin-bottom:4px;line-height:1.4}
+.stat .v{font-size:21px;font-weight:600;letter-spacing:-.02em}
+.stat .v small{font-size:12px;font-weight:400;color:var(--ink2);margin-left:3px}
+.stat.hi{background:var(--coral-bg)}
+.stat.hi .k{color:#B4674C}
+.stat.hi .v{color:var(--coral)}
+.stat.hi2{background:var(--purple-bg)}
+.stat.hi2 .k{color:#7F77DD}
+.stat.hi2 .v{color:var(--purple)}
+
+/* ---------- section ---------- */
+.sec-title{display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-left:2px}
+.sec-title .idx{font-size:12px;font-weight:600;color:var(--paper);background:var(--ink);border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+.sec-title h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+.sec-title .hint{font-size:12.5px;color:var(--ink3);margin-left:auto}
+
+/* ---------- chart ---------- */
+.chart-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px 22px 18px}
+.chart-cap{font-size:13px;color:var(--ink2);padding:0 6px 6px}
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--ink3);padding:8px 6px 2px}
+.chart-legend span{display:flex;align-items:center;gap:6px}
+.chart-legend i{width:11px;height:11px;border-radius:50%;display:block}
+
+/* ---------- table ---------- */
+.tbl-wrap{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{text-align:left;font-size:12.5px;font-weight:600;color:var(--ink3);padding:14px 18px;background:var(--bg);border-bottom:1px solid var(--line);letter-spacing:.02em}
+tbody td{padding:12px 18px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+tbody tr:last-child td{border-bottom:none}
+tbody td:first-child{color:var(--ink3);font-size:12.5px;white-space:nowrap;width:112px}
+tbody tr:nth-child(even){background:#FCFBF9}
+tbody tr.now td{background:var(--coral-bg)}
+tbody tr.now td:first-child{color:#B4674C}
+td b{color:var(--ink);font-weight:600}
+td.pos{color:var(--up);font-weight:600}
+td.neg{color:var(--down);font-weight:600}
+
+/* ---------- callouts ---------- */
+.counter{background:#1D1D1B;color:#EDECE7;border-radius:var(--radius);padding:28px 30px}
+.counter .tag{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8E8E87;font-weight:600;margin-bottom:12px}
+.counter h3{font-size:19px;font-weight:600;color:#fff;margin-bottom:12px;letter-spacing:-.01em}
+.counter p{font-size:14px;color:#B9B8B2;max-width:720px}
+.counter p+p{margin-top:10px}
+.counter b{color:#fff;font-weight:600}
+.counter .hl{color:#F0997B;font-weight:600}
+.counter .numrow{display:flex;gap:28px;flex-wrap:wrap;margin:18px 0 4px}
+.counter .numrow div{border-left:2px solid #444441;padding-left:14px}
+.counter .numrow .k{font-size:11.5px;color:#8E8E87;margin-bottom:2px}
+.counter .numrow .v{font-size:19px;font-weight:600;color:#fff}
+
+.warnbox{
+  margin-top:14px;padding:13px 16px;border-radius:10px;font-size:12.8px;
+  background:var(--up-bg);color:#8C2A21;border-left:3px solid var(--up);line-height:1.75;
+}
+.warnbox b{font-weight:600}
+
+/* ---------- layers ---------- */
+.lyr{display:flex;flex-direction:column;gap:12px}
+.band{border-radius:var(--radius);padding:18px 20px;border:1px solid}
+.band .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.band .hd b{font-size:15px;font-weight:600}
+.band .hd em{font-size:12.5px;font-style:normal;opacity:.76}
+.chps{display:flex;flex-wrap:wrap;gap:8px}
+.chp{font-size:12.5px;padding:5px 12px;border-radius:99px;border:1px solid;background:var(--paper);color:var(--ink2)}
+.b1{background:var(--coral-bg);border-color:var(--coral-line)}
+.b1 .hd b,.b1 .hd em{color:var(--coral-dk)}
+.b2{background:var(--amber-bg);border-color:var(--amber-line)}
+.b2 .hd b,.b2 .hd em{color:#633806}
+.b3{background:var(--gray-bg);border-color:var(--gray-line)}
+.b3 .hd b,.b3 .hd em{color:var(--gray)}
+.b4{background:var(--purple-bg);border-color:var(--purple-line)}
+.b4 .hd b,.b4 .hd em{color:var(--purple)}
+
+/* ---------- layer detail cards ---------- */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;border-top:3px solid transparent}
+.col.c1{border-top-color:var(--coral)}
+.col.c2{border-top-color:var(--amber)}
+.col.c3{border-top-color:var(--gray)}
+.col.c4{border-top-color:var(--purple)}
+.col h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.col.c1 h3{color:var(--coral)}
+.col.c2 h3{color:var(--amber)}
+.col.c3 h3{color:var(--gray)}
+.col.c4 h3{color:var(--purple)}
+.col .sub{font-size:12.5px;color:var(--ink3);margin-bottom:14px}
+.row{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px}
+.row:first-of-type{border-top:none}
+.row .lab{color:var(--ink3);min-width:58px;flex-shrink:0;font-size:12.5px;padding-top:1px}
+.row .val{color:var(--ink2)}
+.row .val b{color:var(--ink);font-weight:600}
+
+/* ---------- flow stepper ---------- */
+.flow{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px}
+.ftabs{display:flex;gap:8px;margin-bottom:22px;flex-wrap:wrap}
+.ftabs button{
+  font:inherit;font-size:13px;padding:7px 16px;border-radius:9px;
+  border:1px solid var(--line);background:var(--bg);color:var(--ink2);cursor:pointer;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.ftabs button:hover{border-color:var(--ink3);color:var(--ink)}
+.ftabs button.on{background:var(--coral-bg);border-color:var(--coral-line);color:var(--coral);font-weight:600}
+.pipe{display:flex;align-items:stretch;margin-bottom:22px}
+.pnode{
+  flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;
+  padding:13px 10px;background:var(--paper);cursor:pointer;text-align:center;
+  transition:background .15s,border-color .15s;
+}
+.pnode .pn{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.08em;margin-bottom:6px}
+.pnode .pt{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.pnode.on{background:var(--coral-bg);border-color:var(--coral)}
+.pnode.on .pn{color:#B4674C}
+.pnode.on .pt{color:var(--coral-dk);font-weight:600}
+.parr{display:flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:var(--ink3);font-size:15px}
+.pdetail{background:var(--bg);border-radius:10px;padding:18px 20px;border-left:3px solid var(--coral)}
+.pdetail h4{font-size:14px;font-weight:600;margin-bottom:8px}
+.pdetail p{font-size:13.5px;color:var(--ink2)}
+.pdetail b{color:var(--ink);font-weight:600}
+.pnote{font-size:11.5px;color:var(--ink3);margin-top:12px}
+
+/* ---------- footer ---------- */
+footer{
+  border:1px solid #EBD9C6;background:#FDF6EC;border-radius:var(--radius);
+  padding:20px 24px;font-size:12.5px;color:#7A5A32;line-height:1.75;
+}
+footer b{color:#5C3F1B}
+footer .src{margin-top:12px;padding-top:12px;border-top:1px dashed #EBD9C6;font-size:11.5px;color:#9C8462}
+
+@media (max-width:760px){
+  body{padding:20px 12px 48px}
+  h1{font-size:26px}
+  h1 .sub{font-size:16px}
+  .hero{padding:26px 22px 24px}
+  .stats{grid-template-columns:1fr 1fr}
+  .cols{grid-template-columns:1fr}
+  thead th,tbody td{padding:11px 13px}
+  tbody td:first-child{width:auto}
+  .flow{padding:20px 18px}
+  .pipe{flex-direction:column;gap:8px}
+  .parr{width:100%;height:20px;transform:rotate(90deg)}
+  .counter{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">Capital Flows · 市场结构</div>
+    <h1>比特币的资金<span class="sub">·</span>从哪来，往哪去</h1>
+    <p class="lede">
+      价格是结果，资金是原因。但"资金"这个词被用得太笼统了——<strong>ETF 申购、企业财库、永续合约的未平仓量、交易所余额</strong>，这四样东西性质完全不同。混在一起看，结论一定会错。
+    </p>
+    <div class="stats">
+      <div class="stat hi">
+        <div class="k">2026 年内 ETF 累计净流入</div>
+        <div class="v num">+10<small>亿美元</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">2026 年 7 月低点</div>
+        <div class="v num">−58<small>亿美元</small></div>
+      </div>
+      <div class="stat">
+        <div class="k">上市公司持有占总供应</div>
+        <div class="v num">5.35<small>%</small></div>
+      </div>
+      <div class="stat hi2">
+        <div class="k">交易所 BTC 余额</div>
+        <div class="v num">268<small>万枚</small></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">01</span>
+      <h2>2026 年 ETF 资金流：一趟完整的往返</h2>
+      <span class="hint">美国现货比特币 ETF · 年内累计净流入</span>
+    </div>
+    <div class="chart-card">
+      <div class="chart-cap">年内累计净流入（十亿美元）</div>
+      <svg viewBox="0 0 872 320" width="100%" role="img" aria-labelledby="fcT fcD" style="display:block">
+        <title id="fcT">2026 年美国现货比特币 ETF 年内累计净流入折线图</title>
+        <desc id="fcD">年内累计净流入从年初归零，1 月末负 16 亿，5 月初正 32 亿，7 月中跌至负 58 亿的低点，10 月初回到正 10 亿美元。</desc>
+        <g stroke="#EFEDE8" stroke-width="1">
+          <line x1="70" y1="40" x2="840" y2="40"/>
+          <line x1="70" y1="87.9" x2="840" y2="87.9"/>
+          <line x1="70" y1="183.8" x2="840" y2="183.8"/>
+          <line x1="70" y1="231.7" x2="840" y2="231.7"/>
+        </g>
+        <path d="M70,135.8 L140,166.5 L210,189.5 L280,164.6 L350,126.3 L420,74.5 L490,239.3 L560,247 L630,231.7 L700,195.3 L770,130.1 L840,116.7 L840,135.8 Z"
+              fill="rgba(153,60,29,0.10)"/>
+        <line x1="70" y1="135.8" x2="840" y2="135.8" stroke="#B4B2A9" stroke-width="1"/>
+        <polyline points="70,135.8 140,166.5 210,189.5 280,164.6 350,126.3 420,74.5 490,239.3 560,247 630,231.7 700,195.3 770,130.1 840,116.7"
+                  fill="none" stroke="#993C1D" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <g fill="#993C1D">
+          <circle cx="70" cy="135.8" r="4.5"/>
+          <circle cx="140" cy="166.5" r="4.5"/>
+          <circle cx="210" cy="189.5" r="4.5"/>
+          <circle cx="420" cy="74.5" r="4.5"/>
+          <circle cx="490" cy="239.3" r="4.5"/>
+          <circle cx="560" cy="247" r="4.5"/>
+          <circle cx="630" cy="231.7" r="4.5"/>
+          <circle cx="770" cy="130.1" r="4.5"/>
+          <circle cx="840" cy="116.7" r="4.5"/>
+        </g>
+        <g fill="#FFFFFF" stroke="#993C1D" stroke-width="2">
+          <circle cx="280" cy="164.6" r="3.5"/>
+          <circle cx="350" cy="126.3" r="3.5"/>
+          <circle cx="700" cy="195.3" r="3.5"/>
+        </g>
+        <g font-size="11" fill="#8E8E87" text-anchor="end">
+          <text x="60" y="44">+5</text>
+          <text x="60" y="140">0</text>
+          <text x="60" y="236">−5</text>
+        </g>
+        <text x="560" y="268" font-size="11.5" font-weight="600" fill="#993C1D" text-anchor="middle">年内低点 −58 亿</text>
+        <text x="838" y="104" font-size="11.5" font-weight="600" fill="#993C1D" text-anchor="end">现在 +10 亿</text>
+        <g font-size="11" fill="#8E8E87" text-anchor="middle">
+          <text x="70" y="292">1月初</text>
+          <text x="140" y="292">1月末</text>
+          <text x="210" y="292">2月末</text>
+          <text x="280" y="292">3月末</text>
+          <text x="350" y="292">4月末</text>
+          <text x="420" y="292">5月初</text>
+          <text x="490" y="292">6月末</text>
+          <text x="560" y="292">7月中</text>
+          <text x="630" y="292">7月末</text>
+          <text x="700" y="292">8月末</text>
+          <text x="770" y="292">9月末</text>
+          <text x="840" y="292">10月初</text>
+        </g>
+      </svg>
+      <div class="chart-legend">
+        <span><i style="background:#993C1D"></i>已披露的确切节点</span>
+        <span><i style="background:#fff;border:2px solid #993C1D"></i>由月度数据推算的衔接点</span>
+      </div>
+    </div>
+
+    <div class="tbl-wrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>时间</th><th>事件</th><th>规模</th></tr></thead>
+        <tbody>
+          <tr><td>2024-01-10</td><td>SEC 批准首批 11 只现货 ETF 上市</td><td>起点</td></tr>
+          <tr><td>2025-10-06</td><td>BTC 创下历史新高 $126,198</td><td>—</td></tr>
+          <tr><td>2026-01</td><td>单月抹去，开启连续 4 个月净流出</td><td class="neg num">−$16 亿</td></tr>
+          <tr><td>2026-03</td><td>单月转正，终结四个月流出</td><td class="pos num">+$13.2 亿</td></tr>
+          <tr><td>2026-04</td><td>全年最强单月，IBIT 独占 99.6%</td><td class="pos num">+$19.7~24.4 亿</td></tr>
+          <tr><td>2026-05-15 → 06-03</td><td><b>13 个交易日连续流出，史上最长</b></td><td class="neg num">−$44 亿</td></tr>
+          <tr><td>2026 上半年</td><td><b>史上第一个净流出的半年</b></td><td class="neg num">−$54 亿</td></tr>
+          <tr><td>2026-07-13</td><td>年内累计净流入见底</td><td class="neg num">−$58 亿</td></tr>
+          <tr><td>2026-08-19</td><td>拐点出现，8/20 单日 +$6.06 亿</td><td>—</td></tr>
+          <tr><td>2026-09-21</td><td>全年最强单日</td><td class="pos num">+$9.99 亿</td></tr>
+          <tr><td>2026-09-25 当周</td><td>2025 年 10 月以来最强单周</td><td class="pos num">+$23.9 亿</td></tr>
+          <tr class="now"><td>2026-10 初</td><td>年内累计正式转正，BTC 约 $8.4 万</td><td class="pos num">约 +$10 亿</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">02</span>
+      <h2>但真正重要的是这些数字的排列顺序</h2>
+      <span class="hint">价格先行，资金后到</span>
+    </div>
+    <div class="counter">
+      <div class="tag">The Sequence</div>
+      <h3>资金流是趋势的确认，不是驱动</h3>
+      <p>BTC 见底 <span class="hl">$58,000</span> 的时候，是资金流出的最高峰；回到 <span class="hl">$78,000</span> 的时候，资金才决定转正；冲到 <span class="hl">$87,000</span> 创下纪录的那一周，资金才创下纪录。</p>
+      <p>这不是"聪明钱提前布局"的故事，而是一个<span class="hl">反应型买盘</span>的故事——ETF 里的钱大部分是模型组合、投顾账户、养老金这类按日程再平衡的被动配置，<b>它们不追突破，只跟趋势</b>。</p>
+      <div class="numrow">
+        <div><div class="k">九连流入期间 IBIT 占比</div><div class="v num">近一半（$13.5 亿）</div></div>
+        <div><div class="k">IBIT 累计净流入</div><div class="v num">$603 亿</div></div>
+        <div><div class="k">是其他所有基金合计的</div><div class="v num">3.3 倍</div></div>
+      </div>
+      <p style="margin-top:14px">顺带一个结构性事实：<b>GBTC 累计流出 $271 亿</b>，纯粹是被那 1.5% 的费率磨走的。这个板块的<b>内部分化</b>，比总净流入数字本身更有信息量。</p>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">03</span>
+      <h2>资金来源的四层结构</h2>
+      <span class="hint">性质完全不同，不能混着看</span>
+    </div>
+    <div class="lyr">
+      <div class="band b1">
+        <div class="hd"><b>① 增量层</b><em>真金白银从法币换成 BTC，唯一改变存量的钱</em></div>
+        <div class="chps">
+          <span class="chp">现货 ETF 申赎</span>
+          <span class="chp">企业财库 DATs</span>
+          <span class="chp">OTC 大宗与合规托管</span>
+          <span class="chp">稳定币扩容</span>
+          <span class="chp">散户与新兴市场</span>
+        </div>
+      </div>
+      <div class="band b2">
+        <div class="hd"><b>② 杠杆层</b><em>不买币，只决定涨跌的速度和幅度</em></div>
+        <div class="chps">
+          <span class="chp">永续合约与资金费率</span>
+          <span class="chp">CME 期货基差</span>
+          <span class="chp">期权做市商 delta 对冲</span>
+        </div>
+      </div>
+      <div class="band b3">
+        <div class="hd"><b>③ 存量筹码层</b><em>币在内部搬家，改变的是可流通供给</em></div>
+        <div class="chps">
+          <span class="chp">交易所余额</span>
+          <span class="chp">长期持有者出货</span>
+          <span class="chp">矿工抛压</span>
+        </div>
+      </div>
+      <div class="band b4">
+        <div class="hd"><b>④ 宏观水位层</b><em>决定整池水的深浅，与币圈自身无关</em></div>
+        <div class="chps">
+          <span class="chp">美元流动性与实际利率</span>
+          <span class="chp">跨资产风险偏好</span>
+          <span class="chp">地缘政治与监管事件</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">04</span>
+      <h2>逐层拆解：每一层现在在哪</h2>
+      <span class="hint">数据截至 2026-10</span>
+    </div>
+    <div class="cols">
+      <div class="col c1">
+        <h3>① 增量层</h3>
+        <div class="sub">唯一真正改变存量的钱</div>
+        <div class="row"><span class="lab">ETF</span><span class="val">年内净流入 <b>+$10 亿</b>，刚从 −$58 亿爬回来</span></div>
+        <div class="row"><span class="lab">企业财库</span><span class="val">上市公司合计持有约 <b>5.35%</b> 总供应（历史新高），Strategy 一家 762,000+ 枚</span></div>
+        <div class="row"><span class="lab">买入速度</span><span class="val">2026 年初企业买入量 = 新矿产出的 <b>2.8 倍</b></span></div>
+        <div class="row"><span class="lab">稳定币</span><span class="val">总市值 2026-04 突破 <b>$2,900 亿</b>，USDT + USDC 占 86% 以上</span></div>
+        <div class="row"><span class="lab">要盯什么</span><span class="val">企业的<b>融资窗口</b>（可转债 / 增发）是否打开——融资一关，它会从买方变成被迫的卖方</span></div>
+      </div>
+      <div class="col c2">
+        <h3>② 杠杆层</h3>
+        <div class="sub">不产生净买入，但强平会变成真实的现货买卖</div>
+        <div class="row"><span class="lab">永续</span><span class="val">未平仓量自 <b>2026 年 4 月</b>起再度飙升，资金费率不稳</span></div>
+        <div class="row"><span class="lab">规模</span><span class="val">仅 Hyperliquid 上就有约 <b>$33 亿</b> BTC 永续未平仓</span></div>
+        <div class="row"><span class="lab">信号</span><span class="val">未平仓量上升 + 基差为负 = <b>新空头进场</b></span></div>
+        <div class="row"><span class="lab">期权</span><span class="val">未平仓量曾单期收缩 <b>22.6%</b>，代表激进去风险</span></div>
+        <div class="row"><span class="lab">要盯什么</span><span class="val">未平仓量 + 资金费率 + 强平密集区，这三者决定了<b>一根K线的长度</b></span></div>
+      </div>
+      <div class="col c3">
+        <h3>③ 存量筹码层</h3>
+        <div class="sub">币在内部搬家，改变的是可流通供给</div>
+        <div class="row"><span class="lab">交易所</span><span class="val">余额降至约 <b>268 万枚</b>，多年低位</span></div>
+        <div class="row"><span class="lab">长期持有</span><span class="val">超过 <b>70%</b> 的供应一年以上没有移动过</span></div>
+        <div class="row"><span class="lab">结构</span><span class="val">短期/长期持有者比率 <b>19.3%</b>，高于历史常态——价格敏感资金占比偏高</span></div>
+        <div class="row"><span class="lab">矿工</span><span class="val">减半后从 450 降到 <b>225 枚/天</b>，是唯一程序化的天然卖方</span></div>
+        <div class="row"><span class="lab">要盯什么</span><span class="val">筹码越锁死，同样的买盘推动的涨幅越大；反过来，长期持有者开始转移就是顶部供给的来源</span></div>
+      </div>
+      <div class="col c4">
+        <h3>④ 宏观水位层</h3>
+        <div class="sub">跟币圈自身毫无关系，却主导了 2026 年的价格</div>
+        <div class="row"><span class="lab">利率</span><span class="val">10 年期美债从 <b>4.10% → 5.264%</b>，美联储转向加息</span></div>
+        <div class="row"><span class="lab">机会成本</span><span class="val">每一次 ETF 申购，都等于<b>放弃 5.26% 的无风险收益</b></span></div>
+        <div class="row"><span class="lab">资金去向</span><span class="val">钱在往 AI 股票走；油价上涨压制无收益资产</span></div>
+        <div class="row"><span class="lab">监管</span><span class="val">CLARITY 法案推进停滞</span></div>
+        <div class="row"><span class="lab">要盯什么</span><span class="val"><b>"钱去了别处"永远比"钱变少了"更能解释加密的下跌。</b></span></div>
+      </div>
+    </div>
+
+    <div class="warnbox">
+      <b>一个最常见的误判：政府不是买方。</b>美国持有约 198,000–326,588 BTC，几乎全部来自执法没收；2025 年 3 月设立的战略比特币储备，承诺的是<b>「持有而非卖出」</b>。所以它的作用是<b>减少供给压力</b>，不是提供需求。把它读成利好，是把"卖方约束"当成了"买方力量"。
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">05</span>
+      <h2>一笔钱是怎么变成买盘的</h2>
+      <span class="hint">点击任一环节查看细节</span>
+    </div>
+    <div class="flow">
+      <div class="ftabs">
+        <button class="on" data-dir="in">申购方向 · 资金流入</button>
+        <button data-dir="out">赎回方向 · 资金流出</button>
+      </div>
+      <div class="pipe" id="pipe"></div>
+      <div class="pdetail">
+        <h4 id="pdTitle"></h4>
+        <p id="pdText"></p>
+      </div>
+      <div class="pnote">两条路径的起点都是「投资者先做决定」。这就是为什么 ETF 资金流永远是结果，而不是原因。</div>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-title">
+      <span class="idx">06</span>
+      <h2>三个周期，看三种东西</h2>
+      <span class="hint">用错周期等于看错指标</span>
+    </div>
+    <div class="cols">
+      <div class="col c1">
+        <h3>按你要判断的时间尺度选</h3>
+        <div class="sub">这不是三重保险，是三个不同的问题</div>
+        <div class="row"><span class="lab">多年趋势</span><span class="val">① 增量层 · <b>已实现资本增长率</b> —— 判断到底有没有真钱进场</span></div>
+        <div class="row"><span class="lab">中期水位</span><span class="val">④ 宏观层 · <b>实际利率 + 稳定币总市值</b> —— 决定整池水有多深</span></div>
+        <div class="row"><span class="lab">短期波动</span><span class="val">②③ 杠杆与筹码 · <b>永续未平仓量 + 资金费率 + 交易所余额</b></span></div>
+      </div>
+      <div class="col c4">
+        <h3>最干净的那个指标</h3>
+        <div class="sub">已实现资本 Realized Cap</div>
+        <div class="row"><span class="lab">定义</span><span class="val">按每枚 BTC <b>最后一次移动时的价格</b>计价求和的市值——等于全市场累计投进来的真金白银</span></div>
+        <div class="row"><span class="lab">现在</span><span class="val num">约 <b>1.08 万亿</b>美元</span></div>
+        <div class="row"><span class="lab">MVRV</span><span class="val num">市值 ÷ 已实现资本 = <b>1.58</b>，远低于历史顶部的 3.5 以上</span></div>
+        <div class="row"><span class="lab">为什么重要</span><span class="val">市值可以被<b>一笔小额成交</b>推高，已实现资本只能被<b>真实换手</b>推高</span></div>
+      </div>
+    </div>
+    <div class="warnbox" style="background:var(--gray-bg);color:var(--gray);border-left-color:var(--gray)">
+      <b>2026 年出现过这样一段：</b>市值在涨，而已实现资本的增长却录得 <b>−0.4%</b>。这两个数字同时成立，只说明一件事——<b>价格上涨是杠杆推上去的，不是新钱进来的。</b>
+    </div>
+  </section>
+
+  <footer>
+    <b>合规提示：</b>在中国内地，虚拟货币相关业务活动属于非法金融活动，交易合同不受法律保护，交易平台亦不在境内监管范围内。本卡片仅为市场资金结构层面的知识梳理，不构成任何投资建议，也不构成对任何交易平台、基金或标的的推荐。加密资产价格波动极大，历史数据不代表未来表现。
+    <div class="src">制表时间：2026-10-04 · 资金流数据来自 SoSoValue / Farside / CoinGlass 等公开口径，不同数据源存在差异，已在文中标注；已实现资本与 MVRV 来自链上数据服务商，口径不一 · 图中实心节点为已披露的确切数据，空心节点为由月度数据推算的衔接点。</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var FLOW = {
+    'in': [
+      { n:'STEP 1', t:'美元买入 ETF 份额', h:'投资者在券商账户里买入份额',
+        d:'钱在这一刻离开美元资产池，流向比特币敞口。这一步纯粹是一个<b>资产配置决策</b>，跟币圈内部发生什么毫无关系——它对比的是"持有 5.26% 的国债"还是"承担 BTC 波动"。' },
+      { n:'STEP 2', t:'AP 向发行方申购', h:'授权参与者发起一级市场申购',
+        d:'做市商与授权参与者（AP）看到需求，向发行方（贝莱德等）发起申购：交付 BTC，换取新创建的份额。<b>这是 ETF 必须真买真卖的那一环</b>——也是 ETF 资金流能真实影响价格的根本原因。' },
+      { n:'STEP 3', t:'AP 去市场上找币', h:'AP 从哪里采购这批 BTC',
+        d:'通常来自交易所和 OTC 渠道。大额机构单优先走 <b>OTC 大宗</b>，因为不显形于订单簿、滑点低——这也解释了为什么机构买盘经常"看不见"，但交易所余额却在下降。' },
+      { n:'STEP 4', t:'筹码被锁进冷钱包', h:'BTC 进入合规托管，退出可流通供给',
+        d:'BTC 交给托管方进入冷钱包，从可流通筹码中消失。交易所余额下降、流通盘缩小，<b>同样的买盘就能推动更大的涨幅</b>——这就是 ETF 影响价格的完整路径。' }
+    ],
+    'out': [
+      { n:'STEP 1', t:'份额被抛售', h:'投资者在二级市场卖出，或直接赎回',
+        d:'触发原因通常不是"看空比特币"，而是<b>组合再平衡、季度末减仓、或风险预算收缩</b>。这三件事都跟币圈的基本面无关。' },
+      { n:'STEP 2', t:'AP 发起赎回', h:'份额换回 BTC，份额被销毁',
+        d:'AP 把份额交还发行方，换回托管的 BTC。这一步把之前锁在冷钱包里的币重新释放出来，<b>可流通供给开始增加</b>。' },
+      { n:'STEP 3', t:'AP 不一定马上卖', h:'关键细节：赎回 ≠ 立即下跌',
+        d:'AP 换回 BTC 后，可以选择继续持有，也可以立刻在市场上抛售。<b>只有当它选择卖出时，赎回才真正转化为抛压。</b>这是"资金流出"和"价格下跌"之间那一层很容易被跳过的缓冲。' },
+      { n:'STEP 4', t:'筹码回到交易所', h:'如果 AP 选择卖出',
+        d:'BTC 回到交易所，可流通供给上升，卖压落地。反过来看也一样成立：<b>真正推动价格的不是"赎回"这个动作，而是 AP 随后的那笔现货卖出。</b>' }
+    ]
+  };
+
+  var pipe = document.getElementById('pipe');
+  var pdTitle = document.getElementById('pdTitle');
+  var pdText = document.getElementById('pdText');
+  var tabs = document.querySelectorAll('.ftabs button');
+  var curDir = 'in';
+  var curIdx = 0;
+
+  function renderPipe(){
+    var steps = FLOW[curDir];
+    var html = '';
+    for (var i = 0; i < steps.length; i++){
+      if (i > 0) html += '<div class="parr">&#8594;</div>';
+      html += '<div class="pnode' + (i === curIdx ? ' on' : '') + '" data-i="' + i + '">' +
+              '<div class="pn">' + steps[i].n + '</div>' +
+              '<div class="pt">' + steps[i].t + '</div></div>';
+    }
+    pipe.innerHTML = html;
+    var nodes = pipe.querySelectorAll('.pnode');
+    for (var j = 0; j < nodes.length; j++){
+      nodes[j].addEventListener('click', function(){
+        curIdx = Number(this.dataset.i);
+        renderPipe();
+        renderDetail();
+      });
+    }
+  }
+
+  function renderDetail(){
+    var s = FLOW[curDir][curIdx];
+    pdTitle.textContent = s.n + ' · ' + s.h;
+    pdText.innerHTML = s.d;
+  }
+
+  for (var k = 0; k < tabs.length; k++){
+    tabs[k].addEventListener('click', function(){
+      for (var m = 0; m < tabs.length; m++) tabs[m].classList.remove('on');
+      this.classList.add('on');
+      curDir = this.dataset.dir;
+      curIdx = 0;
+      renderPipe();
+      renderDetail();
+    });
+  }
+
+  renderPipe();
+  renderDetail();
+})();
+</script>
+</body>
+</html>
