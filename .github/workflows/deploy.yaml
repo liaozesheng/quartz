@@ -1,4 +1,4 @@
-name: Deploy Quartz to GitHub Pages
+name: Deploy Quartz
 
 on:
   push:
@@ -50,6 +50,68 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: public
+
+      - name: Upload site artifact for Aliyun
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: public
+          retention-days: 1
+
+  # 国内站点：阿里云 OSS + CDN
+  # 需要仓库变量 ALIYUN_DEPLOY=true 和以下 Secrets：
+  # ALIYUN_ACCESS_KEY_ID / ALIYUN_ACCESS_KEY_SECRET / ALIYUN_OSS_BUCKET
+  # / ALIYUN_OSS_ENDPOINT / ALIYUN_CDN_DOMAIN
+  publish-aliyun:
+    needs: build
+    if: vars.ALIYUN_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built site
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: public
+
+      - name: Install ossutil
+        run: |
+          curl -sSL https://gosspublic.alicdn.com/ossutil/install.sh | sudo bash
+          ossutil --version
+
+      - name: Upload to Aliyun OSS
+        env:
+          ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+          ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+          ALIYUN_OSS_BUCKET: ${{ secrets.ALIYUN_OSS_BUCKET }}
+          ALIYUN_OSS_ENDPOINT: ${{ secrets.ALIYUN_OSS_ENDPOINT }}
+        run: |
+          set -euo pipefail
+          cat > "$HOME/.ossutilconfig" <<EOF
+          [Credentials]
+          language=EN
+          endpoint=$ALIYUN_OSS_ENDPOINT
+          accessKeyID=$ALIYUN_ACCESS_KEY_ID
+          accessKeySecret=$ALIYUN_ACCESS_KEY_SECRET
+          EOF
+          ossutil rm "oss://$ALIYUN_OSS_BUCKET" -r -f || true
+          ossutil cp -r public/ "oss://$ALIYUN_OSS_BUCKET/" --update
+
+      - name: Refresh Aliyun CDN
+        env:
+          ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+          ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+          ALIYUN_CDN_DOMAIN: ${{ secrets.ALIYUN_CDN_DOMAIN }}
+        run: |
+          set -euo pipefail
+          curl -sSL https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz -o aliyun-cli.tgz
+          tar -xzf aliyun-cli.tgz
+          ./aliyun configure set --profile default --mode AK \
+            --access-key-id "$ALIYUN_ACCESS_KEY_ID" \
+            --access-key-secret "$ALIYUN_ACCESS_KEY_SECRET" \
+            --region cn-hangzhou
+          ./aliyun cdn RefreshObjectCaches \
+            --ObjectPath "https://$ALIYUN_CDN_DOMAIN/" \
+            --ObjectType Directory
 
   deploy:
     environment:
