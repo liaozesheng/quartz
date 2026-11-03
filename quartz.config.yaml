@@ -135,6 +135,13 @@ plugins:
     enabled: true
   - source: "@quartz-community/explorer"
     enabled: true
+    options:
+      mapFn: |
+        (node) => {
+          if (node.slugSegment) {
+            node.displayName = node.slugSegment.replace(/\.(md|html)$/, "")
+          }
+        }
     layout:
       position: left
       priority: 50
