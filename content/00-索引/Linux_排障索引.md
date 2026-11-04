@@ -45,6 +45,7 @@ status: active
 |---|---|---|---|---|
 | systemd 服务管理 | [[systemd管理服务]] | `systemctl status` | 专题教程 | systemd、服务、自启 |
 | NetworkManager 网络管理 | [[NetworkManager]] | `nmcli` | 专题教程 | 网络、连接、网卡 |
+| UFW 防火墙 | [[Ubuntu_UFW防火墙配置指南]] | `sudo ufw status verbose` | 专题教程 | 防火墙、端口、安全 |
 | Linux 目录体系 | [[Linux_目录体系]] | `ls`, `tree` | 专题教程 | 目录、文件系统 |
 
 ## 常用命令
