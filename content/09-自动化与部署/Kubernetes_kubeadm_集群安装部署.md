@@ -34,6 +34,7 @@ status: active
 | 内核 | 5.15 及以上 | Ubuntu 22.04+ 默认满足 |
 | Kubernetes | v1.35.4 | kubeadm、kubelet、kubectl 三件套同版本 |
 | 容器运行时 | containerd 2.x | 使用 Docker 官方仓库的 `containerd.io` 包 |
+| crictl | v1.35.0 | 与 Kubernetes minor 版本对齐 |
 | cgroup 驱动 | systemd | containerd 与 kubelet 必须一致 |
 | CNI | Flannel（默认）/ Calico | Flannel 使用 VXLAN 8472；Calico 步骤见 5.3 |
 | Pod CIDR | `10.244.0.0/16` | 与 Flannel 默认值一致 |
@@ -114,13 +115,13 @@ timedatectl
 
 逐项确认：
 
-- [ ] 操作系统是 Ubuntu 22.04/24.04 或兼容发行版，内核 5.15+
-- [ ] 至少 2C / 4G；控制平面建议 4C / 8G
-- [ ] `/var/lib` 所在分区至少 20G 空闲（镜像和 etcd 都放这里）
-- [ ] 每台机器有静态 IP 或 DHCP 保留地址
-- [ ] 每台机器的 hostname、MAC、`product_uuid` 唯一（虚拟机克隆后必须检查）
-- [ ] `stat -fc %T /sys/fs/cgroup` 输出 `cgroup2fs`（cgroup v2）
-- [ ] 时间同步正常，节点之间时间偏差不能过大
+- [x] 操作系统是 Ubuntu 22.04/24.04 或兼容发行版，内核 5.15+
+- [x] 至少 2C / 4G；控制平面建议 4C / 8G
+- [x] `/var/lib` 所在分区至少 20G 空闲（镜像和 etcd 都放这里）
+- [x] 每台机器有静态 IP 或 DHCP 保留地址
+- [x] 每台机器的 hostname、MAC、`product_uuid` 唯一（虚拟机克隆后必须检查）
+- [x] `stat -fc %T /sys/fs/cgroup` 输出 `cgroup2fs`（cgroup v2）
+- [x] 时间同步正常，节点之间时间偏差不能过大
 
 > [!warning]
 > 虚拟机整机克隆后经常出现 `product_uuid` 和 MAC 相同，kubeadm 会直接报错。克隆后先修改主机名、MAC 和 machine-id，再安装 Kubernetes。
@@ -276,6 +277,47 @@ chronyc tracking
 timedatectl
 ```
 
+时间服务器端配置:
+```bash
+vim /etc/chrony/chrony.conf
+
+# 指定上游公网时间源（阿里云 NTP）
+server ntp.aliyun.com iburst
+server ntp1.aliyun.com iburst
+
+# 允许内网网段（例如 192.168.71.0/24）的客户端来同步时间
+allow 192.168.71.0/24
+
+# 如果上游时间源暂时不可达，允许使用本地时钟作为备用（层级设为10，避免影响外部）
+local stratum 10
+
+sudo systemctl restart chronyd
+sudo systemctl enable chrony
+```
+
+客户端同步:
+```bash
+vim /etc/chrony/chrony.conf
+
+# 指向内网时间服务器
+server 192.168.71.213 iburst
+
+sudo systemctl restart chronyd
+sudo systemctl enable chrony
+```
+
+验证同步状态:
+```bash
+chronyc sources -v
+chronyc tracking
+timedatectl
+```
+
+更改时区:
+```bash
+timedatectl set-timezone Asia/Shanghai
+```
+
 RHEL 系使用 `sudo dnf install -y chrony`。
 
 节点时间偏差过大会导致证书校验和 Join 失败，三台机器必须使用同一时间源。
@@ -308,6 +350,19 @@ https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_C
 
 sudo apt-get update
 ```
+
+> [!tip]
+> 网络问题，可以换国内的镜像源
+```bash
+curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg \
+  | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+  | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+```
+
 
 ### 2.2 安装 containerd
 
@@ -347,6 +402,9 @@ sudo vi /etc/containerd/config.toml
 找到 `runtimes.runc.options` 段，把 `SystemdCgroup` 改为 `true`。containerd 1.7 与 2.x 的配置段名不同，但键名都是 `SystemdCgroup`。
 
 ### 2.5 启动并设置开机自启
+> [!tip]
+> 生成默认配置之后，需要再次重启containerd，应用最新配置
+> `sudo systemctl restart containerd`
 
 ```bash
 sudo systemctl enable --now containerd
@@ -357,6 +415,122 @@ sudo ctr version
 `ctr version` 能正常输出版本，说明 containerd 已经工作。
 
 如果启用了国内镜像，先不要在这一步改 `sandbox_image`，等 kubeadm 安装完成后按附录 B 统一处理。
+
+### 2.6 安装 crictl
+
+`crictl` 是 CRI 的命令行工具，用来直接查看 containerd 里的容器、镜像和 Pod。kubeadm 不会自动安装它，建议每个节点都装。
+
+选择与 Kubernetes minor 版本一致的 cri-tools 版本；本文集群是 1.35.x，所以使用 `v1.35.0`：
+
+```bash
+CRICTL_VERSION="v1.35.0"
+ARCH="$(dpkg --print-architecture)"
+
+curl -L -o crictl.tar.gz \
+  "https://github.com/kubernetes-sigs/cri-tools/releases/download/${CRICTL_VERSION}/crictl-${CRICTL_VERSION}-linux-${ARCH}.tar.gz"
+
+sudo tar -C /usr/local/bin -xzf crictl.tar.gz
+rm -f crictl.tar.gz
+
+crictl --version
+```
+
+配置默认 endpoint，避免每次手动指定：
+
+```bash
+sudo tee /etc/crictl.yaml >/dev/null <<'EOF'
+runtime-endpoint: unix:///run/containerd/containerd.sock
+image-endpoint: unix:///run/containerd/containerd.sock
+timeout: 10
+debug: false
+EOF
+
+sudo crictl info
+```
+
+常用命令：
+
+```bash
+sudo crictl images                 # 镜像列表
+sudo crictl pods                   # Pod 列表（Sandbox）
+sudo crictl ps -a                  # 所有容器，包括已退出
+sudo crictl logs <container-id>    # 查看容器日志
+sudo crictl inspect <container-id> # 查看容器详情
+sudo crictl stats                  # 资源占用
+sudo crictl rmi <image-id>         # 删除镜像
+```
+
+> [!tip]
+> 如果 `crictl ps` 看不到 kubelet 创建的容器，加上 `-n k8s.io` 指定命名空间，例如 `sudo crictl -n k8s.io ps -a`。
+
+### 2.7 用 crictl 拉取私有仓库镜像
+
+手动拉取带 Basic Auth 的私有镜像：
+
+```bash
+sudo crictl pull --creds "admin:你的密码" zot.liaozesheng.lol/你的镜像名:标签
+```
+
+拉取后确认：
+
+```bash
+sudo crictl images | grep zot.liaozesheng.lol
+```
+
+如果列表里看不到，尝试指定 kubelet 使用的命名空间：
+
+```bash
+sudo crictl -n k8s.io images | grep zot.liaozesheng.lol
+```
+
+> [!warning]
+> `--creds` 的密码会出现在命令历史、进程列表和终端记录中。不要把真实密码提交到笔记或 Git；建议用交互输入，并定期轮换。本文位于公开发布目录时，请把仓库地址和账号替换成占位符。
+
+更安全的输入方式：
+
+```bash
+read -rsp "Registry password: " REG_PASS; echo
+sudo crictl pull --creds "admin:${REG_PASS}" zot.liaozesheng.lol/你的镜像名:标签
+unset REG_PASS
+```
+
+**让 Kubernetes Pod 也能拉取私有镜像**
+
+`crictl pull` 只影响当前节点的一次手动拉取，不会给 kubelet 持久化凭据。Pod 需要使用 `imagePullSecret`：
+
+```bash
+kubectl create secret docker-registry zot-registry \
+  --docker-server=zot.liaozesheng.lol \
+  --docker-username=admin \
+  --docker-password='你的密码' \
+  -n default
+```
+
+Pod 中引用：
+
+```yaml
+spec:
+  imagePullSecrets:
+    - name: zot-registry
+  containers:
+    - name: app
+      image: zot.liaozesheng.lol/你的镜像名:标签
+```
+
+如果希望节点级别免 Secret，可以在 containerd 的 registry 配置中写入认证信息，然后重启 containerd。containerd 1.x 与 2.x 的配置段名不同，以 `containerd config default` 生成的段名为准：
+
+```toml
+# containerd 2.x 示例；1.x 段名不同，按实际配置调整
+[plugins.'io.containerd.cri.v1.images'.registry.configs.'zot.liaozesheng.lol'.auth]
+  username = "admin"
+  password = "你的密码"
+```
+
+```bash
+sudo systemctl restart containerd
+```
+
+如果仓库使用自签证书或 HTTP，需要在 `/etc/containerd/certs.d/zot.liaozesheng.lol/hosts.toml` 配置 CA 或 `skip_verify`；生产环境优先使用受信任证书。
 
 ## 3. 所有节点：安装 kubeadm / kubelet / kubectl
 
@@ -395,9 +569,9 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 ```bash
 sudo apt-get install -y \
-  kubeadm=1.35.4-1.1 \
-  kubelet=1.35.4-1.1 \
-  kubectl=1.35.4-1.1
+  kubeadm=1.35.10-1.1 \
+  kubelet=1.35.10-1.1 \
+  kubectl=1.35.10-1.1
 ```
 
 版本号后缀以 `apt-cache madison` 的实际输出为准。
@@ -618,9 +792,13 @@ Calico 的默认 IP 池是 `192.168.0.0/16`，必须改成与 kubeadm 一致；�
 #### 5.3.2 安装 Tigera Operator
 
 Calico 官方推荐通过 Operator 安装。先部署 operator：
+> [!tip]
+> 国内建议先下载，查看镜像信息，再视情况创建
 
 ```bash
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.33.0/manifests/tigera-operator.yaml
+curl -O https://raw.githubusercontent.com/projectcalico/calico/v3.33.0/manifests/tigera-operator.yaml --proxy http://192.168.71.212:7890
+
+kubectl create -f tigera-operator.yaml
 ```
 
 等待 operator 就绪：
@@ -634,9 +812,10 @@ kubectl -n tigera-operator get pods -w
 #### 5.3.3 修改 Installation 配置并安装 Calico
 
 下载 `custom-resources.yaml`：
+> 视情况添加代理
 
 ```bash
-curl -O https://raw.githubusercontent.com/projectcalico/calico/v3.33.0/manifests/custom-resources.yaml
+curl -O https://raw.githubusercontent.com/projectcalico/calico/v3.33.0/manifests/custom-resources.yaml  --proxy https://192.168.71.212:7890
 ```
 
 把默认 CIDR 改为 kubeadm 的 Pod 网段：
@@ -1181,14 +1360,16 @@ Nginx、BusyBox 等业务镜像默认从 Docker Hub 拉取，国内网络可能�
 
 ## 部署完成检查清单
 
-- [ ] `kubectl get nodes` 三个节点全部 `Ready`
-- [ ] `kubectl get pods -A` 系统 Pod 全部 Running
-- [ ] `kubectl get --raw='/readyz?verbose'` 返回 ok
+- [x] `kubectl get nodes` 三个节点全部 `Ready`
+- [x] `kubectl get pods -A` 系统 Pod 全部 Running
+- [x] `kubectl get --raw='/readyz?verbose'` 返回 ok
 - [ ] Nginx Deployment 的 Pod 能跨节点调度
 - [ ] NodePort 能通过节点 IP 访问
 - [ ] `nslookup kubernetes.default` 能解析
 - [ ] `sudo kubeadm token list` 中有可用 token，或已保存 join 命令
 - [ ] `kubeadm certs check-expiration` 记录到期时间
+- [ ] `crictl info` 正常，能列出节点容器和镜像
+- [ ] 私有仓库镜像已按 2.7 配置 `imagePullSecret` 或 containerd 认证
 - [ ] 已记录集群版本、Pod CIDR、Service CIDR 和节点清单
 
 ## 相关笔记
@@ -1197,6 +1378,9 @@ Nginx、BusyBox 等业务镜像默认从 Docker Hub 拉取，国内网络可能�
 - [[Kubernetes_故障排查索引]]
 - [[Kubernetes_Node_NotReady_排查]]
 - [[Kubernetes_Service_无响应排查]]
+- [[Kubernetes_Traefik_Ingress入口改造]]
+- [[Kubernetes_NFS动态存储_部署]]
+- [[Kubernetes_监控栈_kube-prometheus-stack_部署]]
 - [[Kubernetes_Pod_Pending_排查]]
 - [[Kubernetes_Pod_CrashLoopBackOff_排查]]
 - [[containerd_占用磁盘空间过大]]

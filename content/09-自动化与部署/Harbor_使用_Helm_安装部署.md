@@ -854,6 +854,7 @@ kubectl get pv \
 - [[Kubernetes_PV_挂载失败排查]]
 - [[Kubernetes_Ingress_路由失效排查]]
 - [[Kubernetes_Service_无响应排查]]
+- [[Harbor_GitLab_CI_接入集群_方案]]（新 kubeadm 集群的部署与 CI 接入方案）
 
 ## 外部参考
 
