@@ -314,6 +314,113 @@ sudo nginx -t && sudo systemctl reload nginx
 - 保留 `client_max_body_size 0` 与 900s 超时，兼容 registry 推拉大镜像。
 - `registry` / `nexus` / `gitlab-second-pipeline` / `lujie` 这几个旧域名随 `k3s.conf` 一起下线，对应服务还没部署进集群，现在返回 404 属预期。
 
+## Traefik Dashboard 暴露
+
+Dashboard 在 chart 里默认开启（`api.dashboard: true`、`api.insecure: false`），但没有任何路由指向它，需要一条 IngressRoute。**不要**开 `api.insecure`，那会把面板无认证暴露在 8080。
+
+认证与路由：
+
+```yaml
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-dashboard-auth
+  namespace: traefik
+spec:
+  basicAuth:
+    secret: traefik-dashboard-auth
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: traefik
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`traefik.liaozesheng.cn`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      kind: Rule
+      middlewares:
+        - name: traefik-dashboard-auth
+      services:
+        - name: api@internal          # 内置 API，不是 K8s Service
+          kind: TraefikService
+```
+
+生成凭据（htpasswd 的 MD5 格式，Traefik 支持）：
+
+```bash
+HASH=$(openssl passwd -apr1 "$PASS")
+kubectl -n traefik create secret generic traefik-dashboard-auth \
+  --from-literal=users="admin:$HASH" \
+  --dry-run=client -o yaml | kubectl apply -f -
+```
+
+访问 `https://traefik.liaozesheng.cn/dashboard/`。密码保存在 ext-215 的 `/home/zesheng/traefik-dashboard.txt`（600），不写进笔记。
+
+同时把 `api.dashboard` 和 `api.insecure` 显式写进 Helm values，避免以后 chart 默认值变化导致路由失效：
+
+```yaml
+api:
+  dashboard: true
+  insecure: false
+```
+
+验证结果：无凭据 401，错误密码 401，正确凭据 `/dashboard/` 与 `/api/rawdata` 均 200。
+
+## 请求链路详解（以 headlamp 为例）
+
+访问 `https://headlamp.liaozesheng.cn/` 时，请求实际经过 6 跳。**TLS 在第 2 跳终止，路由决策在第 5 跳**。
+
+```mermaid
+flowchart TD
+    B["浏览器<br/>GET / Host: headlamp.liaozesheng.cn"] -->|"DNS 解析 → 192.168.71.213"| N["ext-213 nginx :443<br/>TLS 终止 + 通配符证书"]
+    N -->|"proxy_pass k8s_ingress<br/>HTTP + X-Forwarded-*"| NP["节点 NodePort 30080<br/>kube-proxy DNAT"]
+    NP --> T["Traefik Pod :8000<br/>entrypoint web"]
+    T -->|"匹配 Ingress<br/>Host + Path"| S["Service headlamp<br/>ClusterIP :80"]
+    S -->|"kube-proxy DNAT"| P["Pod :4466<br/>Headlamp 容器"]
+    P -.->|"响应原路返回"| B
+```
+
+### 每一跳的真实对象
+
+| 跳 | 组件 | 实际值 |
+|---|---|---|
+| 1 | DNS | `headlamp.liaozesheng.cn → 192.168.71.213`（公网 DNS 也返回内网 IP，因此无端口映射） |
+| 2 | ext-213 nginx | `server_name *.liaozesheng.cn`，`proxy_pass http://k8s_ingress` |
+| 3 | NodePort | `traefik` Service，`80:30080`，targetPort 8000 |
+| 4 | Traefik | Ingress `headlamp`，规则 `Host(...) && PathPrefix(/)` |
+| 5 | Service | `headlamp` ClusterIP `10.97.189.147:80` |
+| 6 | Pod | `10.244.104.55:4466`，运行在 ext-214 |
+
+### 三个容易混淆的点
+
+1. **Ingress 不是组件，是配置。**真正干活的是 Traefik：它 watch API Server 里的 Ingress 对象，编译成路由表。没有独立的「Ingress 进程」。
+2. **链路里有两次 DNAT。**NodePort 30080 → Traefik Pod 是一次，Service ClusterIP → 业务 Pod 是另一次，都由 kube-proxy 写 iptables 完成。ClusterIP 只是规则里的虚拟地址，没有进程监听。
+3. **TLS 只到 213。**之后全是 HTTP，所以 `X-Forwarded-Proto: https` 必须一路传下去；应用如果按收到的协议生成链接，会得到 http 地址导致跳转异常（Grafana 为此专门配了 `root_url`）。
+
+### 逐跳排查
+
+```bash
+# 第 2 跳：跳过 DNS 直连 213
+curl -k -o /dev/null -w "%{http_code}\n" \
+  --resolve headlamp.liaozesheng.cn:443:192.168.71.213 https://headlamp.liaozesheng.cn/
+
+# 第 3-4 跳：跳过 213，直接打 Traefik 的 NodePort
+curl -o /dev/null -w "%{http_code}\n" \
+  -H "Host: headlamp.liaozesheng.cn" http://192.168.71.214:30080/
+
+# 第 5-6 跳：从集群内直接打 Service
+kubectl -n headlamp run t --rm -it --image=busybox:1.36 --restart=Never -- \
+  wget -qO- http://headlamp/
+```
+
+哪一跳断了，问题就在那一层：213 通而 NodePort 不通 → Traefik/网络；NodePort 通而 Service 不通 → Ingress 规则或 Service selector；Service 通 → 应用本身没问题，回到上游查 TLS 或 Host 头。
+
+> [!warning]
+> 直接打 NodePort 时**必须手动加 `-H "Host: ..."`**。Traefik 收到的是 IP 而不是域名，匹配不到任何路由，会返回 404——这是「服务明明是好的但 curl 不通」最常见的原因。
+
 ## 坑与结论
 
 1. **Traefik chart 42 移除了 `logs` 字段**，访问日志要用 `accessLog.enabled`，否则 Helm 直接报 schema 校验失败。
