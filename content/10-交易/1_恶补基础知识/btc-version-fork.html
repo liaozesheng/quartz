@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>比特币 version 与软分叉可视化</title>
+<style>
+:root{
+  --paper:#f6f2ea;
+  --card:#fffefb;
+  --ink:#1f1c18;
+  --ink-2:#4a443c;
+  --muted:#8a8074;
+  --line:#e7dfd2;
+  --line-2:#f1ebe1;
+  --btc:#f7931a;
+  --btc-ink:#a35c08;
+  --purple:#8b5cf6;
+  --blue:#3b82f6;
+  --green:#0f9d76;
+  --red:#e05252;
+  --amber:#c8791a;
+  --grey:#a8a094;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:52px 20px 80px;
+  background:
+    radial-gradient(880px 420px at 10% -10%, #ffe8cc 0%, rgba(255,232,204,0) 62%),
+    radial-gradient(760px 420px at 96% -4%, #e6efff 0%, rgba(230,239,255,0) 58%),
+    var(--paper);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto}
+
+/* ---------- header ---------- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--btc-ink);background:rgba(247,147,26,.1);
+  border:1px solid rgba(247,147,26,.24);
+  padding:5px 11px;border-radius:999px;
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--btc)}
+h1{font-size:clamp(25px,4.2vw,34px);line-height:1.22;letter-spacing:-.022em;margin:16px 0 12px;font-weight:800}
+.lede{color:var(--muted);font-size:14.5px;margin:0;max-width:64ch}
+
+.thesis{
+  display:flex;gap:13px;align-items:flex-start;
+  margin-top:22px;padding:16px 18px;
+  background:linear-gradient(135deg,rgba(247,147,26,.1),rgba(247,147,26,.035));
+  border:1px solid rgba(247,147,26,.3);border-radius:16px;
+}
+.thesis .badge{
+  flex:0 0 auto;font-size:10.5px;font-weight:800;letter-spacing:.08em;
+  color:#fff;background:linear-gradient(160deg,#ffb956,#f7931a);
+  padding:3px 9px;border-radius:999px;margin-top:1px;
+  box-shadow:0 3px 8px -4px rgba(247,147,26,.9);
+}
+.thesis p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.72}
+.thesis b{color:#8a4a05;font-weight:700}
+
+/* ---------- section ---------- */
+section{margin-top:46px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.sec-head h2{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0}
+.sec-head .hint{font-size:12.5px;color:var(--muted)}
+.sec-head .spacer{flex:1}
+
+.btn{
+  font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--btc-ink);background:#fff;border:1px solid var(--line);
+  padding:6px 13px;border-radius:999px;cursor:pointer;
+  transition:background .18s,border-color .18s,transform .18s;
+}
+.btn:hover{background:#fff8ee;border-color:rgba(247,147,26,.45)}
+.btn:active{transform:scale(.97)}
+
+/* ---------- version timeline ---------- */
+.ver{display:grid;grid-template-columns:50px 1fr;gap:15px;position:relative}
+.rail{position:relative;display:flex;justify-content:center;padding-top:10px}
+.rail::before{
+  content:"";position:absolute;top:56px;bottom:-18px;width:2px;
+  background:repeating-linear-gradient(180deg,#d7cbb6 0 4px,transparent 4px 9px);
+}
+.ver.is-last .rail::before{content:none}
+.vb{
+  width:44px;height:44px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13px;font-weight:700;color:#fff;
+  background:linear-gradient(160deg,#ffb956,#f7931a);
+  box-shadow:0 4px 10px -5px rgba(247,147,26,.85),inset 0 1px 0 rgba(255,255,255,.4);
+}
+.vb--bit{background:linear-gradient(160deg,#a78bfa,#8b5cf6);box-shadow:0 4px 10px -5px rgba(139,92,246,.85),inset 0 1px 0 rgba(255,255,255,.4);font-size:10.5px;letter-spacing:.02em}
+.vb--old{background:linear-gradient(160deg,#c9c0b0,#a8a094);box-shadow:none}
+
+.blk{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 1px 2px rgba(31,28,24,.04),0 16px 34px -22px rgba(31,28,24,.3);
+  overflow:hidden;transition:box-shadow .22s,border-color .22s;
+}
+.blk.is-open{border-color:rgba(247,147,26,.36);box-shadow:0 1px 2px rgba(31,28,24,.05),0 20px 40px -24px rgba(163,92,8,.34)}
+
+.blk__head{
+  width:100%;display:flex;align-items:center;gap:10px;
+  padding:14px 16px;background:none;border:0;cursor:pointer;
+  font:inherit;color:inherit;text-align:left;
+}
+.blk__head:hover{background:rgba(247,147,26,.045)}
+.hmeta{flex:1;min-width:0;display:block}
+.hrow{display:flex;align-items:baseline;gap:10px}
+.hrow .t{font-size:15.5px;font-weight:700;letter-spacing:-.01em;line-height:1.4}
+.hrow .yr{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted);flex:0 0 auto}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.chip{
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.01em;
+  padding:2px 8px;border-radius:999px;white-space:nowrap;
+}
+.chip--v{color:#1d4ed8;background:rgba(59,130,246,.13)}
+.chip--b{color:#047857;background:rgba(15,157,118,.13)}
+.chip--ok{color:#0b7f60;background:rgba(15,157,118,.11)}
+.chip--start{color:#7a736a;background:rgba(168,160,148,.18)}
+.chev{
+  flex:0 0 auto;align-self:center;width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#f4eee3;color:var(--muted);font-size:9px;
+  transition:transform .3s ease,background .2s;
+}
+.blk.is-open .chev{transform:rotate(180deg);background:rgba(247,147,26,.16);color:var(--btc-ink)}
+
+.blk__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1)}
+.blk.is-open .blk__body{grid-template-rows:1fr}
+.blk__body>.inner{overflow:hidden;min-height:0}
+.blk__pad{padding:14px 16px 16px;border-top:1px dashed var(--line-2)}
+.rule{display:flex;gap:9px;font-size:13px;color:var(--ink-2);line-height:1.6}
+.rule+.rule{margin-top:5px}
+.rule::before{
+  content:"";flex:0 0 auto;width:5px;height:5px;border-radius:50%;
+  background:#d6cab6;margin-top:8px;
+}
+.rule b{color:var(--ink);font-weight:700}
+.rule code{font-family:var(--mono);font-size:11.5px;background:#f4efe5;padding:1px 5px;border-radius:4px;color:var(--btc-ink)}
+
+/* ---------- coexist callout ---------- */
+.coexist{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:16px 18px;margin-top:15px;
+  background:linear-gradient(135deg,rgba(247,147,26,.09),rgba(255,255,255,.6));
+  border:1.5px dashed rgba(247,147,26,.5);border-radius:16px;
+}
+.coexist .mark{
+  flex:0 0 auto;width:44px;height:44px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:16px;font-weight:700;color:#fff;
+  background:linear-gradient(160deg,#ffb956,#f7931a);
+  box-shadow:0 4px 10px -5px rgba(247,147,26,.85);
+}
+.coexist .t{font-size:15px;font-weight:700;margin:0 0 4px}
+.coexist .rule{font-size:13px}
+.coexist .tagline{
+  display:inline-block;margin-top:9px;font-size:11.5px;font-weight:700;
+  color:#8a4a05;background:rgba(247,147,26,.16);
+  padding:3px 10px;border-radius:999px;
+}
+
+/* ---------- fork comparison ---------- */
+.forks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.fork{
+  background:var(--card);border:1px solid var(--line);border-radius:15px;
+  padding:15px 15px 16px;display:flex;flex-direction:column;
+  box-shadow:0 1px 2px rgba(31,28,24,.03),0 14px 30px -24px rgba(31,28,24,.34);
+  border-top:2.5px solid var(--c);
+}
+.fork h3{
+  margin:0 0 2px;font-size:14.5px;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:7px;
+}
+.fork h3::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);flex:0 0 auto}
+.fork .fk-sub{font-size:11.5px;color:var(--muted);margin:0 0 4px;font-family:var(--mono)}
+.fdiag{display:block;width:100%;height:auto;margin:6px 0 10px}
+.fcap{font-size:11px;color:var(--muted);line-height:1.5;margin:0 0 11px;padding-bottom:10px;border-bottom:1px dashed var(--line-2);min-height:44px}
+.fork ul{list-style:none;margin:0;padding:0}
+.fork li{display:flex;gap:8px;font-size:12.6px;color:var(--ink-2);line-height:1.55}
+.fork li+li{margin-top:6px}
+.fork li::before{content:"";flex:0 0 auto;width:4px;height:4px;border-radius:50%;background:var(--c);opacity:.55;margin-top:7px}
+.fork li b{color:var(--ink);font-weight:700}
+
+/* ---------- recap ---------- */
+.recap{
+  background:var(--card);border:1px solid var(--line);border-left:3px solid var(--btc);
+  border-radius:15px;padding:18px 20px;
+  box-shadow:0 1px 2px rgba(31,28,24,.04),0 16px 34px -24px rgba(31,28,24,.3);
+}
+.recap h2{margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--btc-ink)}
+.recap p{margin:0;font-size:14.2px;color:var(--ink-2);line-height:1.88}
+.recap b{color:var(--ink);font-weight:700}
+.recap code{font-family:var(--mono);font-size:12.5px;background:#f4efe5;padding:1px 5px;border-radius:4px;color:var(--btc-ink)}
+
+footer{
+  margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+
+@media (max-width:760px){
+  body{padding:32px 14px 56px}
+  .forks{grid-template-columns:1fr}
+  section{margin-top:34px}
+  .ver{grid-template-columns:40px 1fr;gap:11px}
+  .vb{width:36px;height:36px;border-radius:11px;font-size:11.5px}
+  .vb--bit{font-size:9px}
+  .rail::before{top:46px}
+  .hrow .t{font-size:14.5px}
+  .blk__head{padding:12px 13px}
+  .blk__pad{padding:12px 13px 14px}
+  .coexist{padding:14px}
+  .coexist .mark{width:38px;height:38px;font-size:14px;border-radius:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Bitcoin · Version &amp; Fork</span>
+    <h1>比特币 version 与软分叉</h1>
+    <p class="lede">从 v1 一路到 Taproot，看 version 字段是怎么从「数字序号」变成「二进制标记位」的。</p>
+
+    <div class="thesis">
+      <span class="badge">重点</span>
+      <p>软分叉 = <b>整条链仍然只有一条</b>，只是部分矿工打包的区块带上新版 version／标志位；<b>老节点依旧认可这条链，不会分裂</b>。</p>
+    </div>
+  </header>
+
+  <!-- ========== 版本演进 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>version 演进路线</h2>
+      <span class="hint">v1 → v4 → 位标记</span>
+      <span class="spacer"></span>
+      <button class="btn" id="toggleAll" type="button">全部收起</button>
+    </div>
+
+    <div class="ver">
+      <div class="rail"><span class="vb vb--old">v1</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">早期区块</span><span class="yr">2009 ~</span></span>
+            <span class="chips">
+              <span class="chip chip--v">version = 1</span>
+              <span class="chip chip--start">起点</span>
+            </span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="rule">最早版本，没有额外 BIP 功能标记</div>
+          <div class="rule">时间范围：BIP34 之前</div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <div class="ver">
+      <div class="rail"><span class="vb">v2</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">BIP34 软分叉</span><span class="yr">2012</span></span>
+            <span class="chips">
+              <span class="chip chip--v">version = 2</span>
+              <span class="chip chip--b">BIP34</span>
+              <span class="chip chip--ok">软分叉 · 链不变</span>
+            </span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="rule">规则：<b>Coinbase 里必须写入区块高度</b></div>
+          <div class="rule">目的：<b>防止预挖漏洞</b></div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <div class="ver">
+      <div class="rail"><span class="vb">v3</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">BIP66 软分叉</span><span class="yr">2015</span></span>
+            <span class="chips">
+              <span class="chip chip--v">version = 3</span>
+              <span class="chip chip--b">BIP66</span>
+              <span class="chip chip--ok">软分叉 · 链不变</span>
+            </span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="rule">签名<b>严格编码校验（DER）</b></div>
+          <div class="rule">修复<b>脚本延展性漏洞</b></div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <div class="ver">
+      <div class="rail"><span class="vb">v4</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">BIP65 软分叉</span><span class="yr">2015</span></span>
+            <span class="chips">
+              <span class="chip chip--v">version = 4</span>
+              <span class="chip chip--b">BIP65</span>
+              <span class="chip chip--ok">软分叉 · 链不变</span>
+            </span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="rule">增加 <code>OP_CHECKLOCKTIMEVERIFY</code> 锁定脚本</div>
+          <div class="rule">支持<b>时间锁交易</b></div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <div class="ver">
+      <div class="rail"><span class="vb vb--bit">bit</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">隔离见证 SegWit</span><span class="yr">2017</span></span>
+            <span class="chips">
+              <span class="chip chip--v">version 位标记</span>
+              <span class="chip chip--b">BIP141</span>
+              <span class="chip chip--ok">软分叉 · 链不变</span>
+            </span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="rule">不再单纯递增数字，<b>改用 bit 位标记功能</b></div>
+          <div class="rule">隔离见证：扩容、修复延展性</div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <div class="ver is-last">
+      <div class="rail"><span class="vb vb--bit">bit</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">Taproot</span><span class="yr">2021</span></span>
+            <span class="chips">
+              <span class="chip chip--v">version 位标记</span>
+              <span class="chip chip--b">BIP340/341/342</span>
+              <span class="chip chip--ok">软分叉 · 链不变</span>
+            </span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="rule"><b>Schnorr 签名</b> + <b>Tapscript</b></div>
+          <div class="rule">隐私更好、脚本更灵活</div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <div class="coexist">
+      <span class="mark">⇄</span>
+      <div>
+        <p class="t">同时存在：老版本区块</p>
+        <div class="rule">没升级的矿池依旧可以打出旧 version 区块</div>
+        <div class="rule">新旧区块<b>共存于同一条主链</b></div>
+        <span class="tagline">软分叉的核心特点</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 三种分叉对比 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>三种「分叉」不是一回事</h2>
+      <span class="hint">看链的形状就懂了</span>
+    </div>
+
+    <div class="forks">
+      <!-- 软分叉 -->
+      <div class="fork" style="--c:var(--green)">
+        <h3>软分叉 Soft Fork</h3>
+        <p class="fk-sub">规则变严</p>
+        <svg class="fdiag" viewBox="0 0 250 44" role="img" aria-label="一条链上部分区块带新标记，链不分叉">
+          <line x1="14" y1="22" x2="216" y2="22" stroke="#e0d7c8" stroke-width="1.5"/>
+          <rect x="6" y="9" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <rect x="50" y="9" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <rect x="94" y="9" width="34" height="26" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+          <rect x="138" y="9" width="34" height="26" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+          <rect x="182" y="9" width="34" height="26" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+        </svg>
+        <p class="fcap">绿色 = 带新 version／标志位的区块，链不分裂</p>
+        <ul>
+          <li>规则变严，增加新校验</li>
+          <li>老节点看不懂新功能，但认可区块合法</li>
+          <li>只有<b>一条主链</b>，不会分裂成两个币</li>
+          <li>区块 version／标志位改变，用来标记新功能</li>
+        </ul>
+      </div>
+
+      <!-- 硬分叉 -->
+      <div class="fork" style="--c:var(--red)">
+        <h3>硬分叉 Hard Fork</h3>
+        <p class="fk-sub">规则不向后兼容</p>
+        <svg class="fdiag" viewBox="0 0 250 76" role="img" aria-label="同一条链永久分成两条互不承认的链">
+          <line x1="14" y1="40" x2="120" y2="40" stroke="#e0d7c8" stroke-width="1.5"/>
+          <rect x="6" y="27" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <rect x="50" y="27" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <rect x="94" y="27" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <path d="M128 40 H137 V18 H142" fill="none" stroke="#a7e8cd" stroke-width="1.5"/>
+          <path d="M128 40 H137 V60 H142" fill="none" stroke="#efa9a9" stroke-width="1.5"/>
+          <rect x="142" y="5" width="34" height="26" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+          <rect x="184" y="5" width="34" height="26" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+          <rect x="142" y="47" width="34" height="26" rx="7" fill="#fdf1f1" stroke="#efa9a9"/>
+          <rect x="184" y="47" width="34" height="26" rx="7" fill="#fdf1f1" stroke="#efa9a9"/>
+          <text x="226" y="22" font-size="9" fill="#0b7f60">BTC</text>
+          <text x="226" y="64" font-size="9" fill="#b83a3a">BCH</text>
+        </svg>
+        <p class="fcap">同一条链<b>永久分成两条</b>，两条互不承认</p>
+        <ul>
+          <li>规则不向后兼容</li>
+          <li>新旧节点互不承认对方的区块</li>
+          <li>链永久分裂，变成两种币（<b>BTC / BCH</b>）</li>
+          <li>两条独立链，互不认同</li>
+        </ul>
+      </div>
+
+      <!-- 临时分叉 -->
+      <div class="fork" style="--c:var(--amber)">
+        <h3>挖矿临时分叉</h3>
+        <p class="fk-sub">孤立块 orphan</p>
+        <svg class="fdiag" viewBox="0 0 250 76" role="img" aria-label="短暂出现两条链，短的那条作废">
+          <line x1="14" y1="40" x2="120" y2="40" stroke="#e0d7c8" stroke-width="1.5"/>
+          <rect x="6" y="27" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <rect x="50" y="27" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <rect x="94" y="27" width="34" height="26" rx="7" fill="#f4efe5" stroke="#e0d7c8"/>
+          <path d="M128 40 H137 V18 H142" fill="none" stroke="#a7e8cd" stroke-width="1.5"/>
+          <path d="M128 40 H137 V60 H142" fill="none" stroke="#e0d6c6" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <rect x="142" y="5" width="34" height="26" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+          <rect x="184" y="5" width="34" height="26" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+          <rect x="142" y="47" width="34" height="26" rx="7" fill="#faf6ef" stroke="#ddd3c2" stroke-dasharray="4 3"/>
+          <text x="186" y="64" font-size="9" fill="#a8a094">作废</text>
+        </svg>
+        <p class="fcap">短暂两条，<b>短的那条作废</b>，交易回到 mempool</p>
+        <ul>
+          <li>几乎同时挖出两个区块</li>
+          <li>短暂两条链，节点选工作量更大那条为主链</li>
+          <li>短链作废，交易回 mempool</li>
+          <li>和协议升级（软／硬分叉）<b>完全无关</b></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 一句话回顾 ========== -->
+  <section>
+    <div class="recap">
+      <h2>一句话回顾</h2>
+      <p>version 不再只是简单数字序号（SegWit 之后），而是一组<b>二进制标记位</b>。软分叉激活后：一部分矿工打出带新标记的区块、一部分继续老版本区块，它们可以<b>穿插在同一条链里面</b>，链始终只有一条。老节点照常同步、验证 PoW，只是不会解析新脚本功能。</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>BTC · version 与软分叉</span>
+    <span>点击卡片展开／收起 · 颜色区分版本阶段</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var blocks = document.querySelectorAll('.blk');
+  var btn = document.getElementById('toggleAll');
+
+  blocks.forEach(function(b){
+    var head = b.querySelector('.blk__head');
+    head.addEventListener('click', function(){
+      var open = b.classList.toggle('is-open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      syncBtn();
+    });
+  });
+
+  function allOpen(){
+    return Array.prototype.every.call(blocks, function(b){ return b.classList.contains('is-open'); });
+  }
+  function syncBtn(){ btn.textContent = allOpen() ? '全部收起' : '全部展开'; }
+
+  btn.addEventListener('click', function(){
+    var target = !allOpen();
+    blocks.forEach(function(b){
+      b.classList.toggle('is-open', target);
+      b.querySelector('.blk__head').setAttribute('aria-expanded', String(target));
+    });
+    syncBtn();
+  });
+
+  syncBtn();
+})();
+</script>
+</body>
+</html>

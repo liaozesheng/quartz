@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>稀缺与安全 · 存量增量比、双花与确认数</title>
+<style>
+:root{
+  --paper:#fbf8f2;
+  --card:#fffdf8;
+  --ink:#241f18;
+  --ink-2:#4a443c;
+  --muted:#8a8175;
+  --line:#e6ddcf;
+  --line-2:#f0e8da;
+  --btc:#f7931a;
+  --btc-deep:#8a4a05;
+  --teal:#0f7f60;
+  --teal-2:#2fa37f;
+  --teal-soft:#e8f7f1;
+  --red:#c0392b;
+  --red-soft:#fdeeec;
+  --violet:#6d28d9;
+  --violet-soft:#f3ecff;
+  --gray-fill:#f4f1ec;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);color:var(--ink);line-height:1.62;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 22px 56px}
+
+.head .kicker{margin:0 0 8px;font-size:12px;letter-spacing:.12em;color:var(--btc);font-weight:600}
+.head h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px}
+.head p{margin:0;color:var(--ink-2);font-size:14px;max-width:70ch}
+
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0}
+.toc a{
+  font-size:12.5px;padding:5px 12px;border-radius:999px;text-decoration:none;
+  background:#fff;border:1px solid var(--line);color:var(--ink-2);
+  transition:border-color .2s,background .2s,color .2s;
+  font-family:var(--mono);
+}
+.toc a:hover{border-color:#d8c9ae;background:#fffdf5;color:var(--btc-deep)}
+
+section{margin-top:44px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.sec-head .num{
+  font-family:var(--mono);font-size:12px;color:#fff;background:var(--btc);
+  padding:2px 8px;border-radius:6px;letter-spacing:.04em;
+}
+.sec-head h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.lead{margin:0 0 4px;color:var(--ink-2);font-size:14px;max-width:74ch}
+.lead b{color:var(--ink)}
+
+.card{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:20px 20px 16px;
+  box-shadow:0 1px 2px rgba(70,55,30,.03);
+}
+.card h3{margin:0 0 3px;font-size:14.5px;font-weight:600}
+.card .sub{margin:0 0 14px;font-size:12.5px;color:var(--muted)}
+svg.chart{width:100%;height:auto;display:block}
+svg.chart text{font-family:inherit}
+
+.periods{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 0}
+.per{
+  font:inherit;font-size:12.5px;padding:5px 12px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--ink-2);
+  transition:border-color .18s,background .18s,color .18s;
+  font-family:var(--mono);
+}
+.per:hover{border-color:#d8c9ae;background:#fffdf5}
+.per.on{background:var(--btc);border-color:var(--btc);color:#fff;font-weight:600}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.stat{background:var(--gray-fill);border-radius:11px;padding:11px 13px}
+.stat .k{font-size:11.5px;color:var(--muted);margin:0 0 3px}
+.stat .v{font-size:17px;font-weight:700;margin:0;font-family:var(--mono);letter-spacing:-.02em}
+.stat .v small{font-size:11px;font-weight:400;color:var(--muted);margin-left:3px;font-family:inherit}
+.stat.hi{background:var(--teal-soft)}
+.stat.hi .v{color:var(--teal)}
+
+.tbl-wrap{overflow-x:auto;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line-2)}
+th{font-weight:600;font-size:12px;color:var(--muted);background:#faf6ee;white-space:nowrap}
+td{color:var(--ink-2)}
+td:first-child{white-space:nowrap}
+td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+td.hl{font-weight:700;color:var(--ink)}
+tr:last-child td{border-bottom:0}
+
+.caveats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.cav{background:#fdf8ef;border:1px solid #efe0c8;border-radius:12px;padding:13px 15px}
+.cav h4{margin:0 0 5px;font-size:12.5px;font-weight:600;color:var(--btc-deep)}
+.cav p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+
+.tl{list-style:none;margin:16px 0 0;padding:0 0 0 26px;position:relative}
+.tl::before{
+  content:"";position:absolute;left:6px;top:8px;bottom:14px;width:0;
+  border-left:1.5px dashed var(--line);
+}
+.tl-item{position:relative;padding:0 0 20px;opacity:.42;transition:opacity .45s ease}
+.tl-item.on{opacity:1}
+.tl-item::before{
+  content:"";position:absolute;left:-26px;top:6px;width:11px;height:11px;border-radius:50%;
+  background:#fff;border:2px solid #d8cbb4;transition:background .35s,border-color .35s;
+}
+.tl-item.on::before{background:var(--btc);border-color:var(--btc)}
+.tl-item.risk::before{border-color:#e0b0aa}
+.tl-item.on.risk::before{background:var(--red);border-color:var(--red)}
+.tl-item h4{margin:0 0 3px;font-size:13.5px;font-weight:600}
+.tl-item p{margin:0;font-size:12.5px;color:var(--muted)}
+.tl-tag{
+  display:inline-block;font-family:var(--mono);font-size:11px;color:var(--muted);
+  margin-right:7px;letter-spacing:.04em;
+}
+.tl-item.on .tl-tag{color:var(--btc-deep)}
+.tl-item.on.risk .tl-tag{color:var(--red)}
+
+.ctrls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;padding-top:14px;border-top:1px dashed var(--line)}
+button{
+  font:inherit;font-size:13px;padding:6px 14px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--ink-2);
+  transition:border-color .2s,background .2s,color .2s,transform .1s;
+}
+button:hover:not(:disabled){border-color:#d8c9ae;background:#fffdf5}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.primary{background:var(--btc);border-color:var(--btc);color:#fff;font-weight:600}
+button.primary:hover:not(:disabled){background:#f08a0d;border-color:#f08a0d}
+.ctrls .sp{margin-left:auto}
+
+.slider-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.slider-row label{font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;flex:1 1 220px;min-width:160px;height:4px;
+  background:#e8dfd0;border-radius:2px;outline:none;margin:0;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:17px;height:17px;border-radius:50%;
+  background:var(--btc);border:2px solid #fff;box-shadow:0 1px 3px rgba(70,55,30,.25);cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:15px;height:15px;border-radius:50%;background:var(--btc);
+  border:2px solid #fff;box-shadow:0 1px 3px rgba(70,55,30,.25);cursor:pointer;
+}
+.qval{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--btc-deep);white-space:nowrap;min-width:52px;text-align:right}
+
+.readout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.ro{background:var(--gray-fill);border-radius:11px;padding:11px 13px;transition:background .3s}
+.ro .k{font-size:11.5px;color:var(--muted);margin:0 0 3px}
+.ro .v{font-size:17px;font-weight:700;margin:0;font-family:var(--mono);letter-spacing:-.02em;transition:color .3s}
+.ro.good{background:var(--teal-soft)}
+.ro.good .v{color:var(--teal)}
+.ro.bad{background:var(--red-soft)}
+.ro.bad .v{color:var(--red)}
+.ro.warn{background:#fdf3e3}
+.ro.warn .v{color:var(--btc-deep)}
+
+.note{margin-top:22px;font-size:12.5px;color:var(--muted);border-left:2px solid #eddcc0;padding-left:12px}
+.note b{color:var(--ink-2)}
+
+footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+footer p{margin:0 0 6px}
+
+@media (max-width:820px){
+  .wrap{padding:26px 14px 44px}
+  .head h1{font-size:21px}
+  .stats,.caveats,.readout{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats .stat:last-child,.caveats .cav:last-child,.readout .ro:last-child{grid-column:1/-1}
+  .card{padding:16px 14px 13px}
+  .ctrls .sp{margin-left:0}
+}
+@media (max-width:520px){
+  .stats,.caveats,.readout{grid-template-columns:1fr}
+  .stats .stat:last-child,.caveats .cav:last-child,.readout .ro:last-child{grid-column:auto}
+}
+@media (prefers-reduced-motion:reduce){
+  .tl-item,.tl-item::before{transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="head">
+  <p class="kicker">比特币笔记 · 第五篇</p>
+  <h1>稀缺与安全</h1>
+  <p>供给端看<b>存量增量比</b>，安全端看<b>双花成本</b>与<b>确认数</b>。三个数字回答三个不同的问题：新钱造得多快、旧账能不能被撤、要等多久才算数。</p>
+</header>
+
+<nav class="toc">
+  <a href="#s1">01 供给 · 存量增量比</a>
+  <a href="#s2">02 安全 · 双花</a>
+  <a href="#s3">03 安全 · 确认数</a>
+</nav>
+
+<section id="s1">
+  <div class="sec-head"><span class="num">01</span><h2>供给：存量增量比</h2></div>
+  <p class="lead">存量增量比（stock-to-flow）就是你手上已经有的全部存量，除以每年新造出来的增量。它衡量的是<b>稀释速度的倒数</b>——比值越大，新增供给对存量的冲击越小。</p>
+
+  <div class="card">
+    <h3>比特币的阶梯：每 4 年跳一级</h3>
+    <p class="sub">纵轴对数刻度。点下方按钮切换减半周期，看每一级的具体数字。</p>
+    <svg class="chart" viewBox="0 0 900 400" role="img" aria-label="比特币存量增量比历次减半阶梯，并与黄金和美元M2对比">
+      <text x="80" y="40" font-size="12" fill="#8a8175">存量增量比（对数刻度）</text>
+
+      <text x="64" y="344" font-size="12" fill="#8a8175" text-anchor="end">1</text>
+      <path d="M80 340 H860" fill="none" stroke="#e6ddcf" stroke-width="1"/>
+      <text x="64" y="236" font-size="12" fill="#8a8175" text-anchor="end">10</text>
+      <path d="M80 232.4 H860" fill="none" stroke="#f0e8da" stroke-width="1"/>
+      <text x="64" y="129" font-size="12" fill="#8a8175" text-anchor="end">100</text>
+      <path d="M80 124.8 H860" fill="none" stroke="#f0e8da" stroke-width="1"/>
+
+      <path d="M80 150.3 H860" fill="none" stroke="#ddc79c" stroke-width="1.4" stroke-dasharray="6 6"/>
+      <text x="92" y="141" font-size="12" fill="#b08d55">黄金 约 58</text>
+
+      <path d="M80 206.2 H860" fill="none" stroke="#d8a8a2" stroke-width="1.2" stroke-dasharray="2 4"/>
+      <text x="92" y="197" font-size="12" fill="#c0392b">美元 M2 约 17.5</text>
+
+      <g id="segs">
+        <path class="segx" data-i="0" d="M80 310 H212.3 M212.3 310 V232.9" fill="none" stroke="#c9c0b0" stroke-width="3" stroke-linecap="round"/>
+        <path class="segx" data-i="1" d="M212.3 232.9 H334.3 M334.3 232.9 V187.7" fill="none" stroke="#c9c0b0" stroke-width="3" stroke-linecap="round"/>
+        <path class="segx" data-i="2" d="M334.3 187.7 H466.7 M466.7 187.7 V149.9" fill="none" stroke="#c9c0b0" stroke-width="3" stroke-linecap="round"/>
+        <path class="segx" data-i="3" d="M466.7 149.9 H598.9 M598.9 149.9 V115.4" fill="none" stroke="#c9c0b0" stroke-width="3" stroke-linecap="round"/>
+        <path class="segx" data-i="4" d="M598.9 115.4 H734.6 M734.6 115.4 V81.4" fill="none" stroke="#c9c0b0" stroke-width="3" stroke-linecap="round"/>
+        <path class="segx" data-i="5" d="M734.6 81.4 H860" fill="none" stroke="#c9c0b0" stroke-width="3" stroke-linecap="round"/>
+      </g>
+
+      <circle id="perDot" cx="666.8" cy="115.4" r="5" fill="#f7931a"/>
+      <text id="perDotTxt" x="666.8" y="102" font-size="12.5" font-weight="600" fill="#8a4a05" text-anchor="middle">当前 122</text>
+
+      <text x="80" y="368" font-size="12" fill="#8a8175" text-anchor="middle">2009</text>
+      <text x="283.5" y="368" font-size="12" fill="#8a8175" text-anchor="middle">2015</text>
+      <text x="453" y="368" font-size="12" fill="#8a8175" text-anchor="middle">2020</text>
+      <text x="622.6" y="368" font-size="12" fill="#8a8175" text-anchor="middle">2025</text>
+      <text x="792.2" y="368" font-size="12" fill="#8a8175" text-anchor="middle">2030</text>
+      <text x="470" y="392" font-size="12" fill="#8a8175" text-anchor="middle">减半发生在 2012 / 2016 / 2020 / 2024 / 2028，每次供应速度腰斩</text>
+    </svg>
+
+    <div class="periods" id="periods"></div>
+
+    <div class="stats">
+      <div class="stat"><p class="k">区块补贴</p><p class="v" id="stSub">3.125<small>BTC</small></p></div>
+      <div class="stat"><p class="k">存量</p><p class="v" id="stStock">20.11<small>M</small></p></div>
+      <div class="stat"><p class="k">年增量</p><p class="v" id="stFlow">164<small>K</small></p></div>
+      <div class="stat hi"><p class="k">存量增量比</p><p class="v" id="stS2F">122</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>三个体系放在一起</h3>
+    <p class="sub">数据截至 2026 年 11 月。美元为 M2，美联储 H.6 报告 2026 年 9 月读数。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>体系</th><th>存量</th><th>年增量</th><th>存量增量比</th><th>年通胀率</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="hl">比特币</td><td class="num">20,109,941 BTC</td><td class="num">164,250 BTC</td><td class="num hl">122</td><td class="num">0.82%</td></tr>
+          <tr><td class="hl">黄金</td><td class="num">约 21.6 万吨</td><td class="num">约 3,600 吨</td><td class="num hl">约 58</td><td class="num">约 1.7%</td></tr>
+          <tr><td class="hl">美元 M2</td><td class="num">23.41 万亿美元</td><td class="num">约 1.33 万亿美元</td><td class="num hl">约 17.5</td><td class="num">5.7%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:14px">有意思的巧合：比特币在 2020–2024 那一级的存量增量比是 58.4，几乎正好等于黄金的 58。也就是说，2020 年那一次减半之后，它的稀缺度和人类五千年攒下来的黄金持平了。现在这一级是黄金的两倍，2028 年再减半会是四倍。</p>
+  </div>
+
+  <div class="caveats">
+    <div class="cav">
+      <h4>一个是常量，一个是变量</h4>
+      <p>比特币这条线是阶梯，方向单一，2140 年归零，可以提前十年算出来。M2 是政策变量：2021 年 2 月同比一度 +27%，2023 年又出现 −4.6%（1930 年代以来首次负增长）。所谓「美元存量增量比 17.5」只是当下这一年的读数。</p>
+    </div>
+    <div class="cav">
+      <h4>M2 的口径比想象中窄</h4>
+      <p>M2 只统计美国境内银行体系的存款和流通现金。境外流通的美元不在里面，而据估算超过一半的百元钞票在境外。M3 从 2006 年起停止发布，只能用 M2 退而求其次。</p>
+    </div>
+    <div class="cav">
+      <h4>分母的含义不对等</h4>
+      <p>M2 的年度增量里有相当部分对应实际经济增长带来的交易需求，那不算稀释。比特币的 164,250 枚是纯供给，没有需求侧解释。直接相除会高估美元的超发程度。</p>
+    </div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="sec-head"><span class="num">02</span><h2>安全：双花攻击</h2></div>
+  <p class="lead">双花就是同一笔钱被花两次。现金做不到，因为交付是物理的；数字系统天然做得到，因为复制零成本。比特币的做法是把钱切成一枚枚<b>只能消费一次的 UTXO</b>。</p>
+
+  <div class="card">
+    <h3>双花只可能发生在两个位置，其中一个被规则堵死了</h3>
+    <p class="sub">同一区块内重复花费，整块直接判非法；跨分支才是真实战场。</p>
+    <svg class="chart" viewBox="0 0 900 300" role="img" aria-label="双花的两种位置：区块内与跨分叉分支">
+      <text x="80" y="30" font-size="12.5" font-weight="600" fill="#4a443c">① 同一个区块内 —— 硬规则拒绝</text>
+
+      <rect x="80" y="46" width="150" height="66" rx="11" fill="#e8f7f1" stroke="#2fa37f" stroke-width="1"/>
+      <text x="96" y="68" font-size="11.5" fill="#0f7f60">UTXO · 只能花一次</text>
+      <text x="96" y="88" font-size="15" font-weight="700" fill="#0b4a3a">1.00 BTC</text>
+      <text x="96" y="104" font-size="11.5" fill="#2c7f66">归属：攻击者</text>
+
+      <path d="M230 79 H252" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M252 62 V112" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M252 62 H276" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M252 112 H276" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+
+      <rect x="276" y="44" width="172" height="36" rx="9" fill="#fffdf8" stroke="#e0d7c8"/>
+      <text x="292" y="67" font-size="12.5" fill="#241f18">交易 A · 付给商家</text>
+      <rect x="276" y="94" width="172" height="36" rx="9" fill="#fffdf8" stroke="#e0b0aa" stroke-dasharray="5 4"/>
+      <text x="292" y="117" font-size="12.5" fill="#241f18">交易 B · 转回自己</text>
+
+      <path d="M448 79 H474" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M474 62 V112" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M474 87 H500" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+
+      <rect x="500" y="60" width="160" height="56" rx="11" fill="#fdeeec" stroke="#c0392b" stroke-width="1"/>
+      <text x="580" y="84" font-size="12.5" font-weight="600" fill="#c0392b" text-anchor="middle">块 800001</text>
+      <text x="580" y="102" font-size="12" fill="#c0392b" text-anchor="middle">整块非法，节点拒收</text>
+
+      <text x="680" y="84" font-size="12" fill="#8a8175" text-anchor="end" opacity="0"> </text>
+
+      <text x="80" y="168" font-size="12.5" font-weight="600" fill="#4a443c">② 两条分叉分支之间 —— 唯一真实战场</text>
+
+      <rect x="80" y="184" width="150" height="66" rx="11" fill="#e8f7f1" stroke="#2fa37f" stroke-width="1"/>
+      <text x="96" y="206" font-size="11.5" fill="#0f7f60">同一个 UTXO</text>
+      <text x="96" y="226" font-size="15" font-weight="700" fill="#0b4a3a">1.00 BTC</text>
+      <text x="96" y="242" font-size="11.5" fill="#2c7f66">只能进其中一条</text>
+
+      <path d="M230 217 H252" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M252 200 V250" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M252 200 H276" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M252 250 H276" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+
+      <rect x="276" y="182" width="152" height="36" rx="9" fill="#fffdf8" stroke="#e0d7c8"/>
+      <text x="292" y="205" font-size="12.5" fill="#241f18">Tx A</text>
+      <rect x="276" y="232" width="152" height="36" rx="9" fill="#fffdf8" stroke="#e0b0aa" stroke-dasharray="5 4"/>
+      <text x="292" y="255" font-size="12.5" fill="#241f18">Tx B</text>
+
+      <path d="M428 200 H452" fill="none" stroke="#2fa37f" stroke-width="2"/>
+      <path d="M428 250 H452" fill="none" stroke="#c0392b" stroke-width="2"/>
+
+      <rect x="452" y="182" width="150" height="36" rx="9" fill="#e8f7f1" stroke="#2fa37f"/>
+      <text x="527" y="205" font-size="12" fill="#0b4a3a" text-anchor="middle">主链 · 有效</text>
+      <rect x="452" y="232" width="150" height="36" rx="9" fill="#f4f1ec" stroke="#cfc6b8" stroke-dasharray="5 4"/>
+      <text x="527" y="255" font-size="12" fill="#8a8175" text-anchor="middle">孤块 · 作废</text>
+
+      <text x="626" y="200" font-size="12" fill="#2c7f66">Tx A 的接收方拿到钱</text>
+      <text x="626" y="218" font-size="11.5" fill="#8a8175">这笔成了有效历史</text>
+      <text x="626" y="250" font-size="12" fill="#c0392b">Tx B 永久作废</text>
+      <text x="626" y="268" font-size="11.5" fill="#8a8175">输入已不存在，回不了内存池</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h3>典型攻击：私挖分叉 + 事后重组</h3>
+    <p class="sub">也叫 51% 攻击的实用形态。逐步点开看，攻击者从头到尾没有伪造任何东西。</p>
+    <ol class="tl" id="tl">
+      <li class="tl-item on" data-i="0">
+        <h4><span class="tl-tag">T0</span>攻击者广播交易 X，向商家支付 100 BTC</h4>
+        <p>这一步完全正常，X 进入内存池等待打包</p>
+      </li>
+      <li class="tl-item" data-i="1">
+        <h4><span class="tl-tag">T1</span>商家看到 1 个确认，把货发了</h4>
+        <p>X 已上链，从任何角度看都没有可疑之处</p>
+      </li>
+      <li class="tl-item risk" data-i="2">
+        <h4><span class="tl-tag">T2</span>攻击者私下挖一条不含 X 的链</h4>
+        <p>用自有算力从 X 之前的父块起挖，此时累计 work 已经领先</p>
+      </li>
+      <li class="tl-item risk" data-i="3">
+        <h4><span class="tl-tag">T3</span>私链 work 反超，突然广播</h4>
+        <p>全网按最重链规则重组，X 被踢出主链</p>
+      </li>
+      <li class="tl-item risk" data-i="4">
+        <h4><span class="tl-tag">T4</span>X 的输入重新变回未花费，钱回到自己手里</h4>
+        <p>商家已发货，货款两空；X 甚至可以被改花给自己</p>
+      </li>
+    </ol>
+    <div class="ctrls">
+      <button class="primary" id="tlPlay">播放</button>
+      <button id="tlReset">重置</button>
+      <span class="sp"></span>
+      <span style="font-size:12px;color:var(--muted)" id="tlStep">第 1 / 5 步</span>
+    </div>
+    <p class="note" style="margin-top:16px">注意攻击者没有造币。总量不变，别人的余额也不受影响，签名验证是硬性检查。他能做的只有撤回<b>自己已经付出去的那笔</b>，或者拒绝打包别人的交易。</p>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="sec-head"><span class="num">03</span><h2>安全：确认数</h2></div>
+  <p class="lead">确认数不是「审批进度条」，它没有投票的含义。它衡量的是<b>要让这笔交易消失，对方得付出多大代价</b>。交易所在的那个块本身就算第 1 个确认。</p>
+
+  <div class="card">
+    <h3>怎么数</h3>
+    <p class="sub">交易所在区块是第 1 个确认，之后每追加一个块 +1。</p>
+    <svg class="chart" viewBox="0 0 900 200" role="img" aria-label="确认数计数方式示意">
+      <text x="166" y="52" font-size="12" fill="#8a4a05" text-anchor="middle">交易 X 在这里</text>
+      <text x="798" y="52" font-size="12" fill="#8a8175" text-anchor="middle">链尖</text>
+
+      <rect x="90" y="64" width="152" height="60" rx="11" fill="#fdf3e3" stroke="#e0a352" stroke-width="1.2"/>
+      <text x="166" y="100" font-size="13" fill="#5c3508" text-anchor="middle">800001</text>
+
+      <rect x="250" y="64" width="152" height="60" rx="11" fill="#fffdf8" stroke="#e6ddcf"/>
+      <text x="326" y="100" font-size="13" fill="#8a8175" text-anchor="middle">800002</text>
+      <rect x="410" y="64" width="152" height="60" rx="11" fill="#fffdf8" stroke="#e6ddcf"/>
+      <text x="486" y="100" font-size="13" fill="#8a8175" text-anchor="middle">800003</text>
+      <rect x="570" y="64" width="152" height="60" rx="11" fill="#fffdf8" stroke="#e6ddcf"/>
+      <text x="646" y="100" font-size="13" fill="#8a8175" text-anchor="middle">800004</text>
+      <rect x="730" y="64" width="152" height="60" rx="11" fill="#fffdf8" stroke="#e6ddcf"/>
+      <text x="806" y="100" font-size="13" fill="#8a8175" text-anchor="middle">800005</text>
+
+      <path d="M242 94 H250" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M402 94 H410" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M562 94 H570" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+      <path d="M722 94 H730" fill="none" stroke="#c9c0b0" stroke-width="2"/>
+
+      <text x="166" y="152" font-size="17" font-weight="700" fill="#0f7f60" text-anchor="middle">1</text>
+      <text x="326" y="152" font-size="17" fill="#0f7f60" text-anchor="middle">2</text>
+      <text x="486" y="152" font-size="17" fill="#0f7f60" text-anchor="middle">3</text>
+      <text x="646" y="152" font-size="17" fill="#0f7f60" text-anchor="middle">4</text>
+      <text x="806" y="152" font-size="17" fill="#0f7f60" text-anchor="middle">5</text>
+
+      <text x="166" y="174" font-size="12" fill="#0f7f60" text-anchor="middle">含交易</text>
+      <text x="490" y="178" font-size="12" fill="#8a8175" text-anchor="middle">每追加一个块，确认数 +1</text>
+    </svg>
+  </div>
+
+  <div class="card">
+    <h3>反转要多大代价</h3>
+    <p class="sub">拖动滑块改变攻击者掌握的算力占比，看曲线怎么变。纵轴对数刻度。</p>
+    <svg class="chart" id="probChart" viewBox="0 0 900 400" role="img" aria-label="不同攻击者算力下双花成功概率随确认数的衰减"></svg>
+
+    <div class="slider-row">
+      <label for="q">攻击者算力占比</label>
+      <input type="range" id="q" min="1" max="45" value="10" step="1">
+      <span class="qval" id="qval">10%</span>
+    </div>
+
+    <div class="readout">
+      <div class="ro warn"><p class="k">0 确认</p><p class="v" id="ro0">100%</p></div>
+      <div class="ro" id="ro1box"><p class="k">1 确认</p><p class="v" id="ro1">20.5%</p></div>
+      <div class="ro" id="ro6box"><p class="k">6 确认</p><p class="v" id="ro6">0.02%</p></div>
+    </div>
+
+    <p class="note" id="verdict">攻击者只有 10% 算力时，每多一个确认成功率乘 0.111。6 个确认之后只剩万分之二。</p>
+  </div>
+
+  <div class="card">
+    <h3>「6 个确认」是怎么来的</h3>
+    <p class="sub">中本聪 2009 年白皮书里算的是 q=0.1 的情况，第 6 块之后概率跌破 0.1%，他说这就够安全了。行业把 6 抄成了惯例。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>确认数</th><th>10% 算力的攻击者</th><th>30% 算力的攻击者</th><th>实际含义</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="hl">0</td><td class="num">100%</td><td class="num">100%</td><td>还在内存池，可被替换或直接丢弃</td></tr>
+          <tr><td class="hl">1</td><td class="num">20.5%</td><td class="num">62.8%</td><td>需要 51% 算力再加一次竞速</td></tr>
+          <tr><td class="hl">3</td><td class="num">1.32%</td><td class="num">32.5%</td><td>交易所小额充值的常见档位</td></tr>
+          <tr><td class="hl">6</td><td class="num hl">0.024%</td><td class="num hl">13.2%</td><td>行业惯例，但绑定「对手只有 10%」这个前提</td></tr>
+          <tr><td class="hl">12</td><td class="num">0.000009%</td><td class="num">2.36%</td><td>继续加，收益递减明显</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">这张表最关键的一列是第三列。同样 6 个确认，如果对手掌握 30% 算力，还剩 13.2% 的成功率——完全不安全。<b>「6 确认安全」这句话省略了后半句：前提是对手只有 10% 算力。</b></p>
+  </div>
+
+  <div class="card">
+    <h3>确认数要等多久</h3>
+    <p class="sub">出块时间服从指数分布，6 个块的总等待服从 Erlang-6。均值 60 分钟，标准差却有 24.5 分钟。</p>
+    <svg class="chart" id="waitChart" viewBox="0 0 900 380" role="img" aria-label="攒够六个确认所需时间的分布"></svg>
+    <div class="readout" style="margin-top:6px">
+      <div class="ro"><p class="k">10% 的交易</p><p class="v">31 分钟</p></div>
+      <div class="ro"><p class="k">中位数</p><p class="v">57 分钟</p></div>
+      <div class="ro warn"><p class="k">90% 的交易</p><p class="v">93 分钟</p></div>
+    </div>
+    <p class="note" style="margin-top:16px">所以在 60 分钟时，其实只有 55% 的交易攒够了 6 个确认，剩下 45% 还在等。更要紧的是：<b>安全指标是块数，不是时间。</b>协议里没有时钟，节点只认累计工作量。算力涨了出块变快，6 确认可能只要 15 分钟，但安全性一点没降；算力跌了要等 3 小时，安全性也一点没升。60 分钟只是「6 块 work」在当前难度下的时间投影。</p>
+  </div>
+
+  <div class="caveats">
+    <div class="cav">
+      <h4>确认数得自己算才可信</h4>
+      <p>轻钱包本地不存区块，高度由第三方告知。服务器撒谎，你看到的「6 确认」就是假的。收大额应该跑全节点，或者至少交叉核对多个数据源。</p>
+    </div>
+    <div class="cav">
+      <h4>深度重组真的发生过</h4>
+      <p>2013 年 3 月，v0.8 与 v0.7 的共识 bug 造成分叉，最终发生了<b>深度 24 块</b>的重组。当时 20 多个确认的交易被回滚。「6 确认」是概率舒适区，不是物理定律。</p>
+    </div>
+    <div class="cav">
+      <h4>它是定价，不是保证</h4>
+      <p>真正的保护始终是经济的：打下 6 个确认的块，得租到超过全网一半的算力并持续挖，这笔钱通常远超它能撤回的金额。确认数是在给攻击者开价。</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>数据来源：比特币流通量与区块高度取自链上数据（2026-11-09，高度 975,181）；美元 M2 取自美联储 H.6 报告 2026 年 9 月读数（23,413.9 十亿美元，同比 +5.7%）；黄金存量与年产量为行业通用估算。</p>
+  <p>概率计算采用中本聪白皮书第 11 节的泊松模型：P = 1 − Σ<sub>k=0..z</sub> [e<sup>−λ</sup>λ<sup>k</sup>/k!] × [1 − (q/p)<sup>z−k</sup>]，其中 λ = z·q/p。</p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var periods = [
+    {name:'2009-12', sub:'50 BTC/块',   stock:5.0,    flow:2628000, s2f:1.9,   dot:310,  cx:146.2, dtxt:'1.9'},
+    {name:'2012-16', sub:'25 BTC/块',   stock:13.0,   flow:1314000, s2f:9.9,   dot:232.9,cx:273.3, dtxt:'9.9'},
+    {name:'2016-20', sub:'12.5 BTC/块', stock:17.0,   flow:657000,  s2f:25.9,  dot:187.7,cx:400.5, dtxt:'26'},
+    {name:'2020-24', sub:'6.25 BTC/块', stock:19.2,   flow:328500,  s2f:58.4,  dot:149.9,cx:532.8, dtxt:'58'},
+    {name:'2024-28', sub:'3.125 BTC/块',stock:20.11,  flow:164250,  s2f:122.4, dot:115.4,cx:666.8, dtxt:'122'},
+    {name:'2028-32', sub:'1.5625 BTC/块',stock:20.5,  flow:82125,   s2f:249.6, dot:81.4, cx:797.3, dtxt:'250'}
+  ];
+
+  var segs = Array.prototype.slice.call(document.querySelectorAll('.segx'));
+  var perBox = document.getElementById('periods');
+  var dotEl = document.getElementById('perDot');
+  var dotTxt = document.getElementById('perDotTxt');
+  var stSub = document.getElementById('stSub');
+  var stStock = document.getElementById('stStock');
+  var stFlow = document.getElementById('stFlow');
+  var stS2F = document.getElementById('stS2F');
+
+  function fmtM(v){ return v >= 10 ? v.toFixed(1) : v.toFixed(2); }
+  function fmtK(v){
+    if(v >= 1000000) return (v/1000000).toFixed(2);
+    if(v >= 1000) return Math.round(v/1000);
+    return v;
+  }
+  function unitK(v){
+    if(v >= 1000000) return 'M';
+    if(v >= 1000) return 'K';
+    return '';
+  }
+
+  periods.forEach(function(p, i){
+    var b = document.createElement('button');
+    b.className = 'per' + (i === 4 ? ' on' : '');
+    b.textContent = p.name;
+    b.type = 'button';
+    b.addEventListener('click', function(){ pick(i); });
+    perBox.appendChild(b);
+  });
+
+  function pick(i){
+    var p = periods[i];
+    Array.prototype.slice.call(perBox.children).forEach(function(b, j){
+      b.classList.toggle('on', j === i);
+    });
+    segs.forEach(function(s, j){
+      var on = (j === i);
+      s.setAttribute('stroke', on ? '#f7931a' : '#c9c0b0');
+      s.setAttribute('stroke-width', on ? '4' : '3');
+      s.setAttribute('opacity', on ? '1' : '.55');
+    });
+    dotEl.setAttribute('cy', p.dot);
+    dotEl.setAttribute('cx', p.cx);
+    dotTxt.setAttribute('y', p.dot - 13);
+    dotTxt.setAttribute('x', p.cx);
+    dotTxt.textContent = '当前 ' + p.dtxt;
+    stSub.innerHTML = p.sub.replace(' BTC/块', '') + '<small>BTC</small>';
+    stStock.innerHTML = fmtM(p.stock) + '<small>M</small>';
+    stFlow.innerHTML = fmtK(p.flow) + '<small>' + unitK(p.flow) + '</small>';
+    stS2F.textContent = (p.s2f >= 100 ? Math.round(p.s2f) : p.s2f.toFixed(1));
+  }
+  pick(4);
+
+  var tlItems = Array.prototype.slice.call(document.querySelectorAll('.tl-item'));
+  var tlPlay = document.getElementById('tlPlay');
+  var tlReset = document.getElementById('tlReset');
+  var tlStep = document.getElementById('tlStep');
+  var tlCur = 0, tlTimer = null;
+
+  function tlSet(n){
+    tlCur = Math.max(0, Math.min(tlItems.length - 1, n));
+    tlItems.forEach(function(el, i){
+      el.classList.toggle('on', i <= tlCur);
+    });
+    tlStep.textContent = '第 ' + (tlCur + 1) + ' / ' + tlItems.length + ' 步';
+  }
+
+  tlItems.forEach(function(el, i){
+    el.addEventListener('click', function(){
+      stopTl();
+      tlSet(i);
+    });
+  });
+
+  function stopTl(){
+    if(tlTimer){ clearInterval(tlTimer); tlTimer = null; }
+    tlPlay.textContent = '播放';
+  }
+
+  tlPlay.addEventListener('click', function(){
+    if(tlTimer){ stopTl(); return; }
+    if(tlCur >= tlItems.length - 1) tlSet(0);
+    tlPlay.textContent = '暂停';
+    tlTimer = setInterval(function(){
+      if(tlCur >= tlItems.length - 1){ stopTl(); return; }
+      tlSet(tlCur + 1);
+    }, 1600);
+  });
+
+  tlReset.addEventListener('click', function(){ stopTl(); tlSet(0); });
+
+  function prob(q, z){
+    if(q >= 0.5) return 1;
+    var p = 1 - q;
+    var lam = z * q / p;
+    var s = 0;
+    var term = Math.exp(-lam);
+    for(var k = 0; k <= z; k++){
+      if(k > 0) term = term * lam / k;
+      s += term * (1 - Math.pow(q / p, z - k));
+    }
+    return Math.max(0, Math.min(1, 1 - s));
+  }
+
+  var probChart = document.getElementById('probChart');
+  var qSlider = document.getElementById('q');
+  var qval = document.getElementById('qval');
+  var ro0 = document.getElementById('ro0');
+  var ro1 = document.getElementById('ro1');
+  var ro6 = document.getElementById('ro6');
+  var ro1box = document.getElementById('ro1box');
+  var ro6box = document.getElementById('ro6box');
+  var verdict = document.getElementById('verdict');
+
+  function pct(v){
+    if(v >= 0.1) return (v * 100).toFixed(1) + '%';
+    if(v >= 0.001) return (v * 100).toFixed(2) + '%';
+    if(v >= 1e-6) return (v * 100).toFixed(4) + '%';
+    return (v * 100).toExponential(1).replace('e', 'e') + '%';
+  }
+
+  function yOf(p){
+    var lp = -Math.log10(Math.max(p, 1e-8));
+    return 60 + Math.min(8, Math.max(0, lp)) * 32.5;
+  }
+  function xOf(z){ return 110 + z * 57.5; }
+
+  var ticks = [
+    {v:1,      t:'100%'},
+    {v:0.1,    t:'10%'},
+    {v:0.01,   t:'1%'},
+    {v:0.001,  t:'0.1%'},
+    {v:1e-4,   t:'0.01%'},
+    {v:1e-5,   t:'0.001%'},
+    {v:1e-6,   t:'0.0001%'}
+  ];
+
+  function drawProb(q){
+    var out = '';
+    out += '<text x="110" y="40" font-size="12" fill="#8a8175">双花成功概率</text>';
+
+    ticks.forEach(function(tk){
+      var y = yOf(tk.v);
+      out += '<text x="96" y="' + (y + 4) + '" font-size="12" fill="#8a8175" text-anchor="end">' + tk.t + '</text>';
+      out += '<path d="M110 ' + y + ' H800" fill="none" stroke="#f0e8da" stroke-width="1"/>';
+    });
+
+    out += '<path d="M455 60 V330" fill="none" stroke="#c9a15e" stroke-width="1.2" stroke-dasharray="5 5"/>';
+    out += '<text x="461" y="52" font-size="12" fill="#8a4a05">行业惯例 6 确认</text>';
+
+    var d = '';
+    for(var z = 0; z <= 12; z++){
+      var x = xOf(z).toFixed(1);
+      var y = yOf(prob(q, z)).toFixed(1);
+      d += (z === 0 ? 'M' : ' L') + x + ' ' + y;
+    }
+    out += '<path d="' + d + '" fill="none" stroke="#f7931a" stroke-width="2.4" stroke-linejoin="round"/>';
+
+    [0, 1, 6, 12].forEach(function(z){
+      var p = prob(q, z);
+      var cx = xOf(z).toFixed(1);
+      var cy = yOf(p).toFixed(1);
+      out += '<circle cx="' + cx + '" cy="' + cy + '" r="4" fill="#8a4a05"/>';
+    });
+
+    for(var z2 = 0; z2 <= 12; z2 += 2){
+      out += '<text x="' + xOf(z2) + '" y="356" font-size="12" fill="#8a8175" text-anchor="middle">' + z2 + '</text>';
+    }
+    out += '<text x="455" y="384" font-size="12" fill="#8a8175" text-anchor="middle">确认数</text>';
+    out += '<path d="M110 330 H800" fill="none" stroke="#e6ddcf" stroke-width="1"/>';
+
+    probChart.innerHTML = out;
+  }
+
+  function updateOne(){
+    var q = parseInt(qSlider.value, 10) / 100;
+    qval.textContent = Math.round(q * 100) + '%';
+    drawProb(q);
+
+    var p0 = 1, p1 = prob(q, 1), p6 = prob(q, 6);
+    ro0.textContent = '100%';
+    ro1.textContent = pct(p1);
+    ro6.textContent = pct(p6);
+
+    ro1box.className = 'ro ' + (p1 > 0.2 ? 'bad' : p1 > 0.05 ? 'warn' : 'good');
+    ro6box.className = 'ro ' + (p6 > 0.05 ? 'bad' : p6 > 0.005 ? 'warn' : 'good');
+
+    var ratio = q / (1 - q);
+    var msg = '攻击者占 ' + Math.round(q * 100) + '% 算力时，每多一个确认成功率乘 ' + ratio.toFixed(3) + '。';
+    if(p6 > 0.05){
+      msg += ' 6 个确认之后还剩 ' + pct(p6) + '，这远不安全——这个攻击者已经接近能稳定双花的水平。';
+    } else if(p6 > 0.005){
+      msg += ' 6 个确认之后还有 ' + pct(p6) + '，对小额够用，大额要更多确认。';
+    } else {
+      msg += ' 6 个确认之后只剩 ' + pct(p6) + '，已经足够安全。';
+    }
+    verdict.textContent = msg;
+  }
+
+  qSlider.addEventListener('input', updateOne);
+  updateOne();
+
+  var waitChart = document.getElementById('waitChart');
+
+  function erlangPdf(t, k){
+    if(t <= 0) return 0;
+    var lam = 1 / 10;
+    var fact = 1;
+    for(var i = 2; i <= k - 1; i++) fact *= i;
+    return Math.pow(t, k - 1) * Math.exp(-lam * t) * Math.pow(lam, k) / fact;
+  }
+
+  function drawWait(){
+    var k = 6;
+    var x0 = 90, x1 = 850, base = 300;
+    function X(t){ return x0 + t * (x1 - x0) / 180; }
+    function Y(v){ return base - v * 13000; }
+
+    var out = '';
+    out += '<text x="90" y="40" font-size="12" fill="#8a8175">发出交易后，攒够 6 个确认要多久</text>';
+
+    var area = '';
+    for(var t = 60; t <= 180; t += 2){
+      area += X(t).toFixed(1) + ' ' + Y(erlangPdf(t, k)).toFixed(1) + ' ';
+    }
+    out += '<path d="M' + X(60).toFixed(1) + ' ' + base + ' L' + area + 'L' + x1 + ' ' + base + ' Z" fill="#f8e3bf" stroke="none"/>';
+
+    var d = '';
+    for(var t2 = 0; t2 <= 180; t2 += 2){
+      d += (t2 === 0 ? 'M' : ' L') + X(t2).toFixed(1) + ' ' + Y(erlangPdf(t2, k)).toFixed(1);
+    }
+    out += '<path d="' + d + '" fill="none" stroke="#e0a352" stroke-width="2.4" stroke-linejoin="round"/>';
+    out += '<path d="M' + x0 + ' ' + base + ' H' + x1 + '" fill="none" stroke="#e6ddcf" stroke-width="1"/>';
+    out += '<path d="M' + X(60).toFixed(1) + ' ' + base + ' V' + (Y(erlangPdf(60, k)) - 8).toFixed(1) + '" fill="none" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="5 4"/>';
+
+    out += '<circle cx="' + X(50).toFixed(1) + '" cy="' + Y(erlangPdf(50, k)).toFixed(1) + '" r="4.5" fill="#8a4a05"/>';
+    out += '<text x="' + X(50).toFixed(1) + '" y="' + (Y(erlangPdf(50, k)) - 14).toFixed(1) + '" font-size="12" fill="#8a4a05" text-anchor="middle">峰值 50 分钟</text>';
+    out += '<text x="' + (X(60) + 8).toFixed(1) + '" y="' + (Y(erlangPdf(60, k)) + 18).toFixed(1) + '" font-size="12" fill="#c0392b">60 分钟</text>';
+
+    out += '<text x="596" y="206" font-size="15" font-weight="600" fill="#c0392b">44.6%</text>';
+    out += '<text x="596" y="226" font-size="12" fill="#8a8175">这时还没攒够 6 个确认</text>';
+
+    [0, 30, 60, 90, 120, 150, 180].forEach(function(v){
+      out += '<text x="' + X(v).toFixed(1) + '" y="324" font-size="12" fill="#8a8175" text-anchor="middle">' + v + '</text>';
+    });
+    out += '<text x="470" y="352" font-size="12" fill="#8a8175" text-anchor="middle">发出交易后的分钟数</text>';
+
+    waitChart.innerHTML = out;
+  }
+
+  drawWait();
+})();
+</script>
+</body>
+</html>

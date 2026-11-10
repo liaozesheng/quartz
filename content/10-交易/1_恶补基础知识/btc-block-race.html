@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>区块竞争与链重组 · 累计工作量视角</title>
+<style>
+:root{
+  --paper:#fbf8f2;
+  --card:#fffdf8;
+  --ink:#241f18;
+  --ink-2:#4a443c;
+  --muted:#8a8175;
+  --line:#e6ddcf;
+  --line-2:#f0e8da;
+  --btc:#f7931a;
+  --btc-deep:#8a4a05;
+  --teal:#0f7f60;
+  --teal-2:#2fa37f;
+  --teal-soft:#e8f7f1;
+  --gray-fill:#f4f1ec;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);color:var(--ink);line-height:1.62;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 22px 56px}
+
+.head h1{font-size:24px;font-weight:700;letter-spacing:-.01em;margin:0 0 6px}
+.head p{margin:0;color:var(--ink-2);font-size:14px}
+.formula{
+  display:inline-block;margin-top:14px;padding:6px 12px;border-radius:8px;
+  background:#fdf3e3;border:1px solid #eddcc0;color:var(--btc-deep);
+  font-family:var(--mono);font-size:12.5px;
+}
+.formula sup{font-size:9px}
+
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:18px 0 0;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+
+.card{
+  margin-top:14px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:18px 18px 14px;
+  box-shadow:0 1px 2px rgba(70,55,30,.03);
+}
+
+.chain-scroll{overflow:hidden}
+svg.chain{width:100%;height:auto;display:block}
+svg.chain text{font-family:inherit}
+
+.blk{opacity:0;transform:translateY(9px);transition:opacity .4s ease,transform .45s cubic-bezier(.22,1,.36,1)}
+.blk.on{opacity:1;transform:translateY(0)}
+.blk .box{fill:#fdf3e3;stroke:#e0a352;stroke-width:.9;transition:fill .45s ease,stroke .45s ease}
+.blk .tt{font-size:14px;font-weight:600;fill:#241f18;transition:fill .45s ease}
+.blk .st{font-size:11.5px;fill:#8a8175;transition:fill .45s ease}
+
+.blk[data-state="main"] .box{fill:var(--teal-soft);stroke:var(--teal-2)}
+.blk[data-state="main"] .tt{fill:#0b4a3a}
+.blk[data-state="main"] .st{fill:#2c7f66}
+.blk[data-state="stale"] .box{fill:var(--gray-fill);stroke:#cfc6b8;stroke-dasharray:5 4}
+.blk[data-state="stale"] .tt{fill:#6b6459}
+.blk[data-state="stale"] .st{fill:#9a9287}
+.blk.on[data-state="stale"]{opacity:.9}
+
+@keyframes pop{
+  0%{stroke-width:.9;stroke-opacity:1}
+  35%{stroke-width:3.4;stroke-opacity:.4}
+  100%{stroke-width:.9;stroke-opacity:1}
+}
+.blk.just .box{animation:pop .95s ease-out}
+
+.slot{opacity:0;transition:opacity .4s ease}
+.slot.on{opacity:1}
+.slot .ph{fill:none;stroke:#ded2bc;stroke-width:1.2;stroke-dasharray:6 5}
+.slot .tx{font-size:12px;fill:#b3aa9b}
+@keyframes dashmove{to{stroke-dashoffset:-22}}
+.slot.on .ph{animation:dashmove 1.8s linear infinite}
+
+.conn{opacity:0;transition:opacity .45s ease,stroke .45s ease}
+.conn.on{opacity:1}
+.conn[data-state="stale"]{stroke:#ddd4c6;stroke-dasharray:5 4}
+.conn[data-state="main"]{stroke:#b9c9c0}
+
+.rowlabel{font-size:12px;fill:#9a9287;letter-spacing:.04em;transition:fill .45s ease}
+.rowlabel[data-state="main"]{fill:var(--teal)}
+.rowlabel[data-state="stale"]{fill:#b0a89b}
+
+.chain-note{margin:12px 0 2px;font-size:12.5px;color:var(--muted)}
+.board{margin-top:6px;border-top:1px dashed var(--line);padding-top:14px}
+.bhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.bhead h2{margin:0;font-size:13px;font-weight:600;color:var(--ink-2)}
+.bhead h2 span{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:400}
+.verdict{
+  font-size:12.5px;padding:4px 10px;border-radius:999px;font-family:var(--mono);
+  background:#f5f0e7;color:var(--ink-2);border:1px solid var(--line);
+  transition:background .4s,color .4s,border-color .4s;
+  white-space:nowrap;
+}
+.verdict[data-tone="main"]{background:var(--teal-soft);color:#0b6b52;border-color:#a8ddc9}
+.verdict[data-tone="warn"]{background:#fdf3e3;color:#8a4a05;border-color:#e8c9a0}
+.verdict[data-tone="reorg"]{background:var(--teal);color:#fff;border-color:var(--teal)}
+@keyframes flash{0%{transform:scale(1)}45%{transform:scale(1.07)}100%{transform:scale(1)}}
+.verdict.pulse{animation:flash .62s ease-out}
+
+.brow{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.bl{flex:0 0 62px;color:var(--ink-2);font-weight:600}
+.track{flex:1 1 auto;min-width:0;height:14px;border-radius:7px;background:#efe7d9;overflow:hidden}
+.fill{display:block;height:100%;width:0;border-radius:7px;background:#e8a44a;
+  transition:width .6s cubic-bezier(.22,1,.36,1),background-color .45s ease}
+.bv{flex:0 0 46px;text-align:right;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);
+  transition:color .45s ease}
+.brow[data-state="main"] .bv{color:var(--teal);font-weight:600}
+.brow[data-state="stale"] .bv{color:var(--muted)}
+.chip{
+  flex:0 0 auto;font-size:11.5px;padding:1px 8px;border-radius:6px;
+  background:#fdf3e3;color:#8a4a05;border:1px solid #eddcc0;
+  transition:background .45s,color .45s,border-color .45s;
+}
+.chip[data-state="main"]{background:var(--teal-soft);color:#0b6b52;border-color:#a8ddc9}
+.chip[data-state="stale"]{background:#f2efe9;color:#8a8175;border-color:#e0d8c9}
+
+.narr{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+.ntxt h3{margin:0 0 6px;font-size:15px;font-weight:600}
+.ntxt p{margin:0;font-size:13.5px;color:var(--ink-2);min-height:3.2em}
+.ctrls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+button{
+  font:inherit;font-size:13px;padding:6px 14px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--ink-2);
+  transition:border-color .2s,background .2s,color .2s,transform .1s;
+}
+button:hover:not(:disabled){border-color:#d8c9ae;background:#fffdf5}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{opacity:.4;cursor:not-allowed}
+#play{background:var(--btc);border-color:var(--btc);color:#fff;font-weight:600}
+#play:hover:not(:disabled){background:#f08a0d;border-color:#f08a0d}
+.dots{display:flex;gap:6px;margin-left:auto}
+.dot{width:9px;height:9px;padding:0;border-radius:50%;border:1px solid #d8cbb4;background:#fff;cursor:pointer}
+.dot.on{background:var(--btc);border-color:var(--btc)}
+.dot:hover{border-color:#c8b48f}
+
+.note{margin-top:22px;font-size:12.5px;color:var(--muted);border-left:2px solid #eddcc0;padding-left:12px}
+.hint{display:none;font-size:12px;color:var(--muted);margin:0 0 8px}
+
+@media (max-width:780px){
+  .wrap{padding:26px 14px 44px}
+  .head h1{font-size:20px}
+  .chain-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .chain-scroll svg.chain{min-width:700px}
+  .hint{display:block}
+  .bl{flex:0 0 56px}
+}
+@media (prefers-reduced-motion:reduce){
+  .blk,.conn,.fill,.box,.tt,.st,.chip,.verdict{transition-duration:.01ms!important}
+  .blk.just .box{animation:none}
+  .slot.on .ph{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="head">
+    <h1>区块竞争与链重组</h1>
+    <p>同一高度上出现两个块时，主链到底怎么判定 —— 用累计工作量来看</p>
+    <div class="formula">work = 2<sup>256</sup> / target(nBits)　同一窗口内 每块恒为 W</div>
+    <div class="legend">
+      <span><i style="background:#e8f7f1;border:1px solid #2fa37f"></i>当前主链</span>
+      <span><i style="background:#f4f1ec;border:1px dashed #cfc6b8"></i>孤块 / 落后分支</span>
+      <span><i style="background:#fdf3e3;border:1px solid #e0a352"></i>未定</span>
+    </div>
+  </header>
+
+  <section class="card">
+    <p class="hint">← 左右滑动查看完整链条 →</p>
+    <div class="chain-scroll">
+      <svg class="chain" viewBox="0 0 760 334" role="img" aria-label="区块竞争与链重组动画示意">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#d3c9b8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <g transform="translate(30,-16)">
+        <g>
+          <path id="fA" class="conn" data-br="a" d="M142 199 H172 V95 H192" fill="none" stroke="#d3c9b8" stroke-width="1.6" marker-end="url(#ar)"/>
+          <path id="fB" class="conn" data-br="b" d="M142 199 H172 V303 H192" fill="none" stroke="#d3c9b8" stroke-width="1.6" marker-end="url(#ar)"/>
+          <path id="cA1" class="conn" data-br="a" d="M336 95 H362" fill="none" stroke="#d3c9b8" stroke-width="1.6" marker-end="url(#ar)"/>
+          <path id="cB1" class="conn" data-br="b" d="M336 303 H362" fill="none" stroke="#d3c9b8" stroke-width="1.6" marker-end="url(#ar)"/>
+          <path id="cB2" class="conn" data-br="b" d="M506 303 H532" fill="none" stroke="#d3c9b8" stroke-width="1.6" marker-end="url(#ar)"/>
+        </g>
+
+        <g id="p" class="blk on">
+          <rect class="box" x="24" y="168" width="118" height="62" rx="11"/>
+          <text class="tt" x="83" y="191" text-anchor="middle" dominant-baseline="central">父块</text>
+          <text class="st" x="83" y="209" text-anchor="middle" dominant-baseline="central">高度 N-1</text>
+        </g>
+
+        <text id="labA" class="rowlabel" data-br="a" x="196" y="52">A 分支</text>
+        <text id="labB" class="rowlabel" data-br="b" x="196" y="260">B 分支</text>
+
+        <g id="slotA" class="slot">
+          <rect class="ph" x="196" y="64" width="140" height="62" rx="11"/>
+          <text class="tx" x="266" y="95" text-anchor="middle" dominant-baseline="central">挖矿中…</text>
+        </g>
+
+        <g id="slotB" class="slot">
+          <rect class="ph" x="196" y="272" width="140" height="62" rx="11"/>
+          <text class="tx" x="266" y="303" text-anchor="middle" dominant-baseline="central">挖矿中…</text>
+        </g>
+
+        <g id="a1" class="blk" data-br="a" data-state="pending">
+          <rect class="box" x="196" y="64" width="140" height="62" rx="11"/>
+          <text class="tt" x="266" y="87" text-anchor="middle" dominant-baseline="central">块 N</text>
+          <text class="st" x="266" y="105" text-anchor="middle" dominant-baseline="central">A 分支 · 1W</text>
+        </g>
+
+        <g id="a2" class="blk" data-br="a" data-state="pending">
+          <rect class="box" x="366" y="64" width="140" height="62" rx="11"/>
+          <text class="tt" x="436" y="87" text-anchor="middle" dominant-baseline="central">块 N+1</text>
+          <text class="st" x="436" y="105" text-anchor="middle" dominant-baseline="central">A 分支 · 1W</text>
+        </g>
+
+        <g id="b1" class="blk" data-br="b" data-state="pending">
+          <rect class="box" x="196" y="272" width="140" height="62" rx="11"/>
+          <text class="tt" x="266" y="295" text-anchor="middle" dominant-baseline="central">块 N</text>
+          <text class="st" x="266" y="313" text-anchor="middle" dominant-baseline="central">B 分支 · 1W</text>
+        </g>
+
+        <g id="b2" class="blk" data-br="b" data-state="pending">
+          <rect class="box" x="366" y="272" width="140" height="62" rx="11"/>
+          <text class="tt" x="436" y="295" text-anchor="middle" dominant-baseline="central">块 N+1</text>
+          <text class="st" x="436" y="313" text-anchor="middle" dominant-baseline="central">B 分支 · 1W</text>
+        </g>
+
+        <g id="b3" class="blk" data-br="b" data-state="pending">
+          <rect class="box" x="536" y="272" width="140" height="62" rx="11"/>
+          <text class="tt" x="606" y="295" text-anchor="middle" dominant-baseline="central">块 N+2</text>
+          <text class="st" x="606" y="313" text-anchor="middle" dominant-baseline="central">B 分支 · 1W</text>
+        </g>
+
+        </g>
+      </svg>
+    </div>
+    <p class="chain-note">同一窗口内，每个块的 work 都是同一个 W —— 与它试了多少次、运气多好完全无关。</p>
+
+    <div class="board">
+      <div class="bhead">
+        <h2>累计工作量 <span>nChainWork</span></h2>
+        <span class="verdict" id="verdict" data-tone="neutral">单块 work = W</span>
+      </div>
+      <div class="brow" data-br="a">
+        <span class="bl">A 分支</span>
+        <span class="track"><i class="fill"></i></span>
+        <span class="bv">0 W</span>
+        <span class="chip" data-state="idle">—</span>
+      </div>
+      <div class="brow" data-br="b">
+        <span class="bl">B 分支</span>
+        <span class="track"><i class="fill"></i></span>
+        <span class="bv">0 W</span>
+        <span class="chip" data-state="idle">—</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="narr">
+    <div class="ntxt">
+      <h3 id="stepTitle">准备：同高度、同 nBits</h3>
+      <p id="stepText">A 和 B 都在为高度 N 找 nonce。这个窗口内全网 nBits 相同，所以不管谁出块、试了多少次，那个块的 work 都是同一个 W。</p>
+    </div>
+    <div class="ctrls">
+      <button id="prev">上一步</button>
+      <button id="play">播放</button>
+      <button id="next">下一步</button>
+      <button id="reset">重置</button>
+      <div class="dots" id="dots"></div>
+    </div>
+  </section>
+
+  <p class="note">
+    两处容易被忽略的地方：第一，「追平」不会触发重组，规则要求累计工作量<strong>严格大于</strong>；第二，切换主链不是谁下指令，而是每个节点各自算出同一个结论，然后自己切。
+  </p>
+</div>
+
+<script>
+(function(){
+  var MAXW = 4;
+  var CHIP = {idle:'—', pending:'未定', main:'主链', stale:'孤块'};
+  var FILL = {idle:'#e8a44a', pending:'#e8a44a', main:'#2fa37f', stale:'#cfc6b8'};
+
+  var STEPS = [
+    {
+      title:'准备：同高度、同 nBits',
+      text:'A 和 B 都在为高度 N 找 nonce。这个窗口内全网 nBits 相同，所以不管谁出块、试了多少次，那个块的 work 都是同一个 W。',
+      show:['p','fA','fB','slotA','slotB'],
+      work:{a:0,b:0},
+      state:{a:'idle',b:'idle'},
+      verdict:'单块 work = W',
+      tone:'neutral'
+    },
+    {
+      title:'第一幕：双块同高度，work 完全相同',
+      text:'A 试 1 次就命中，B 试了 1 万亿次。两块都合法、都被保存 —— 但 work 都是 1W。协议看不出谁更辛苦，此刻是个平局。',
+      show:['p','fA','fB','a1','b1'],
+      work:{a:1,b:1},
+      state:{a:'pending',b:'pending'},
+      verdict:'1W = 1W　平局',
+      tone:'neutral'
+    },
+    {
+      title:'第二幕：A 先被延展',
+      text:'有人把下一块接在 A 上，A 分支累计 2W，成为主链。B 的块成为孤块：拿不到 3.125 BTC 补贴，块内交易退回内存池，与主链冲突的那些永久作废。',
+      show:['p','fA','fB','a1','b1','cA1','a2'],
+      work:{a:2,b:1},
+      state:{a:'main',b:'stale'},
+      verdict:'2W > 1W　A 成为主链',
+      tone:'main'
+    },
+    {
+      title:'第三幕：B 追平，但不切换',
+      text:'B 也挖出第 2 块，累计 2W，与 A 持平。平局不触发重组 —— 规则要求累计工作量必须严格大于，激活链保持不变。',
+      show:['p','fA','fB','a1','b1','cA1','a2','cB1','b2'],
+      work:{a:2,b:2},
+      state:{a:'main',b:'pending'},
+      verdict:'2W = 2W　平局，不切换',
+      tone:'warn'
+    },
+    {
+      title:'第四幕：严格反超，主链切回 B',
+      text:'B 再出一块，累计 3W > 2W。每个节点各自算出同一个结论，自己切换主链。A 上的交易退回内存池，已确认的确认数归零。',
+      show:['p','fA','fB','a1','b1','cA1','a2','cB1','b2','cB2','b3'],
+      work:{a:2,b:3},
+      state:{a:'stale',b:'main'},
+      verdict:'3W > 2W　触发重组',
+      tone:'reorg'
+    }
+  ];
+
+  var cur = 0;
+  var timer = null;
+  var INTERVAL = 3600;
+
+  var els = {
+    verdict: document.getElementById('verdict'),
+    title: document.getElementById('stepTitle'),
+    text: document.getElementById('stepText'),
+    prev: document.getElementById('prev'),
+    next: document.getElementById('next'),
+    play: document.getElementById('play'),
+    reset: document.getElementById('reset'),
+    dots: document.getElementById('dots')
+  };
+
+  var allNodes = Array.prototype.slice.call(document.querySelectorAll('.blk, .conn, .slot'));
+  var scroller = document.querySelector('.chain-scroll');
+  var BLOCK_IDS = ['a1','a2','b1','b2','b3'];
+
+  function keepInView(show){
+    if(!scroller || scroller.scrollWidth <= scroller.clientWidth + 1) return;
+    var shown = show.filter(function(id){ return BLOCK_IDS.indexOf(id) !== -1; });
+    if(!shown.length) return;
+    var el = document.getElementById(shown[shown.length - 1]);
+    if(!el) return;
+    var r = el.getBoundingClientRect();
+    var cr = scroller.getBoundingClientRect();
+    if(r.right > cr.right - 10){
+      scroller.scrollLeft = scroller.scrollLeft + (r.right - cr.right) + 26;
+    } else if(r.left < cr.left - 10){
+      scroller.scrollLeft = scroller.scrollLeft - (cr.left - r.left) - 26;
+    }
+  }
+
+  els.dots.innerHTML = STEPS.map(function(_, i){
+    return '<button class="dot" data-i="' + i + '" aria-label="第 ' + (i+1) + ' 步"></button>';
+  }).join('');
+  var dotNodes = Array.prototype.slice.call(els.dots.querySelectorAll('.dot'));
+
+  function retrigger(el, cls){
+    el.classList.remove(cls);
+    void el.getBoundingClientRect();
+    el.classList.add(cls);
+    window.setTimeout(function(){ el.classList.remove(cls); }, 1100);
+  }
+
+  function render(i){
+    var s = STEPS[i];
+    var prevShow = i > 0 ? STEPS[i-1].show : [];
+
+    allNodes.forEach(function(el){
+      var on = s.show.indexOf(el.id) !== -1;
+      var was = prevShow.indexOf(el.id) !== -1;
+      el.classList.toggle('on', on);
+      if(on && !was && el.classList.contains('blk')) retrigger(el, 'just');
+    });
+
+    ['a','b'].forEach(function(br){
+      var st = s.state[br];
+      Array.prototype.slice.call(document.querySelectorAll('[data-br="' + br + '"]')).forEach(function(el){
+        el.setAttribute('data-state', st);
+      });
+      ['labA','labB'].forEach(function(id){
+        var lab = document.getElementById(id);
+        if(lab && lab.getAttribute('data-br') === br) lab.setAttribute('data-state', st);
+      });
+
+      var row = document.querySelector('.brow[data-br="' + br + '"]');
+      if(row){
+        var w = s.work[br];
+        var fill = row.querySelector('.fill');
+        fill.style.width = (w / MAXW * 100) + '%';
+        fill.style.backgroundColor = FILL[st] || FILL.pending;
+        row.querySelector('.bv').textContent = w + ' W';
+        var chip = row.querySelector('.chip');
+        chip.textContent = CHIP[st] || '—';
+        chip.setAttribute('data-state', st);
+      }
+    });
+
+    els.verdict.textContent = s.verdict;
+    els.verdict.setAttribute('data-tone', s.tone);
+    if(s.tone === 'reorg') retrigger(els.verdict, 'pulse');
+
+    els.title.textContent = s.title;
+    els.text.textContent = s.text;
+
+    dotNodes.forEach(function(d, k){ d.classList.toggle('on', k === i); });
+
+    els.prev.disabled = (i === 0);
+    els.next.disabled = (i === STEPS.length - 1);
+
+    keepInView(s.show);
+  }
+
+  function goto(i){
+    cur = Math.max(0, Math.min(STEPS.length - 1, i));
+    render(cur);
+    if(cur === 0 && scroller) scroller.scrollLeft = 0;
+  }
+
+  function stopPlay(){
+    if(timer){ window.clearInterval(timer); timer = null; }
+    els.play.textContent = '播放';
+  }
+
+  function startPlay(){
+    if(timer) return;
+    if(cur >= STEPS.length - 1) goto(0);
+    els.play.textContent = '暂停';
+    timer = window.setInterval(function(){
+      if(cur >= STEPS.length - 1){ stopPlay(); return; }
+      goto(cur + 1);
+    }, INTERVAL);
+  }
+
+  els.next.addEventListener('click', function(){ stopPlay(); goto(cur + 1); });
+  els.prev.addEventListener('click', function(){ stopPlay(); goto(cur - 1); });
+  els.reset.addEventListener('click', function(){ stopPlay(); goto(0); });
+  els.play.addEventListener('click', function(){ timer ? stopPlay() : startPlay(); });
+
+  els.dots.addEventListener('click', function(e){
+    var t = e.target;
+    if(!t.classList.contains('dot')) return;
+    stopPlay();
+    goto(parseInt(t.getAttribute('data-i'), 10));
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight'){ stopPlay(); goto(cur + 1); }
+    if(e.key === 'ArrowLeft'){ stopPlay(); goto(cur - 1); }
+  });
+
+  render(0);
+})();
+</script>
+</body>
+</html>

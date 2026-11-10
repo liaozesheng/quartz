@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>安全预算 · 能被算出来的那一半</title>
+<style>
+:root{
+  --paper:#fbf8f2;
+  --card:#fffdf8;
+  --ink:#241f18;
+  --ink-2:#4a443c;
+  --muted:#8a8175;
+  --line:#e6ddcf;
+  --line-2:#f0e8da;
+  --btc:#f7931a;
+  --btc-deep:#8a4a05;
+  --teal:#0f7f60;
+  --teal-2:#2fa37f;
+  --teal-soft:#e8f7f1;
+  --red:#c0392b;
+  --red-soft:#fdeeec;
+  --amber:#b8791a;
+  --amber-soft:#fdf4e3;
+  --violet:#6d28d9;
+  --violet-soft:#f3ecff;
+  --gray-fill:#f4f1ec;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);color:var(--ink);line-height:1.62;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:40px 22px 56px}
+
+.head .kicker{margin:0 0 8px;font-size:12px;letter-spacing:.12em;color:var(--btc);font-weight:600}
+.head h1{font-size:27px;font-weight:700;letter-spacing:-.02em;margin:0 0 10px}
+.head p{margin:0;color:var(--ink-2);font-size:14.5px;max-width:72ch}
+.head p+p{margin-top:9px}
+
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:20px 0 0;padding:12px 16px;
+  background:#fffdf8;border:1px solid var(--line);border-radius:12px}
+.legend .it{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+.dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+.dot.r{background:var(--teal)}
+.dot.m{background:var(--btc)}
+.dot.a{background:#b4b2a9}
+
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
+.toc a{
+  font-size:12.5px;padding:5px 12px;border-radius:999px;text-decoration:none;
+  background:#fff;border:1px solid var(--line);color:var(--ink-2);
+  transition:border-color .2s,background .2s,color .2s;
+  font-family:var(--mono);
+}
+.toc a:hover{border-color:#d8c9ae;background:#fffdf5;color:var(--btc-deep)}
+
+section{margin-top:46px;scroll-margin-top:20px}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.sec-head .num{
+  font-family:var(--mono);font-size:12px;color:#fff;background:var(--btc);
+  padding:2px 8px;border-radius:6px;letter-spacing:.04em;
+}
+.sec-head h2{margin:0;font-size:19.5px;font-weight:700;letter-spacing:-.01em}
+.badge{
+  font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:999px;
+  letter-spacing:.02em;white-space:nowrap;
+}
+.badge.r{background:var(--teal-soft);color:var(--teal);border:1px solid #bfe6d7}
+.badge.m{background:var(--amber-soft);color:var(--amber);border:1px solid #f0dcb4}
+.badge.a{background:var(--gray-fill);color:var(--muted);border:1px solid var(--line)}
+.lead{margin:0 0 4px;color:var(--ink-2);font-size:14px;max-width:76ch}
+.lead b{color:var(--ink)}
+
+.card{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:20px 20px 18px;
+  box-shadow:0 1px 2px rgba(70,55,30,.03);
+}
+.card h3{margin:0 0 3px;font-size:14.5px;font-weight:600}
+.card .sub{margin:0 0 14px;font-size:12.5px;color:var(--muted);line-height:1.55}
+svg.chart{width:100%;height:auto;display:block}
+.chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.chart-scroll svg.chart{min-width:100%}
+.chart-hint{display:none;margin:8px 0 0;font-size:11.5px;color:var(--muted);text-align:center}
+svg.chart text{font-family:inherit}
+
+.formula{
+  font-family:var(--mono);font-size:13px;line-height:2;
+  background:#faf6ee;border:1px solid var(--line-2);border-left:3px solid var(--btc);
+  border-radius:8px;padding:12px 16px;margin:14px 0;
+  overflow-x:auto;white-space:nowrap;color:var(--ink-2);
+}
+.formula b{color:var(--btc-deep);font-weight:700}
+.formula .v{color:var(--teal);font-weight:600}
+.formula .u{color:var(--violet);font-weight:600}
+
+.tbl-wrap{overflow-x:auto;margin-top:14px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line-2)}
+th{font-weight:600;font-size:12px;color:var(--muted);background:#faf6ee;white-space:nowrap}
+td{color:var(--ink-2)}
+td:first-child{white-space:nowrap}
+td.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+td.hl{font-weight:700;color:var(--ink)}
+tr:last-child td{border-bottom:0}
+tr.pick td{background:#fffaf0}
+tbody tr{cursor:pointer;transition:background .16s}
+tbody tr:hover td{background:#fffdf7}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.stat{background:var(--gray-fill);border-radius:11px;padding:11px 13px}
+.stat .k{font-size:11.5px;color:var(--muted);margin:0 0 3px}
+.stat .v{font-size:17px;font-weight:700;margin:0;font-family:var(--mono);letter-spacing:-.02em}
+.stat .v small{font-size:11px;font-weight:400;color:var(--muted);margin-left:3px;font-family:inherit}
+.stat.hi{background:var(--teal-soft)}
+.stat.hi .v{color:var(--teal)}
+.stat.warn{background:var(--amber-soft)}
+.stat.warn .v{color:var(--amber)}
+.stat.bad{background:var(--red-soft)}
+.stat.bad .v{color:var(--red)}
+
+.sl{margin-top:18px}
+.sl+.sl{margin-top:16px}
+.sl .lab{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;color:var(--ink-2);margin-bottom:6px}
+.sl .lab b{font-family:var(--mono);font-weight:700;color:var(--btc-deep);font-size:13.5px}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;
+  background:linear-gradient(90deg,#f7931a 0%,#f7931a var(--p,50%),#efe6d6 var(--p,50%),#efe6d6 100%);
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:17px;height:17px;border-radius:50%;
+  background:#fff;border:2.5px solid var(--btc);cursor:pointer;
+  box-shadow:0 1px 3px rgba(120,80,20,.22);
+}
+input[type=range]::-moz-range-thumb{
+  width:17px;height:17px;border-radius:50%;background:#fff;border:2.5px solid var(--btc);
+  cursor:pointer;box-shadow:0 1px 3px rgba(120,80,20,.22);
+}
+.ticks{display:flex;justify-content:space-between;font-size:10.5px;color:#b0a696;font-family:var(--mono);margin-top:4px}
+
+.verdict{
+  margin-top:14px;border-radius:11px;padding:12px 15px;font-size:13px;line-height:1.6;
+  background:var(--teal-soft);border:1px solid #bfe6d7;color:#0a5c46;
+}
+.verdict.warn{background:var(--amber-soft);border-color:#f0dcb4;color:#7a4e08}
+.verdict.bad{background:var(--red-soft);border-color:#f2c9c3;color:#8f2a1e}
+.verdict b{font-weight:700}
+
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.panel{border-radius:13px;padding:15px 17px}
+.panel.yes{background:var(--teal-soft);border:1px solid #bfe6d7}
+.panel.no{background:var(--amber-soft);border:1px solid #f0dcb4}
+.panel h4{margin:0 0 8px;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:7px}
+.panel.yes h4{color:#0a5c46}
+.panel.no h4{color:#7a4e08}
+.panel ul{margin:0;padding-left:17px;font-size:12.5px;line-height:1.75;color:var(--ink-2)}
+.panel li{margin-bottom:4px}
+.panel li:last-child{margin-bottom:0}
+.panel code{font-family:var(--mono);font-size:11.5px;background:rgba(255,255,255,.66);padding:1px 5px;border-radius:4px}
+
+.caveats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+.cav{background:#fdf8ef;border:1px solid #efe0c8;border-radius:12px;padding:13px 15px}
+.cav h4{margin:0 0 5px;font-size:12.5px;font-weight:600;color:var(--btc-deep)}
+.cav p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+
+footer{margin-top:52px;padding-top:18px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted);line-height:1.7}
+footer b{color:var(--ink-2);font-weight:600}
+
+@media (max-width:760px){
+  .wrap{padding:28px 16px 44px}
+  .head h1{font-size:22px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two{grid-template-columns:1fr}
+  .caveats{grid-template-columns:1fr}
+  .formula{white-space:normal;font-size:12px;line-height:1.9}
+  .legend{gap:10px;padding:11px 13px}
+  .chart-scroll svg.chart{min-width:620px}
+  .chart-hint{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="head">
+  <p class="kicker">比特币的数学边界</p>
+  <h1>安全预算 · 能被算出来的那一半</h1>
+  <p>比特币的安全性由两个因子相乘：一个写死在协议规则里，一个由市场定价。前者可以精确推到 2140 年，一位不差；后者没人能预测，包括中本聪。把两者混在一起谈，就会得出互相矛盾的结论。</p>
+  <p>这一页把两个因子拆开，让每一行数字都能追到它的来源。<b>凡是绿色的，任何人都能独立复算；凡是琥珀色的，都只是当下的市场读数。</b></p>
+
+  <div class="legend">
+    <span class="it"><span class="dot r"></span>规则锁定 · 可独立复算</span>
+    <span class="it"><span class="dot m"></span>市场变量 · 当下读数</span>
+    <span class="it"><span class="dot a"></span>情景假设 · 非预测</span>
+  </div>
+
+  <nav class="toc">
+    <a href="#s1">01 供给</a>
+    <a href="#s2">02 安全预算</a>
+    <a href="#s3">03 攻击成本</a>
+    <a href="#s4">04 q 值</a>
+    <a href="#s5">05 三道门槛</a>
+    <a href="#s6">06 历史检验</a>
+    <a href="#s7">07 确定性边界</a>
+  </nav>
+</header>
+
+<section id="s1">
+  <div class="sec-head">
+    <span class="num">01</span>
+    <h2>供给：一条几何级数</h2>
+    <span class="badge r">绿色 · 规则锁定</span>
+  </div>
+  <p class="lead">2100 万这个数字不是拍脑袋定的，是一条<b>收敛的等比数列</b>算出来的。每 210,000 块补贴减半，初始 50 BTC，所以总量是：</p>
+
+  <div class="formula">
+    <b>Σ</b> = 210,000 × 50 × (1 + ½ + ¼ + ⅛ + …) = 210,000 × 50 × 2 = <span class="v">21,000,000</span>
+  </div>
+
+  <p class="lead">等比数列求和，公比 ½，极限就是 2 倍。所以总量 <b>21,000,000 BTC</b> 是这条公式的推论，不是外部设定。实际发行量会略微低于这个数，因为最后一个聪永远除不尽。</p>
+
+  <div class="card">
+    <h3>减半时间表 · 全部九个周期</h3>
+    <p class="sub">点击任意一行查看该周期详情。年产出按 144 块/天 × 365.25 天 = 52,596 块/年计算。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>周期</th><th>块高度区间</th><th>时间</th>
+            <th class="num">每块补贴</th><th class="num">年产出 BTC</th><th class="num">期末累计</th>
+          </tr>
+        </thead>
+        <tbody id="halfBody"></tbody>
+      </table>
+    </div>
+    <div class="stats" id="halfStats"></div>
+  </div>
+
+  <div class="card">
+    <h3>补贴按对数刻度衰减</h3>
+    <p class="sub">九级台阶，每一级正好是上一级的一半。纵轴取对数，所以视觉上是等距下降。</p>
+    <div class="chart-scroll"><svg class="chart" id="stepChart" viewBox="0 0 900 230" role="img" aria-label="补贴阶梯图：从每个区块 50 BTC 逐级减半至 0.195 BTC，共九级"></svg></div>
+    <p class="chart-hint">← 左右滑动可查看完整图表 →</p>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="sec-head">
+    <span class="num">02</span>
+    <h2>安全预算：一个乘法式</h2>
+    <span class="badge r">绿色</span>
+    <span class="badge m">琥珀色</span>
+  </div>
+  <p class="lead">矿工为什么愿意烧电保护这条链？因为收入。而这份收入，就是攻击者必须跨过的门槛。把它写成式子：</p>
+
+  <div class="formula">
+    <b>B</b> = <span class="v">52,596</span> × (<span class="v">补贴</span> + <span class="v">手续费</span>) × <span class="u">币价</span>
+  </div>
+  <p class="lead">三个因子，性质完全不同：<b>52,596 和补贴是常量</b>（协议写死），<b>币价是市场变量</b>（无人能预测）。中间的手续费介于两者之间：它由区块空间的需求决定，但需求量本身受协议规则约束。</p>
+
+  <div class="card">
+    <h3>安全预算计算器</h3>
+    <p class="sub">拖动三个滑块，实时看安全预算、攻击成本、以及它占市值的比例如何变化。默认值取 2026 年 11 月的真实读数。</p>
+
+    <div class="sl">
+      <div class="lab"><span>BTC 币价</span><b id="vPrice">$80,000</b></div>
+      <input type="range" id="sPrice" min="0" max="100" value="30.1" step="0.1" aria-label="比特币价格">
+      <div class="ticks"><span>$20K</span><span>$63K</span><span>$200K</span><span>$632K</span><span>$2M</span></div>
+    </div>
+
+    <div class="sl">
+      <div class="lab"><span>手续费占矿工收入比例</span><b id="vFee">0.69%</b></div>
+      <input type="range" id="sFee" min="0" max="100" value="10.7" step="0.1" aria-label="手续费占比">
+      <div class="ticks"><span>0%</span><span>15%</span><span>35%</span><span>60%</span></div>
+    </div>
+
+    <div class="sl">
+      <div class="lab"><span>目标确认数</span><b id="vConf">6 确认</b></div>
+      <input type="range" id="sConf" min="0" max="144" value="6" step="1" aria-label="确认数">
+      <div class="ticks"><span>0</span><span>36</span><span>72</span><span>108</span><span>144（1 天）</span></div>
+    </div>
+
+    <div class="stats" id="calcStats"></div>
+    <div class="verdict" id="calcVerdict"></div>
+  </div>
+
+  <div class="formula">
+    <span class="v">B</span> = 52,596 × 3.125 BTC × $80,000 ÷ (1 − 0.0069) ≈ <b>$132.4 亿 / 年</b>
+  </div>
+  <p class="lead">这就是 2026 年 11 月的真实安全预算。作为对照：同期全网矿工日均收入约 3,500–3,900 万美元，年化 128–142 亿，落在同一区间，公式对得上。</p>
+</section>
+
+<section id="s3">
+  <div class="sec-head">
+    <span class="num">03</span>
+    <h2>攻击成本：安全预算的时间切片</h2>
+    <span class="badge r">绿色 · 规则锁定</span>
+  </div>
+  <p class="lead">这里有一个长期被说错的点：<b>双花攻击不需要"持有 51% 算力"。</b>你只需要在一个时间窗口内，让私链的累计 work 超过主链。所以正确的算法是：</p>
+
+  <div class="formula">
+    <b>C</b> = <span class="v">H</span> × <span class="u">T</span> × <span class="u">c</span> = <b>B</b> × (<span class="u">T</span> ÷ 1 年)
+  </div>
+  <p class="lead">H 是主链算力，T 是目标确认窗口，c 是单位算力成本。而在完全竞争下，矿工利润被压到接近零，所以 <code>H × c × 1年 ≈ B</code>。代进去就得到右边那个式子：</p>
+
+  <div class="formula">
+    <b>攻击成本 ≈ 安全预算 × (确认数 × 10 分钟 ÷ 525,960 分钟)</b>
+  </div>
+  <p class="lead">这个式子很干净，因为它说明了一件事：<b>攻击成本不是一个独立的量，它就是安全预算的一个比例切片。</b>你想知道攻击 6 个确认要多少钱，不需要知道算力、难度、矿机型号，只需要知道安全预算。</p>
+
+  <div class="card">
+    <h3>按当前安全预算换算</h3>
+    <p class="sub">安全预算取 $132.4 亿/年，即 2026 年 11 月读数。这是"用与主链等量算力正面竞速"的成本上限。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>目标</th><th>时间窗口</th><th class="num">攻击成本</th><th>相当于</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>0 确认</td><td>内存池</td><td class="num">≈ 0</td><td>可直接 RBF 替换，无需算力</td></tr>
+          <tr><td>1 确认</td><td>10 分钟</td><td class="num">$25.2 万</td><td>一辆豪车</td></tr>
+          <tr><td>3 确认</td><td>30 分钟</td><td class="num">$75.5 万</td><td>一线城市一套小户型首付</td></tr>
+          <tr><td class="hl">6 确认</td><td>60 分钟</td><td class="num hl">$151 万</td><td>行业惯例的默认值</td></tr>
+          <tr><td>12 确认</td><td>2 小时</td><td class="num">$302 万</td><td>交易所大额提现常见门槛</td></tr>
+          <tr><td>72 确认</td><td>12 小时</td><td class="num">$1,812 万</td><td>接近一次中型并购的对价</td></tr>
+          <tr><td>144 确认</td><td>1 天</td><td class="num">$3,625 万</td><td>超过多数上市公司的年利润</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="caveats">
+    <div class="cav">
+      <h4>这是上限，不是下限</h4>
+      <p>如果攻击者提前私挖若干块，成本可以降到 1/2 甚至 1/3。白皮书算过：预挖 6 块后，只需约 25% 算力就能长期维持领先。</p>
+    </div>
+    <div class="cav">
+      <h4>真正的瓶颈不是钱</h4>
+      <p>想租到 1000 EH/s，市场根本没有这么多现货。全球矿机产能有限，订单排几个季度。物理可得性才是十几年没出事的主因。</p>
+    </div>
+    <div class="cav">
+      <h4>攻击收益得另算</h4>
+      <p>成本不等于收益。还要比较"能撤回多少钱"，并扣掉砸盘损失、交易所风控延迟、以及只能干一次的机会成本。</p>
+    </div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="sec-head">
+    <span class="num">04</span>
+    <h2>q 值：一个非对称的除法</h2>
+    <span class="badge m">琥珀色 · 市场变量</span>
+  </div>
+  <p class="lead">双花成功概率只取决于一个数：<b>q = 攻击者算力 ÷ 全网算力</b>。所以关键问题从来不是"全网有多少算力"，而是这个<b>比值</b>怎么变。</p>
+  <p class="lead">而它是不对称的。诚实矿工算的是"挖矿收益 vs 电费"，币价跌破关机价就停机；攻击者算的是"双花收益 vs 算力成本"，只要能骗到钱，全网算力跌反而是好消息。<b>两本不同的账，所以缩水绝不会等比例。</b></p>
+
+  <div class="card">
+    <h3>攻击者投入固定时，q 值如何爬升</h3>
+    <p class="sub">这里假设攻击者始终投入 <b id="vAtk">50</b> EH/s 不变，诚实算力随币价同比下降（安全预算 ∝ 币价 ∝ 算力）。</p>
+
+    <div class="sl">
+      <div class="lab"><span>攻击者投入算力</span><b id="vAtkLbl">50 EH/s</b></div>
+      <input type="range" id="sAtk" min="10" max="400" value="50" step="5" aria-label="攻击者算力">
+      <div class="ticks"><span>10</span><span>100</span><span>200</span><span>300</span><span>400 EH/s</span></div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:16px;margin:16px 0 0;font-size:12px;color:var(--ink-2)">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:0;border-top:2.5px solid #378add"></span>诚实算力（EH/s，左轴）</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:16px;height:0;border-top:2.5px dashed #c0392b"></span>攻击者占比 q（%，右轴）</span>
+    </div>
+
+    <div class="chart-scroll"><svg class="chart" id="qChart" viewBox="0 0 900 300" role="img" aria-label="双轴折线图：随币价下跌诚实算力下降，攻击者占比 q 上升" style="margin-top:14px"></svg></div>
+    <p class="chart-hint">← 左右滑动可查看完整图表 →</p>
+
+    <div class="stats" id="qStats"></div>
+    <div class="verdict" id="qVerdict"></div>
+  </div>
+
+  <p class="lead">这里有个必须分清的地方：<b>q 上升会提高双花成功率，但攻击者依然要付出成本。</b>图里那条红线爬到 45% 时，攻击者已经投入了接近全网一半的算力，这笔钱远比挖矿收益贵。真正让攻击变得划算，得靠下面两个条件同时成立：</p>
+
+  <div class="two">
+    <div class="panel no">
+      <h4>条件一 · 攻击目标是美元计价</h4>
+      <ul>
+        <li>币价跌 → 攻击成本跌</li>
+        <li>若目标是稳定币或法币出金，收益不跌</li>
+        <li>比值以<code>跌幅的平方</code>恶化</li>
+      </ul>
+    </div>
+    <div class="panel no">
+      <h4>条件二 · 算力被永久分流</h4>
+      <ul>
+        <li>关机只是暂停，矿机还在，要买仍得付市价</li>
+        <li>2026 年矿企把机房转去做 AI，属于<code>不可逆流失</code></li>
+        <li>物理门槛真下降，才轮到算经济账</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="sec-head">
+    <span class="num">05</span>
+    <h2>三道门槛：×2 / ×2.25 / ×4</h2>
+    <span class="badge a">情景假设</span>
+  </div>
+  <p class="lead">如果币价每 4 年翻一倍，补贴每 4 年减半，两者相乘正好相抵，<b>美元计价的补贴收入恒定</b>。这个算术完全正确。</p>
+  <p class="lead">但"×2"守的东西比想象中少。取决于你想守住哪一层，门槛逐级变严：</p>
+
+  <div class="card">
+    <h3>三档目标的年化要求</h3>
+    <p class="sub">年化按 4 年复利折算：倍数^(1/4) − 1。通胀档假设美元长期通胀 3%。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>你想守住什么</th><th class="num">4 年倍数</th><th class="num">年化</th><th>含义</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>攻击的绝对美元成本不变</td><td class="num">×2</td><td class="num">18.9%</td><td>最宽松的一档，只对冲减半</td></tr>
+          <tr><td>安全预算的购买力不变</td><td class="num">×2.25</td><td class="num">22.5%</td><td>再扣掉 3% 通胀侵蚀</td></tr>
+          <tr><td class="hl">安全预算 ÷ 市值不变</td><td class="num hl">×4</td><td class="num hl">41.4%</td><td>维持相对保护强度，最严格</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="lead">第三档的道理很直白：<b>币价翻倍时，你要保护的资产也翻倍了，但保安费只是"没有缩水"。</b>等于保护的钱没变多，被保护的东西大了一倍。</p>
+
+  <div class="formula">
+    2026 年：$132.4 亿 ÷ <span class="u">1.61 万亿市值</span> = <span class="v">0.823%</span><br>
+    2040 年：$132.4 亿 ÷ <span class="u">26.8 万亿市值</span> = <span class="v">0.049%</span> 　→ 跌了 <b>16.8 倍</b>
+  </div>
+  <p class="lead">这里 2040 年按币价 128 万美元算（即 16 年翻四次，正好兑现"每 4 年翻倍"）。此时补贴的美元收入确实没变，但市值涨了 16.8 倍，<b>安全预算占市值的比例就跌了 16.8 倍。</b></p>
+
+  <div class="verdict warn">
+    <b>一句话记住：</b>币价每 4 年翻倍，只能保证"攻击的价格不下降"。要保证"安全性不下降"，得翻 4 倍。
+  </div>
+</section>
+
+<section id="s6">
+  <div class="sec-head">
+    <span class="num">06</span>
+    <h2>历史检验：倍数在递减</h2>
+    <span class="badge m">琥珀色 · 市场读数</span>
+  </div>
+  <p class="lead">"每 4 年翻倍"听起来不难，因为历史上从来不难，难的是它正在变得越来越难。这是历次减半周期的实际币价倍数：</p>
+
+  <div class="card">
+    <h3>减半周期的币价倍数</h3>
+    <p class="sub">取每次减半当日的收盘价计算。最后一根灰色柱是"要抵消减半所需的倍数"，不是实际值。</p>
+    <div class="chart-scroll"><svg class="chart" id="ratioChart" viewBox="0 0 900 260" role="img" aria-label="柱状图：各周期币价倍数 52.6、13.4、7.4，逐级递减，当前周期仅需 2.0 倍"></svg></div>
+    <p class="chart-hint">← 左右滑动可查看完整图表 →</p>
+    <div class="stats">
+      <div class="stat"><div class="k">2012 → 2016</div><div class="v">×52.6</div></div>
+      <div class="stat"><div class="k">2016 → 2020</div><div class="v">×13.4</div></div>
+      <div class="stat"><div class="k">2020 → 2024</div><div class="v">×7.4</div></div>
+      <div class="stat warn"><div class="k">2024 → 2028 所需</div><div class="v">×2.0</div></div>
+    </div>
+  </div>
+
+  <p class="lead">原因不神秘：<b>市值基数变大了，翻一倍需要的增量资金是几何级增长的。</b>2012 年翻 52 倍只需要几十亿美元流入，现在翻 2 倍需要上万亿。</p>
+
+  <div class="formula">
+    2024-04 减半时 ≈ $64,000　→　<span class="u">2026-11 现价 ≈ $80,000</span>　→　2028-04 需 <span class="v">$128,000</span>
+  </div>
+  <p class="lead">这一周期已经走过 2.5 年，只涨了 25%。要在剩下的 17 个月里涨到 12.8 万，还需要再涨 <b>60%</b>。<b>这是"每 4 年翻倍"这个假设的第一个实时考验点，时间就在 2028 年 4 月。</b></p>
+
+  <div class="caveats">
+    <div class="cav">
+      <h4>历史三次都远超门槛</h4>
+      <p>52.6×、13.4×、7.4× 全部大幅超过 4×。这就是比特币过去十几年"越来越安全"的真正来源：保安费跑赢了资产增值。</p>
+    </div>
+    <div class="cav">
+      <h4>手续费是唯一补位者</h4>
+      <p>若倍数掉到 2× 而门槛需要 4×，中间两倍缺口只能靠手续费填。而手续费现在只占矿工收入 0.69%，2021 和 2024 都是 6%。</p>
+    </div>
+    <div class="cav">
+      <h4>它证明过能长起来</h4>
+      <p>2024 年减半那个块，因为 Ordinals 抢区块空间，手续费一度<b>超过</b> 3.125 BTC 的补贴。市场能长起来，只是现在萎了。</p>
+    </div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="sec-head">
+    <span class="num">07</span>
+    <h2>确定性边界：哪一半能算</h2>
+    <span class="badge r">绿色</span>
+    <span class="badge m">琥珀色</span>
+  </div>
+  <p class="lead">这一页的所有内容，可以干净地切成两栏。左边是数学，右边是赌注。</p>
+
+  <div class="two">
+    <div class="panel yes">
+      <h4><span class="dot r"></span>算得出来的（规则锁定）</h4>
+      <ul>
+        <li>总量 2100 万：<code>210000×50×2</code></li>
+        <li>每年 52,596 个块：<code>144×365.25</code></li>
+        <li>2040 年每块 0.1953125 BTC</li>
+        <li>2052 年每块 0.048828125 BTC</li>
+        <li>2140 年补贴归零，存量 2099 万</li>
+        <li>任意高度上 <code>nBits</code> 是父块的确定性函数</li>
+        <li>难度每 2016 块调整一次，单次限幅 [¼, 4]</li>
+        <li>攻击成本 = 安全预算 × 时间比例</li>
+        <li>q 值决定双花概率，公式见白皮书</li>
+      </ul>
+    </div>
+    <div class="panel no">
+      <h4><span class="dot m"></span>算不出来的（市场定价）</h4>
+      <ul>
+        <li>2040 年币价是多少</li>
+        <li>手续费占比是 0.7% 还是 40%</li>
+        <li>有多少矿机被 AI 永久分流</li>
+        <li>下一个周期是涨 2 倍还是 8 倍</li>
+        <li>是否有人愿意为攻击付出 $151 万</li>
+        <li>监管会不会改变链上结算需求</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:18px">这个划分之所以重要，是因为两边常被混着用，然后得出互相矛盾的结论：</p>
+
+  <div class="two">
+    <div class="panel no">
+      <h4>「比特币 2140 年就死了」</h4>
+      <ul>
+        <li>用<b>确定性</b>的补贴归零，去推<b>不确定性</b>的矿工退出</li>
+        <li>忽略了难度调整这条负反馈</li>
+        <li>忽略了手续费这个补位项</li>
+      </ul>
+    </div>
+    <div class="panel no">
+      <h4>「比特币永远安全」</h4>
+      <ul>
+        <li>用<b>当下</b>的安全预算，去保证<b>未来</b>的安全性</li>
+        <li>忽略了补贴每 4 年砍半</li>
+        <li>把"现在打不起"当成"以后也打不起"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:22px">
+    <h3>把它压缩成一句</h3>
+    <p class="sub" style="margin-bottom:10px">如果只记一件事，记这个。</p>
+    <div class="formula" style="margin:0;white-space:normal;line-height:1.95">
+      减半是确定的，<b>币价是概率的</b>。<br>
+      安全预算 = 确定的供给 × 概率的价格。<br>
+      所以比特币的安全性，<b>永远是一个关于价格的命题，而不是关于密码学的命题。</b>
+    </div>
+    <p class="sub" style="margin:12px 0 0">这也是为什么它给的是"攻击不划算"，而不是"攻击不可能"。前者是经济学，随时间变化；后者才是密码学，才是常数。</p>
+  </div>
+</section>
+
+<footer>
+  <b>数据来源与口径</b><br>
+  供给与减半：协议规则，块高度为 210,000 的整数倍；年产出按 144 块/天 × 365.25 天 = 52,596 块折算。<br>
+  全网算力（2026-11）：约 1,069 EH/s 七日均值；峰值 2025-11 约 1,110 EH/s；2026-07 见底 879 EH/s。来源 Hashrate Index、mempool.space。<br>
+  矿工收入：2026 年 10 月约 12.15 亿美元/月，日均约 3,920 万美元；手续费占比 0.69%。来源 Luxor Hashrate Index。<br>
+  当前价格与市值：约 $80,000，流通量约 2,011 万枚。<br>
+  <b>免责：</b>页面中的 2028 年及以后币价为情景假设，不是预测；2040 年相关推算仅用于展示公式的敏感度，不构成任何投资判断。
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var BLOCKS_PER_YEAR = 144 * 365.25;
+  var MIN_PER_YEAR = 365.25 * 1440;
+  var SUBS = [50, 25, 12.5, 6.25, 3.125, 1.5625, 0.78125, 0.390625, 0.1953125];
+  var TIMES = ['2009-01 → 2012-11','2012-11 → 2016-07','2016-07 → 2020-05','2020-05 → 2024-04',
+               '2024-04 → 2028-04','2028-04 → 2032','2032 → 2036','2036 → 2040','2040 → 2044'];
+
+  function fmt(n, d){
+    var s = n.toFixed(d === undefined ? 0 : d);
+    var parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  }
+
+  var rows = [], cum = 0;
+  for(var i = 0; i < SUBS.length; i++){
+    var h0 = i * 210000, h1 = h0 + 209999;
+    cum += 210000 * SUBS[i];
+    rows.push({
+      n: i + 1,
+      range: fmt(h0) + ' – ' + fmt(h1),
+      time: TIMES[i],
+      sub: SUBS[i],
+      yearly: BLOCKS_PER_YEAR * SUBS[i],
+      cum: cum
+    });
+  }
+
+  var body = document.getElementById('halfBody');
+  var html = '';
+  for(var j = 0; j < rows.length; j++){
+    var r = rows[j];
+    html += '<tr data-i="' + j + '">' +
+      '<td>' + (r.n === 5 ? '<b>5 · 进行中</b>' : r.n) + '</td>' +
+      '<td class="num" style="text-align:left">' + r.range + '</td>' +
+      '<td style="font-size:12px;color:#8a8175">' + r.time + '</td>' +
+      '<td class="num">' + r.sub + '</td>' +
+      '<td class="num">' + fmt(r.yearly) + '</td>' +
+      '<td class="num">' + fmt(r.cum, r.cum % 1 ? 2 : 0) + '</td>' +
+      '</tr>';
+  }
+  body.innerHTML = html;
+
+  var statsEl = document.getElementById('halfStats');
+  function showRow(j){
+    var r = rows[j];
+    body.querySelectorAll('tr').forEach(function(tr){ tr.classList.remove('pick'); });
+    body.querySelectorAll('tr')[j].classList.add('pick');
+    var priceRef = [12.35, 650, 8700, 64000, 80000, null, null, null, null][j];
+    statsEl.innerHTML =
+      '<div class="stat"><div class="k">周期补贴</div><div class="v">' + r.sub + '<small>BTC/块</small></div></div>' +
+      '<div class="stat"><div class="k">年新增</div><div class="v">' + fmt(r.yearly) + '<small>BTC</small></div></div>' +
+      '<div class="stat"><div class="k">期末累计存量</div><div class="v">' + fmt(r.cum, r.cum % 1 ? 2 : 0) + '</div></div>' +
+      (priceRef
+        ? '<div class="stat hi"><div class="k">按减半日币价折算</div><div class="v">$' + fmt(Math.round(r.yearly * priceRef / 1e8 * 10) / 10) + '<small>亿/年</small></div></div>'
+        : '<div class="stat warn"><div class="k">补贴的美元价值</div><div class="v">取决于币价</div></div>');
+  }
+  body.addEventListener('click', function(e){
+    var tr = e.target.closest('tr');
+    if(tr) showRow(+tr.dataset.i);
+  });
+  showRow(4);
+
+  var step = document.getElementById('stepChart');
+  var s = '';
+  var x0 = 62, W = 792, segW = W / SUBS.length, top = 44, bot = 186;
+  var lmax = Math.log10(50), lmin = Math.log10(0.1953125), span = lmax - lmin;
+  function yy(v){ return top + (lmax - Math.log10(v)) / span * (bot - top); }
+  s += '<line x1="' + x0 + '" y1="' + (bot + 8) + '" x2="' + (x0 + W) + '" y2="' + (bot + 8) + '" stroke="#e6ddcf" stroke-width="1"/>';
+  for(var k = 0; k < SUBS.length; k++){
+    var px = x0 + k * segW, py = yy(SUBS[k]);
+    var col = k === 4 ? '#f7931a' : (k < 4 ? '#0f7f60' : '#c2b8a8');
+    s += '<rect x="' + (px + 3) + '" y="' + py + '" width="' + (segW - 6) + '" height="' + (bot + 8 - py) + '" fill="' + (k === 4 ? '#fdf1e0' : (k < 4 ? '#eef8f3' : '#f7f4ee')) + '" rx="3"/>';
+    s += '<line x1="' + (px + 3) + '" y1="' + py + '" x2="' + (px + segW - 3) + '" y2="' + py + '" stroke="' + col + '" stroke-width="2.4"/>';
+    if(k > 0){
+      var prev = yy(SUBS[k - 1]);
+      s += '<line x1="' + px + '" y1="' + prev + '" x2="' + px + '" y2="' + py + '" stroke="#ded4c2" stroke-width="1.2" stroke-dasharray="3 3"/>';
+    }
+    s += '<text x="' + (px + segW / 2) + '" y="' + (py - 8) + '" text-anchor="middle" font-size="11.5" font-weight="600" fill="' + col + '">' + SUBS[k] + '</text>';
+    s += '<text x="' + (px + segW / 2) + '" y="' + (bot + 26) + '" text-anchor="middle" font-size="10.5" fill="#9a9287">' + (k === 0 ? '2009' : ['2012','2016','2020','2024','2028','2032','2036','2040'][k - 1]) + '</text>';
+  }
+  s += '<text x="' + x0 + '" y="24" font-size="12" font-weight="600" fill="#4a443c">每块补贴（BTC，对数刻度）</text>';
+  s += '<text x="' + (x0 + W) + '" y="24" text-anchor="end" font-size="11" fill="#9a9287">第九级之后趋近于 0，2140 年归零</text>';
+  step.innerHTML = s;
+
+  var rchart = document.getElementById('ratioChart');
+  var r = '';
+  var RAT = [52.6, 13.4, 7.4, 2.0];
+  var LAB = ['2012 → 2016','2016 → 2020','2020 → 2024','2024 → 2028 所需'];
+  var COL = ['#0f7f60','#2fa37f','#8fd4bd','#c2b8a8'];
+  var baseY = 196, cw = 92, gap = 66, startX = 150;
+  var maxV = 56;
+  function by(v){ return baseY - v / maxV * 150; }
+  r += '<line x1="60" y1="' + baseY + '" x2="840" y2="' + baseY + '" stroke="#e6ddcf" stroke-width="1"/>';
+  for(var m = 0; m < RAT.length; m++){
+    var cx = startX + m * (cw + gap);
+    r += '<rect x="' + cx + '" y="' + by(RAT[m]) + '" width="' + cw + '" height="' + (baseY - by(RAT[m])) + '" rx="5" fill="' + COL[m] + '"/>';
+    r += '<text x="' + (cx + cw / 2) + '" y="' + (by(RAT[m]) - 9) + '" text-anchor="middle" font-size="13" font-weight="700" fill="' + (m === 3 ? '#8a8175' : '#0f7f60') + '">×' + RAT[m] + '</text>';
+    r += '<text x="' + (cx + cw / 2) + '" y="' + (baseY + 22) + '" text-anchor="middle" font-size="11" fill="#9a9287">' + LAB[m] + '</text>';
+  }
+  var thr = by(2);
+  r += '<line x1="60" y1="' + thr + '" x2="840" y2="' + thr + '" stroke="#c0392b" stroke-width="1.4" stroke-dasharray="7 5"/>';
+  r += '<line x1="676" y1="24" x2="712" y2="24" stroke="#c0392b" stroke-width="1.4" stroke-dasharray="7 5"/>';
+  r += '<text x="720" y="28" font-size="11" font-weight="600" fill="#c0392b">抵消减半门槛 ×2</text>';
+  r += '<text x="60" y="26" font-size="12" font-weight="600" fill="#4a443c">币价倍数</text>';
+  r += '<text x="60" y="' + (baseY + 44) + '" font-size="11" fill="#9a9287">前三次都远超 4 倍门槛，因此"安全预算 ÷ 市值"一路上升；若本周期只有 2 倍，这条曲线将开始下降。</text>';
+  rchart.innerHTML = r;
+
+  var P_BASE = 80000, H_BASE = 1000;
+  var sPrice = document.getElementById('sPrice');
+  var sFee = document.getElementById('sFee');
+  var sConf = document.getElementById('sConf');
+  var vPrice = document.getElementById('vPrice');
+  var vFee = document.getElementById('vFee');
+  var vConf = document.getElementById('vConf');
+  var cStats = document.getElementById('calcStats');
+  var cVerdict = document.getElementById('calcVerdict');
+
+  function priceFromSlider(v){ return 20000 * Math.pow(100, v / 100); }
+
+  function calc(){
+    var p = priceFromSlider(+sPrice.value);
+    var feeV = +sFee.value;
+    var feeR = 0.60 * Math.pow(feeV / 100, 2);
+    var conf = +sConf.value;
+
+    vPrice.textContent = '$' + fmt(Math.round(p / 1000)) + 'K';
+    vFee.textContent = (feeR * 100).toFixed(2) + '%';
+    vConf.textContent = conf + ' 确认';
+
+    var subUsd = BLOCKS_PER_YEAR * 3.125 * p;
+    var budget = subUsd / (1 - feeR);
+    var perBlock = 3.125 * p / (1 - feeR);
+    var atk = budget * (conf * 10) / MIN_PER_YEAR;
+    var supply = 20.11e6;
+    var ratio = budget / (supply * p) * 100;
+
+    cStats.innerHTML =
+      '<div class="stat hi"><div class="k">年安全预算</div><div class="v">$' + (budget / 1e8).toFixed(1) + '<small>亿</small></div></div>' +
+      '<div class="stat"><div class="k">单块总收入</div><div class="v">$' + fmt(Math.round(perBlock)) + '</div></div>' +
+      '<div class="stat warn"><div class="k">' + conf + ' 确认攻击成本</div><div class="v">' + (atk >= 1e8 ? '$' + (atk / 1e8).toFixed(2) + '<small>亿</small>' : '$' + (atk / 1e4).toFixed(1) + '<small>万</small>') + '</div></div>' +
+      '<div class="stat"><div class="k">预算 ÷ 市值</div><div class="v">' + ratio.toFixed(3) + '<small>%</small></div></div>';
+
+    var cls = 'verdict', msg;
+    if(conf === 0){
+      msg = '<b>0 确认等于没有保护。</b>交易还在内存池，攻击者不需要任何算力，直接用更高手续费替换（RBF）或干脆不广播就行。';
+    } else if(atk < 1e6){
+      msg = '<b>攻击成本 ' + (atk / 1e4).toFixed(0) + ' 万美元。</b>低于这个量级的目标，理论上已经落在可攻击区间；实际上仍受算力可得性限制。';
+    } else if(atk < 1e8){
+      msg = '<b>攻击成本 ' + (atk / 1e4).toFixed(0) + ' 万美元。</b>需要与主链等量算力竞速这么久，且只能成功一次——对多数目标仍然不划算。';
+    } else {
+      msg = '<b>攻击成本 ' + (atk / 1e8).toFixed(2) + ' 亿美元。</b>这个量级已远超绝大多数双花收益，物理上也几乎租不到这么多现货算力。';
+    }
+    if(conf > 0 && ratio < 0.3) cls += ' warn';
+    if(conf > 0 && ratio < 0.1) cls += ' bad';
+    cVerdict.className = cls;
+    cVerdict.innerHTML = msg;
+  }
+
+  function paint(el){
+    el.style.setProperty('--p', (el.value - el.min) / (el.max - el.min) * 100 + '%');
+  }
+  [sPrice, sFee, sConf].forEach(function(el){
+    el.addEventListener('input', function(){ paint(el); calc(); });
+    paint(el);
+  });
+  calc();
+
+  var sAtk = document.getElementById('sAtk');
+  var vAtkLbl = document.getElementById('vAtkLbl');
+  var vAtk = document.getElementById('vAtk');
+  var qChart = document.getElementById('qChart');
+  var qStats = document.getElementById('qStats');
+  var qVerdict = document.getElementById('qVerdict');
+
+  var PRICES = [80000, 40000, 20000, 10000, 5000];
+
+  function drawQ(){
+    var A = +sAtk.value;
+    vAtkLbl.textContent = A + ' EH/s';
+    vAtk.textContent = A;
+
+    var hs = [], qs = [];
+    for(var i = 0; i < PRICES.length; i++){
+      var h = H_BASE * PRICES[i] / P_BASE;
+      hs.push(h);
+      qs.push(A / (A + h) * 100);
+    }
+
+    var x0 = 78, x1 = 742, yTop = 40, yBot = 216;
+    var lx = [80, 240, 400, 560, 720];
+    var g = '';
+    g += '<line x1="' + x0 + '" y1="' + yBot + '" x2="' + (x1 + 10) + '" y2="' + yBot + '" stroke="#e6ddcf" stroke-width="1"/>';
+    for(var j = 0; j <= 4; j++){
+      var gy = yTop + j * (yBot - yTop) / 4;
+      g += '<line x1="' + x0 + '" y1="' + gy + '" x2="' + (x1 + 10) + '" y2="' + gy + '" stroke="#f2ebdf" stroke-width="1"/>';
+      g += '<text x="' + (x0 - 8) + '" y="' + (gy + 3.5) + '" text-anchor="end" font-size="10" fill="#a89e8e">' + (1000 - j * 250) + '</text>';
+      g += '<text x="' + (x1 + 18) + '" y="' + (gy + 3.5) + '" font-size="10" fill="#c8a0a0">' + (60 - j * 15) + '%</text>';
+    }
+    g += '<text x="' + (x0 - 8) + '" y="24" text-anchor="end" font-size="10.5" fill="#8a8175">EH/s</text>';
+    g += '<text x="' + (x1 + 18) + '" y="24" font-size="10.5" fill="#a87070">q %</text>';
+
+    var hp = [], qp = [];
+    for(var k = 0; k < 5; k++){
+      var hx = lx[k];
+      var hy = yBot - (hs[k] / 1000) * (yBot - yTop);
+      var qy = yBot - (qs[k] / 60) * (yBot - yTop);
+      hp.push(hx + ' ' + hy.toFixed(1));
+      qp.push(hx + ' ' + qy.toFixed(1));
+    }
+
+    g += '<polygon points="' + (lx[0] + ' ' + yBot + ' ') + hp.join(' ') + ' ' + lx[4] + ' ' + yBot + '" fill="rgba(55,138,221,0.07)"/>';
+    g += '<polyline points="' + hp.join(' ') + '" fill="none" stroke="#378add" stroke-width="2.2" stroke-linejoin="round"/>';
+    g += '<polyline points="' + qp.join(' ') + '" fill="none" stroke="#c0392b" stroke-width="2.2" stroke-dasharray="6 4" stroke-linejoin="round"/>';
+
+    for(var m = 0; m < 5; m++){
+      var mx = lx[m];
+      var mhy = yBot - (hs[m] / 1000) * (yBot - yTop);
+      var mqy = yBot - (qs[m] / 60) * (yBot - yTop);
+      g += '<circle cx="' + mx + '" cy="' + mhy.toFixed(1) + '" r="4" fill="#fff" stroke="#378add" stroke-width="2"/>';
+      g += '<circle cx="' + mx + '" cy="' + mqy.toFixed(1) + '" r="4" fill="#fff" stroke="#c0392b" stroke-width="2"/>';
+      g += '<text x="' + mx + '" y="' + (yBot + 20) + '" text-anchor="middle" font-size="10.5" fill="#9a9287">$' + (PRICES[m] / 1000) + 'K</text>';
+    }
+    g += '<text x="' + (x0 + 300) + '" y="' + (yBot + 42) + '" text-anchor="middle" font-size="11" fill="#9a9287">BTC 币价（诚实算力随之下滑）</text>';
+
+    g += '<line x1="' + lx[0] + '" y1="' + (yBot - (50/60) * (yBot - yTop)) + '" x2="' + lx[4] + '" y2="' + (yBot - (50/60) * (yBot - yTop)) + '" stroke="#e0b0aa" stroke-width="1" stroke-dasharray="2 4"/>';
+    g += '<text x="' + lx[2] + '" y="' + (yBot - (50/60) * (yBot - yTop) - 8) + '" text-anchor="middle" font-size="10.5" fill="#c0392b">临界线 50%</text>';
+
+    qChart.innerHTML = g;
+
+    var qNow = qs[0];
+    qStats.innerHTML =
+      '<div class="stat"><div class="k">当前 q（币价 $80K）</div><div class="v">' + qNow.toFixed(1) + '<small>%</small></div></div>' +
+      '<div class="stat"><div class="k">币价跌到 $20K 时</div><div class="v">' + qs[2].toFixed(1) + '<small>%</small></div></div>' +
+      '<div class="stat warn"><div class="k">币价跌到 $5K 时</div><div class="v">' + qs[4].toFixed(1) + '<small>%</small></div></div>';
+
+    var cls = 'verdict', msg;
+    if(qs[4] < 30){
+      msg = '<b>即使币价跌到 $5K，q 也只有 ' + qs[4].toFixed(1) + '%。</b>攻击者这 ' + A + ' EH/s 的投入长期跑不赢挖矿，属于纯烧钱。';
+    } else if(qs[4] < 45){
+      msg = '<b>币价 $5K 时 q 达到 ' + qs[4].toFixed(1) + '%。</b>已进入需要更高确认数的区间；此时 6 确认的防护强度明显弱于今天。';
+      cls += ' warn';
+    } else {
+      msg = '<b>币价 $5K 时 q 达到 ' + qs[4].toFixed(1) + '%，越过临界线。</b>双花从"不划算"变成"值得一试"，此时安全性已经由经济问题转为物理问题。';
+      cls += ' bad';
+    }
+    qVerdict.className = cls;
+    qVerdict.innerHTML = msg;
+  }
+
+  sAtk.addEventListener('input', function(){ paint(sAtk); drawQ(); });
+  paint(sAtk);
+  drawQ();
+})();
+</script>
+</body>
+</html>

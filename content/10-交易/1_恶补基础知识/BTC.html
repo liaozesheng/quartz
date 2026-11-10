@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>比特币区块链结构可视化</title>
+<style>
+:root{
+  --paper:#f6f2ea;
+  --card:#fffefb;
+  --ink:#1f1c18;
+  --ink-2:#4a443c;
+  --muted:#8a8074;
+  --line:#e7dfd2;
+  --line-2:#f1ebe1;
+  --btc:#f7931a;
+  --btc-ink:#a35c08;
+  --purple:#8b5cf6;
+  --blue:#3b82f6;
+  --green:#0f9d76;
+  --red:#e05252;
+  --amber:#c8791a;
+  --grey:#a8a094;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:52px 20px 80px;
+  background:
+    radial-gradient(880px 420px at 10% -10%, #ffe8cc 0%, rgba(255,232,204,0) 62%),
+    radial-gradient(760px 420px at 96% -4%, #e6efff 0%, rgba(230,239,255,0) 58%),
+    var(--paper);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto}
+
+/* ---------- header ---------- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--btc-ink);background:rgba(247,147,26,.1);
+  border:1px solid rgba(247,147,26,.24);
+  padding:5px 11px;border-radius:999px;
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--btc)}
+h1{font-size:clamp(26px,4.4vw,36px);line-height:1.2;letter-spacing:-.022em;margin:16px 0 10px;font-weight:800}
+.lede{color:var(--muted);font-size:14.5px;margin:0;max-width:62ch}
+.lede b{color:var(--ink-2);font-weight:600}
+
+/* ---------- section ---------- */
+section{margin-top:46px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.sec-head h2{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0}
+.sec-head .hint{font-size:12.5px;color:var(--muted)}
+.sec-head .spacer{flex:1}
+
+.btn{
+  font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--btc-ink);background:#fff;border:1px solid var(--line);
+  padding:6px 13px;border-radius:999px;cursor:pointer;
+  transition:background .18s,border-color .18s,transform .18s;
+}
+.btn:hover{background:#fff8ee;border-color:rgba(247,147,26,.45)}
+.btn:active{transform:scale(.97)}
+
+/* ---------- byte anatomy ---------- */
+.anatomy{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:20px 20px 18px;
+  box-shadow:0 1px 2px rgba(31,28,24,.04),0 16px 34px -22px rgba(31,28,24,.3);
+}
+.bar{display:flex;height:52px;border-radius:11px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.seg{
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.03em;
+  line-height:1.3;overflow:hidden;white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.35);
+}
+.seg:last-child{border-right:0}
+.seg--thin{font-size:9px;letter-spacing:0;padding:0 2px}
+.seg--thin small{font-size:8.5px}
+.seg small{font-weight:500;opacity:.82;font-size:9.5px}
+.bar-note{
+  margin-top:12px;font-size:12.5px;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:6px 16px;
+}
+.bar-note code{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);background:#f5f0e7;padding:1px 6px;border-radius:5px}
+.bar-key{display:none;flex-wrap:wrap;gap:6px 14px;margin-top:11px;padding-top:11px;border-top:1px dashed var(--line-2)}
+.bar-key span{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-2);font-family:var(--mono)}
+.bar-key i{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+.bar-key em{font-style:normal;color:var(--muted);font-size:10px}
+
+/* ---------- chain ---------- */
+.blk{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 1px 2px rgba(31,28,24,.04),0 16px 34px -22px rgba(31,28,24,.3);
+  overflow:hidden;transition:box-shadow .22s,border-color .22s;
+}
+.blk.is-open{border-color:rgba(247,147,26,.4);box-shadow:0 1px 2px rgba(31,28,24,.05),0 22px 44px -24px rgba(163,92,8,.4)}
+.blk--ghost{border-style:dashed;background:rgba(255,254,251,.62);box-shadow:none}
+
+.blk__head{
+  width:100%;display:flex;align-items:center;gap:14px;
+  padding:16px 20px;background:none;border:0;cursor:pointer;
+  font:inherit;color:inherit;text-align:left;
+}
+.blk__head:hover{background:rgba(247,147,26,.045)}
+.idx{
+  flex:0 0 auto;width:44px;height:44px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:13.5px;font-weight:700;color:#fff;
+  background:linear-gradient(160deg,#ffb956,#f7931a);
+  box-shadow:0 4px 10px -4px rgba(247,147,26,.85),inset 0 1px 0 rgba(255,255,255,.4);
+}
+.blk--ghost .idx{background:linear-gradient(160deg,#dfd7c9,#c3b8a6);box-shadow:none}
+.blk__meta{min-width:0;flex:1;display:block}
+.blk__meta .t{display:block;font-size:16.5px;font-weight:700;letter-spacing:-.01em;line-height:1.35}
+.blk__meta .hash{
+  display:block;
+  font-family:var(--mono);font-size:11px;color:var(--btc-ink);
+  word-break:break-all;line-height:1.45;margin-top:2px;opacity:.85;
+}
+.blk__meta .sub{display:block;font-size:12.5px;color:var(--muted);margin-top:1px;line-height:1.5}
+.chev{
+  flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#f4eee3;color:var(--muted);font-size:10px;
+  transition:transform .3s ease,background .2s;
+}
+.blk.is-open .chev{transform:rotate(180deg);background:rgba(247,147,26,.16);color:var(--btc-ink)}
+
+.blk__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1)}
+.blk.is-open .blk__body{grid-template-rows:1fr}
+.blk__body>.inner{overflow:hidden;min-height:0}
+.blk__pad{padding:2px 20px 20px;border-top:1px dashed var(--line-2);margin:0 0 0;padding-top:16px}
+
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fld{
+  background:#faf7f1;border-radius:10px;padding:8px 11px;
+  border-left:2.5px solid var(--c,var(--grey));
+}
+.fld .k{
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  font-family:var(--mono);font-size:10.5px;font-weight:700;
+  letter-spacing:.02em;color:var(--c,var(--grey));
+}
+.fld .k .b{font-weight:400;color:#a99f90;font-size:9.5px;letter-spacing:0}
+.fld .v{font-size:13px;color:var(--ink-2);margin-top:1px}
+
+/* merkle */
+.mk{margin-top:15px;background:#faf7f1;border:1px dashed var(--line);border-radius:13px;padding:13px 13px 10px}
+.mk__t{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.mk__t b{color:var(--purple);font-weight:700}
+.mk svg{display:block;width:100%;max-width:400px;margin:8px auto 0;height:auto}
+.mk svg.mk--h{max-width:486px}
+.mk__cap{font-size:11.5px;color:var(--muted);text-align:center;margin-top:2px}
+
+/* tx */
+.txs{margin-top:15px}
+.txs__h{font-size:12px;color:var(--muted);letter-spacing:.04em;margin-bottom:7px}
+.tx{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:8px 11px;border-radius:9px;font-size:13px;color:var(--ink-2);
+  background:#f8f9fc;border-left:2.5px solid var(--blue);margin-bottom:6px;
+}
+.tx:last-child{margin-bottom:0}
+.tx--cb{background:#f1faf6;border-left-color:var(--green)}
+.tx .tag{
+  flex:0 0 auto;font-family:var(--mono);font-size:9.5px;font-weight:700;
+  letter-spacing:.03em;color:var(--blue);background:rgba(59,130,246,.11);
+  padding:2px 7px;border-radius:999px;margin-top:1px;
+}
+.tx--cb .tag{color:var(--green);background:rgba(15,157,118,.12)}
+
+/* steps (block 3) */
+.steps{counter-reset:s;display:grid;gap:8px}
+.step{
+  counter-increment:s;display:flex;gap:11px;align-items:flex-start;
+  background:#faf7f1;border-radius:10px;padding:9px 12px;font-size:13px;color:var(--ink-2);
+}
+.step::before{
+  content:counter(s);flex:0 0 auto;
+  width:19px;height:19px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:10.5px;font-weight:700;
+  color:var(--btc-ink);background:rgba(247,147,26,.16);
+}
+
+/* connector */
+.conn{display:flex;flex-direction:column;align-items:center;padding:0}
+.conn .stem{width:2px;height:16px;background:repeating-linear-gradient(180deg,var(--line) 0 4px,transparent 4px 8px)}
+.conn .pill{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:10.5px;color:var(--btc-ink);
+  background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:4px 12px;white-space:nowrap;
+  box-shadow:0 1px 2px rgba(31,28,24,.04);
+}
+.conn .pill b{color:var(--btc);font-weight:700}
+.conn .tip{width:0;height:0;border-left:4.5px solid transparent;border-right:4.5px solid transparent;border-top:6px solid #d9cfbe;margin-top:1px}
+
+/* takeaways */
+.takes{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.take{
+  background:var(--card);border:1px solid var(--line);border-radius:13px;
+  padding:13px 15px;display:flex;gap:11px;align-items:flex-start;
+  box-shadow:0 1px 2px rgba(31,28,24,.03);
+  transition:border-color .2s,transform .2s;
+}
+.take:hover{border-color:rgba(247,147,26,.4);transform:translateY(-1px)}
+.take:last-child{grid-column:1 / -1;background:linear-gradient(180deg,rgba(247,147,26,.055),rgba(247,147,26,.02));border-color:rgba(247,147,26,.3)}
+.take .n{
+  flex:0 0 auto;font-family:var(--mono);font-size:10.5px;font-weight:700;
+  color:var(--btc-ink);background:rgba(247,147,26,.13);
+  padding:2px 7px;border-radius:6px;margin-top:2px;
+}
+.take p{margin:0;font-size:13.2px;color:var(--ink-2);line-height:1.6}
+.take p b{color:var(--ink);font-weight:700}
+.take code{font-family:var(--mono);font-size:11.5px;background:#f4efe5;padding:1px 5px;border-radius:4px;color:var(--btc-ink)}
+
+footer{
+  margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+
+@media (max-width:760px){
+  body{padding:32px 14px 56px}
+  .fields,.takes{grid-template-columns:1fr}
+  section{margin-top:34px}
+  .blk__head{padding:14px 15px;gap:11px}
+  .blk__pad{padding-left:15px;padding-right:15px}
+  .idx{width:38px;height:38px;border-radius:12px;font-size:12px}
+  .bar{height:44px}
+  .seg small{display:none}
+  .seg{font-size:9.5px}
+  .seg--thin{font-size:0;padding:0}
+  .bar-key{display:flex}
+  .conn .pill{font-size:9.5px;padding:4px 9px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Bitcoin · 区块结构</span>
+    <h1>比特币区块链结构可视化</h1>
+    <p class="lede">从 <b>80 字节区块头</b> 到默克尔树，看清楚一笔交易是怎么被锁进链里的。<b>点击任意区块卡片可展开 / 收起详情。</b></p>
+  </header>
+
+  <!-- ========== 80 字节解剖 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>区块头：永远固定 80 字节</h2>
+      <span class="hint">字段顺序与占比</span>
+    </div>
+
+    <div class="anatomy">
+      <div class="bar">
+        <div class="seg seg--thin" style="flex:4;background:#b3a99a">ver<small>4B</small></div>
+        <div class="seg" style="flex:32;background:linear-gradient(180deg,#ffae4d,#f7931a)">prevHash<small>32B</small></div>
+        <div class="seg" style="flex:32;background:linear-gradient(180deg,#a78bfa,#8b5cf6)">merkleRoot<small>32B</small></div>
+        <div class="seg seg--thin" style="flex:4;background:#5b9cf8">time<small>4B</small></div>
+        <div class="seg seg--thin" style="flex:4;background:#d98a2b">nBits<small>4B</small></div>
+        <div class="seg seg--thin" style="flex:4;background:#e56b6b">nonce<small>4B</small></div>
+      </div>
+      <div class="bar-note">
+        <span><code>4 + 32 + 32 + 4 + 4 + 4 = 80</code></span>
+        <span>变长交易列表不在这 80 字节里 —— 所以区块头大小恒定</span>
+      </div>
+      <div class="bar-key">
+        <span><i style="background:#b3a99a"></i>version <em>4B</em></span>
+        <span><i style="background:#f7931a"></i>prevHash <em>32B</em></span>
+        <span><i style="background:#8b5cf6"></i>merkleRoot <em>32B</em></span>
+        <span><i style="background:#3b82f6"></i>time <em>4B</em></span>
+        <span><i style="background:#c8791a"></i>nBits <em>4B</em></span>
+        <span><i style="background:#e05252"></i>nonce <em>4B</em></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 链式结构 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>链式结构</h2>
+      <span class="hint">prevHash 把历史一节一节锁死</span>
+      <span class="spacer"></span>
+      <button class="btn" id="toggleAll" type="button">全部展开</button>
+    </div>
+
+    <!-- 区块 0 -->
+    <article class="blk is-open">
+      <button class="blk__head" type="button" aria-expanded="true">
+        <span class="idx">#0</span>
+        <span class="blk__meta">
+          <span class="t">创世区块</span>
+          <span class="hash">000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f</span>
+        </span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="blk__body"><div class="inner"><div class="blk__pad">
+        <div class="fields">
+          <div class="fld" style="--c:var(--grey)"><div class="k"><span>version</span><span class="b">4B</span></div><div class="v">版本号 1</div></div>
+          <div class="fld" style="--c:var(--btc)"><div class="k"><span>prevHash</span><span class="b">32B</span></div><div class="v">000…000（创世无前置区块）</div></div>
+          <div class="fld" style="--c:var(--purple)"><div class="k"><span>merkleRoot</span><span class="b">32B</span></div><div class="v">默克尔根（仅 coinbase）</div></div>
+          <div class="fld" style="--c:var(--blue)"><div class="k"><span>time</span><span class="b">4B</span></div><div class="v">2009-01-03</div></div>
+          <div class="fld" style="--c:var(--amber)"><div class="k"><span>nBits</span><span class="b">4B</span></div><div class="v">0x1d00ffff 难度基准 1</div></div>
+          <div class="fld" style="--c:var(--red)"><div class="k"><span>nonce</span><span class="b">4B</span></div><div class="v">2083236893</div></div>
+        </div>
+
+        <div class="mk">
+          <div class="mk__t">🌳 默克尔树：只有 Coinbase 一笔交易</div>
+          <svg class="mk--h" viewBox="0 0 500 66" role="img" aria-label="创世区块只有一个叶子交易，它本身就是默克尔根">
+            <rect x="0" y="11" width="192" height="44" rx="11" fill="#eafaf3" stroke="#a7e8cd"/>
+            <text x="96" y="38" text-anchor="middle" font-size="12" font-weight="700" fill="#0b7f60">Tx0 · Coinbase</text>
+            <line x1="200" y1="33" x2="256" y2="33" stroke="#cfc5b5" stroke-width="1.6"/>
+            <polygon points="256,33 248,28.5 248,37.5" fill="#cfc5b5"/>
+            <text x="228" y="24" text-anchor="middle" font-size="9" fill="#a8a094">哈希</text>
+            <rect x="266" y="11" width="192" height="44" rx="11" fill="#f3ecff" stroke="#c4b5fd"/>
+            <text x="362" y="38" text-anchor="middle" font-size="12" font-weight="700" fill="#6d28d9">merkleRoot</text>
+          </svg>
+          <div class="mk__cap">叶子直接就是根</div>
+        </div>
+
+        <div class="txs">
+          <div class="txs__h">交易列表</div>
+          <div class="tx tx--cb">
+            <span class="tag">COINBASE</span>
+            <span>50 BTC 创世奖励，备注：<em>The Times 03/Jan/2009 Chancellor on brink of second bailout for banks</em></span>
+          </div>
+        </div>
+      </div></div></div>
+    </article>
+
+    <div class="conn">
+      <span class="stem"></span>
+      <span class="pill">prevHash <b>=</b> 区块 #0 的哈希</span>
+      <span class="stem"></span>
+      <span class="tip"></span>
+    </div>
+
+    <!-- 区块 1 -->
+    <article class="blk">
+      <button class="blk__head" type="button" aria-expanded="false">
+        <span class="idx">#1</span>
+        <span class="blk__meta">
+          <span class="t">第一个正式区块</span>
+          <span class="sub">prevHash = 区块 0 的哈希</span>
+        </span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="blk__body"><div class="inner"><div class="blk__pad">
+        <div class="fields">
+          <div class="fld" style="--c:var(--grey)"><div class="k"><span>version</span><span class="b">4B</span></div><div class="v">版本号 1</div></div>
+          <div class="fld" style="--c:var(--btc)"><div class="k"><span>prevHash</span><span class="b">32B</span></div><div class="v">区块 0 哈希</div></div>
+          <div class="fld" style="--c:var(--purple)"><div class="k"><span>merkleRoot</span><span class="b">32B</span></div><div class="v">这批交易汇总指纹</div></div>
+          <div class="fld" style="--c:var(--blue)"><div class="k"><span>time</span><span class="b">4B</span></div><div class="v">出块时间</div></div>
+          <div class="fld" style="--c:var(--amber)"><div class="k"><span>nBits</span><span class="b">4B</span></div><div class="v">难度目标编码</div></div>
+          <div class="fld" style="--c:var(--red)"><div class="k"><span>nonce</span><span class="b">4B</span></div><div class="v">矿机遍历尝试值</div></div>
+        </div>
+
+        <div class="mk">
+          <div class="mk__t">🌳 默克尔树：把下面所有交易 txid 向上哈希合并 → 得到根</div>
+          <svg viewBox="0 0 340 190" role="img" aria-label="默克尔树：四个叶子节点两两哈希合并得到根">
+            <rect x="95" y="8" width="150" height="28" rx="8" fill="#f3ecff" stroke="#c4b5fd"/>
+            <text x="170" y="26" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6d28d9">merkleRoot</text>
+            <line x1="170" y1="36" x2="90" y2="76" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="170" y1="36" x2="250" y2="76" stroke="#d8cfc0" stroke-width="1.5"/>
+            <rect x="46" y="76" width="88" height="26" rx="7" fill="#f7f5f0" stroke="#e0d7c8"/>
+            <text x="90" y="93" text-anchor="middle" font-size="10" fill="#4a443c">H(0,1)</text>
+            <rect x="206" y="76" width="88" height="26" rx="7" fill="#f7f5f0" stroke="#e0d7c8"/>
+            <text x="250" y="93" text-anchor="middle" font-size="10" fill="#4a443c">H(2,3)</text>
+            <line x1="90" y1="102" x2="50" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="90" y1="102" x2="130" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="250" y1="102" x2="210" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="250" y1="102" x2="290" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <rect x="14" y="148" width="72" height="28" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+            <text x="50" y="166" text-anchor="middle" font-size="9.5" fill="#0b7f60">Tx0 cb</text>
+            <rect x="94" y="148" width="72" height="28" rx="7" fill="#f7f9ff" stroke="#c9d9f7"/>
+            <text x="130" y="166" text-anchor="middle" font-size="9.5" fill="#2a5aa8">Tx1</text>
+            <rect x="174" y="148" width="72" height="28" rx="7" fill="#f7f9ff" stroke="#c9d9f7"/>
+            <text x="210" y="166" text-anchor="middle" font-size="9.5" fill="#2a5aa8">Tx2</text>
+            <rect x="254" y="148" width="72" height="28" rx="7" fill="#f7f9ff" stroke="#c9d9f7" stroke-dasharray="4 3"/>
+            <text x="290" y="166" text-anchor="middle" font-size="9.5" fill="#2a5aa8">Tx2*</text>
+          </svg>
+          <div class="mk__cap">叶子是奇数个时，最后一个复制一份（Tx2*）凑对</div>
+        </div>
+
+        <div class="txs">
+          <div class="txs__h">交易列表</div>
+          <div class="tx tx--cb"><span class="tag">COINBASE</span><span>50 BTC + 本区块手续费 → 矿工地址</span></div>
+          <div class="tx"><span class="tag">TX1</span><span>A 转 B　0.2 BTC</span></div>
+          <div class="tx"><span class="tag">TX2</span><span>C 转 D　1.0 BTC（带 OP_RETURN 备注）</span></div>
+        </div>
+      </div></div></div>
+    </article>
+
+    <div class="conn">
+      <span class="stem"></span>
+      <span class="pill">prevHash <b>=</b> 区块 #1 的哈希</span>
+      <span class="stem"></span>
+      <span class="tip"></span>
+    </div>
+
+    <!-- 区块 2 -->
+    <article class="blk">
+      <button class="blk__head" type="button" aria-expanded="false">
+        <span class="idx">#2</span>
+        <span class="blk__meta">
+          <span class="t">下一个区块</span>
+          <span class="sub">prevHash = 区块 1 的哈希</span>
+        </span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="blk__body"><div class="inner"><div class="blk__pad">
+        <div class="fields">
+          <div class="fld" style="--c:var(--grey)"><div class="k"><span>version</span><span class="b">4B</span></div><div class="v">版本号</div></div>
+          <div class="fld" style="--c:var(--btc)"><div class="k"><span>prevHash</span><span class="b">32B</span></div><div class="v">区块 1 哈希</div></div>
+          <div class="fld" style="--c:var(--purple)"><div class="k"><span>merkleRoot</span><span class="b">32B</span></div><div class="v">交易集合指纹</div></div>
+          <div class="fld" style="--c:var(--blue)"><div class="k"><span>time</span><span class="b">4B</span></div><div class="v">时间戳（4 字节 uint32）</div></div>
+          <div class="fld" style="--c:var(--amber)"><div class="k"><span>nBits</span><span class="b">4B</span></div><div class="v">难度压缩目标</div></div>
+          <div class="fld" style="--c:var(--red)"><div class="k"><span>nonce</span><span class="b">4B</span></div><div class="v">挖矿计数器</div></div>
+        </div>
+
+        <div class="mk">
+          <div class="mk__t">🌳 默克尔树：本区块所有交易哈希向上合并</div>
+          <svg viewBox="0 0 340 190" role="img" aria-label="默克尔树：四个交易叶子节点合并得到根">
+            <rect x="95" y="8" width="150" height="28" rx="8" fill="#f3ecff" stroke="#c4b5fd"/>
+            <text x="170" y="26" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6d28d9">merkleRoot</text>
+            <line x1="170" y1="36" x2="90" y2="76" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="170" y1="36" x2="250" y2="76" stroke="#d8cfc0" stroke-width="1.5"/>
+            <rect x="46" y="76" width="88" height="26" rx="7" fill="#f7f5f0" stroke="#e0d7c8"/>
+            <text x="90" y="93" text-anchor="middle" font-size="10" fill="#4a443c">H(0,1)</text>
+            <rect x="206" y="76" width="88" height="26" rx="7" fill="#f7f5f0" stroke="#e0d7c8"/>
+            <text x="250" y="93" text-anchor="middle" font-size="10" fill="#4a443c">H(2,3)</text>
+            <line x1="90" y1="102" x2="50" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="90" y1="102" x2="130" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="250" y1="102" x2="210" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <line x1="250" y1="102" x2="290" y2="148" stroke="#d8cfc0" stroke-width="1.5"/>
+            <rect x="14" y="148" width="72" height="28" rx="7" fill="#eafaf3" stroke="#a7e8cd"/>
+            <text x="50" y="166" text-anchor="middle" font-size="9.5" fill="#0b7f60">Tx0 cb</text>
+            <rect x="94" y="148" width="72" height="28" rx="7" fill="#f7f9ff" stroke="#c9d9f7"/>
+            <text x="130" y="166" text-anchor="middle" font-size="9.5" fill="#2a5aa8">Tx1</text>
+            <rect x="174" y="148" width="72" height="28" rx="7" fill="#f7f9ff" stroke="#c9d9f7"/>
+            <text x="210" y="166" text-anchor="middle" font-size="9.5" fill="#2a5aa8">Tx2</text>
+            <rect x="254" y="148" width="72" height="28" rx="7" fill="#f7f9ff" stroke="#c9d9f7"/>
+            <text x="290" y="166" text-anchor="middle" font-size="9.5" fill="#2a5aa8">Tx3</text>
+          </svg>
+          <div class="mk__cap">4 个叶子 → 2 个中间哈希 → 1 个根</div>
+        </div>
+
+        <div class="txs">
+          <div class="txs__h">交易列表</div>
+          <div class="tx tx--cb"><span class="tag">COINBASE</span><span>50 BTC + 手续费</span></div>
+          <div class="tx"><span class="tag">TX1</span><span>D 转你　1 BTC</span></div>
+          <div class="tx"><span class="tag">TX2</span><span>转账、附带 OP_RETURN 留言</span></div>
+          <div class="tx"><span class="tag">TX3</span><span>另一笔普通转账</span></div>
+        </div>
+      </div></div></div>
+    </article>
+
+    <div class="conn">
+      <span class="stem"></span>
+      <span class="pill">prevHash <b>=</b> 区块 #2 的哈希</span>
+      <span class="stem"></span>
+      <span class="tip"></span>
+    </div>
+
+    <!-- 区块 3 无限延伸 -->
+    <article class="blk blk--ghost">
+      <button class="blk__head" type="button" aria-expanded="false">
+        <span class="idx">#3…</span>
+        <span class="blk__meta">
+          <span class="t">持续向后延伸</span>
+          <span class="sub">每一个区块的 prevHash = 上一个区块哈希，链就这样锁住历史</span>
+        </span>
+        <span class="chev">▼</span>
+      </button>
+      <div class="blk__body"><div class="inner"><div class="blk__pad">
+        <div class="steps">
+          <div class="step">区块头永远固定 <b>80 字节</b></div>
+          <div class="step">区块总大小 = 80 字节头 + 变长交易列表</div>
+          <div class="step">矿工挑选交易 → 构建默克尔树 → 组装区块头 → 换 nonce 哈希闯关</div>
+          <div class="step">成功出块，广播；交易上链，默克尔根锁死这批交易</div>
+        </div>
+      </div></div></div>
+    </article>
+  </section>
+
+  <!-- ========== 知识汇总 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>知识汇总</h2>
+      <span class="hint">今晚学的全部要点</span>
+    </div>
+    <div class="takes">
+      <div class="take"><span class="n">01</span><p>区块头固定 80 字节：<code>version(4)</code> + <code>prevHash(32)</code> + <code>merkleRoot(32)</code> + <code>time(4)</code> + <code>nBits(4)</code> + <code>nonce(4)</code></p></div>
+      <div class="take"><span class="n">02</span><p>区块哈希 = 对 80 字节区块头做<b>双重 SHA256</b>，<b>不是</b>默克尔根</p></div>
+      <div class="take"><span class="n">03</span><p>Coinbase 是每区块第一笔交易：凭空产生区块奖励 + 手续费，<b>无输入</b>，100 个区块后才能花</p></div>
+      <div class="take"><span class="n">04</span><p>矿工自选交易，交易清单不同 → 默克尔根不同 → 候选区块不同，互相竞争 PoW</p></div>
+      <div class="take"><span class="n">05</span><p>OP_RETURN 可以在普通交易里写入简短文字，<b>永久上链，无法删除</b></p></div>
+      <div class="take"><span class="n">06</span><p>交易打包前在 mempool，手续费低会长期排队，<b>没有强制打包机制</b></p></div>
+      <div class="take"><span class="n">07</span><p>篡改旧区块交易 → merkleRoot 变 → 区块哈希变 → 后面全部区块 prevHash 对不上，需要<b>重挖全部后续区块</b></p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>BTC · 区块链结构可视化</span>
+    <span>点击卡片展开详情 · 颜色区分区块头字段</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var blocks = document.querySelectorAll('.blk');
+  blocks.forEach(function(b){
+    var head = b.querySelector('.blk__head');
+    head.addEventListener('click', function(){
+      var open = b.classList.toggle('is-open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      syncBtn();
+    });
+  });
+
+  var btn = document.getElementById('toggleAll');
+  function syncBtn(){
+    var allOpen = Array.prototype.every.call(blocks, function(b){ return b.classList.contains('is-open'); });
+    btn.textContent = allOpen ? '全部收起' : '全部展开';
+  }
+  btn.addEventListener('click', function(){
+    var allOpen = Array.prototype.every.call(blocks, function(b){ return b.classList.contains('is-open'); });
+    blocks.forEach(function(b){
+      b.classList.toggle('is-open', !allOpen);
+      b.querySelector('.blk__head').setAttribute('aria-expanded', String(!allOpen));
+    });
+    syncBtn();
+  });
+  syncBtn();
+})();
+</script>
+</body>
+</html>

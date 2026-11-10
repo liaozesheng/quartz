@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>比特币 UTXO 模型可视化</title>
+<style>
+:root{
+  --paper:#f6f2ea;
+  --card:#fffefb;
+  --ink:#1f1c18;
+  --ink-2:#4a443c;
+  --muted:#8a8074;
+  --line:#e7dfd2;
+  --line-2:#f1ebe1;
+  --btc:#f7931a;
+  --btc-ink:#a35c08;
+  --purple:#8b5cf6;
+  --blue:#3b82f6;
+  --green:#0f9d76;
+  --green-d:#0b7f60;
+  --red:#e05252;
+  --rose:#c2417a;
+  --amber:#c8791a;
+  --grey:#a8a094;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:52px 20px 80px;
+  background:
+    radial-gradient(880px 420px at 10% -10%, #ffe8cc 0%, rgba(255,232,204,0) 62%),
+    radial-gradient(760px 420px at 96% -4%, #e6efff 0%, rgba(230,239,255,0) 58%),
+    var(--paper);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto}
+
+/* ---------- header ---------- */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--btc-ink);background:rgba(247,147,26,.1);
+  border:1px solid rgba(247,147,26,.24);
+  padding:5px 11px;border-radius:999px;
+}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--btc)}
+h1{font-size:clamp(25px,4.2vw,34px);line-height:1.22;letter-spacing:-.022em;margin:16px 0 12px;font-weight:800}
+.lede{color:var(--muted);font-size:14.5px;margin:0;max-width:64ch}
+.lede b{color:var(--ink-2);font-weight:600}
+
+.thesis{
+  display:flex;gap:13px;align-items:flex-start;
+  margin-top:22px;padding:16px 18px;
+  background:linear-gradient(135deg,rgba(247,147,26,.1),rgba(247,147,26,.035));
+  border:1px solid rgba(247,147,26,.3);border-radius:16px;
+}
+.thesis .badge{
+  flex:0 0 auto;font-size:10.5px;font-weight:800;letter-spacing:.08em;
+  color:#fff;background:linear-gradient(160deg,#ffb956,#f7931a);
+  padding:3px 9px;border-radius:999px;margin-top:1px;
+  box-shadow:0 3px 8px -4px rgba(247,147,26,.9);
+}
+.thesis p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.75}
+.thesis b{color:#8a4a05;font-weight:700}
+.thesis .sep{color:#d9b58c;padding:0 3px}
+
+/* ---------- section ---------- */
+section{margin-top:46px}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.sec-head h2{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0}
+.sec-head .hint{font-size:12.5px;color:var(--muted)}
+.sec-head .spacer{flex:1}
+.btn{
+  font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--btc-ink);background:#fff;border:1px solid var(--line);
+  padding:6px 13px;border-radius:999px;cursor:pointer;
+  transition:background .18s,border-color .18s,transform .18s;
+}
+.btn:hover{background:#fff8ee;border-color:rgba(247,147,26,.45)}
+.btn:active{transform:scale(.97)}
+
+/* ---------- tickets ---------- */
+.ticket{
+  --c:var(--green);
+  background:#fff;border:1px solid var(--line);border-left:3px solid var(--c);
+  border-radius:12px;padding:10px 13px;min-width:0;
+  box-shadow:0 1px 2px rgba(31,28,24,.03);
+}
+.ticket .k{
+  font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.05em;
+  color:var(--c);text-transform:uppercase;
+}
+.ticket .amt{
+  font-family:var(--mono);font-size:15.5px;font-weight:800;letter-spacing:-.01em;
+  line-height:1.3;margin-top:1px;
+}
+.ticket .who{font-size:11.5px;color:var(--muted);margin-top:1px}
+.ticket .memo{font-size:11.5px;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px dashed var(--line-2);line-height:1.55}
+.ticket--utxo{--c:var(--green)}
+.ticket--in{--c:var(--grey)}
+.ticket--fee{--c:var(--amber);background:#fffdf7}
+.ticket--cb{--c:var(--rose);background:#fffbfd}
+.ticket--spent{--c:#c3bab0;background:#faf8f4}
+.ticket--spent .amt{text-decoration:line-through;color:#b3a99f}
+.ticket .stamp{
+  display:inline-block;margin-top:6px;font-size:10px;font-weight:700;
+  letter-spacing:.04em;padding:2px 8px;border-radius:999px;
+  color:#b8ada0;background:rgba(168,160,148,.16);
+}
+.ticket .stamp--live{color:var(--green-d);background:rgba(15,157,118,.12)}
+
+/* ---------- flow ---------- */
+.flow-card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:20px;box-shadow:0 1px 2px rgba(31,28,24,.04),0 16px 34px -22px rgba(31,28,24,.3);
+}
+.fgrid{
+  display:grid;
+  grid-template-columns:172px 26px minmax(0,1fr) 26px 172px;
+  align-items:center;
+}
+.fa{
+  color:#cfc5b5;font-size:15px;font-weight:600;font-family:var(--mono);
+  line-height:1;text-align:center;
+}
+.fbranch{
+  grid-column:3 / 6;
+  position:relative;
+  padding-top:17px;
+  display:flex;align-items:center;gap:12px;
+}
+.fbranch::before{
+  content:"";position:absolute;left:42px;top:0;height:17px;
+  border-left:2px dashed #ded4c2;
+}
+.fbranch .ticket--fee{flex:0 0 200px}
+.ftx{
+  min-width:0;
+  background:#fffdf7;border:1px solid rgba(200,121,26,.35);border-radius:13px;
+  padding:11px 14px;
+}
+.ftx .t{font-size:13.5px;font-weight:800;color:#8a4a05;margin-bottom:7px}
+.cl{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
+  display:flex;justify-content:space-between;gap:10px;padding:2.5px 0;
+}
+.cl+.cl{border-top:1px solid rgba(231,223,210,.55)}
+.cl .r{color:var(--muted);flex:0 0 auto}
+.cl--hi{color:#a35c08;font-weight:700}
+.cl--hi .r{color:#a35c08}
+.fwarn{
+  margin-top:9px;padding:7px 10px;border-radius:9px;
+  background:rgba(224,82,82,.07);border:1px dashed rgba(224,82,82,.32);
+  font-size:11.5px;color:#a83e3e;line-height:1.5;
+}
+.feq{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin-top:16px;padding-top:14px;border-top:1px dashed var(--line-2);
+  font-family:var(--mono);font-size:11.5px;color:var(--muted);
+}
+.feq b{color:var(--ink-2);font-weight:700}
+.feq .eq-x{color:#cbbfae}
+
+/* ---------- step timeline ---------- */
+.ver{display:grid;grid-template-columns:50px 1fr;gap:15px;position:relative}
+.rail{position:relative;display:flex;justify-content:center;padding-top:12px}
+.rail::before{
+  content:"";position:absolute;top:58px;bottom:-18px;width:2px;
+  background:repeating-linear-gradient(180deg,#d7cbb6 0 4px,transparent 4px 9px);
+}
+.ver.is-last .rail::before{content:none}
+.vb{
+  width:44px;height:44px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:15px;font-weight:800;color:#fff;
+  background:linear-gradient(160deg,#ffb956,#f7931a);
+  box-shadow:0 4px 10px -5px rgba(247,147,26,.85),inset 0 1px 0 rgba(255,255,255,.4);
+}
+
+.blk{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 1px 2px rgba(31,28,24,.04),0 16px 34px -22px rgba(31,28,24,.3);
+  overflow:hidden;transition:box-shadow .22s,border-color .22s;
+}
+.blk.is-open{border-color:rgba(247,147,26,.36);box-shadow:0 1px 2px rgba(31,28,24,.05),0 20px 40px -24px rgba(163,92,8,.34)}
+.blk__head{
+  width:100%;display:flex;align-items:center;gap:10px;
+  padding:14px 16px;background:none;border:0;cursor:pointer;
+  font:inherit;color:inherit;text-align:left;
+}
+.blk__head:hover{background:rgba(247,147,26,.045)}
+.hmeta{flex:1;min-width:0;display:block}
+.hrow{display:flex;align-items:baseline;gap:10px}
+.hrow .t{font-size:15.5px;font-weight:700;letter-spacing:-.01em;line-height:1.4}
+.hrow .stag{
+  margin-left:auto;flex:0 0 auto;font-size:10.5px;font-weight:700;
+  color:var(--green-d);background:rgba(15,157,118,.11);
+  padding:2px 8px;border-radius:999px;white-space:nowrap;
+}
+.chev{
+  flex:0 0 auto;align-self:center;width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#f4eee3;color:var(--muted);font-size:9px;
+  transition:transform .3s ease,background .2s;
+}
+.blk.is-open .chev{transform:rotate(180deg);background:rgba(247,147,26,.16);color:var(--btc-ink)}
+.blk__body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s cubic-bezier(.4,0,.2,1)}
+.blk.is-open .blk__body{grid-template-rows:1fr}
+.blk__body>.inner{overflow:hidden;min-height:0}
+.blk__pad{padding:15px 16px 16px;border-top:1px dashed var(--line-2)}
+
+.srow{display:grid;grid-template-columns:minmax(0,150px) 26px minmax(0,1.5fr) 26px minmax(0,150px);align-items:center;gap:0}
+.srow--two{grid-template-columns:minmax(0,190px) 26px minmax(0,1fr)}
+.srow--one{grid-template-columns:1fr}
+.sarrow{color:#cfc5b5;font-size:15px;font-family:var(--mono);text-align:center;line-height:1}
+.sarrow--v{display:none}
+
+.sbar{
+  display:flex;align-items:center;gap:9px;margin-top:14px;
+  padding:9px 12px;border-radius:10px;
+  background:rgba(15,157,118,.07);border:1px solid rgba(15,157,118,.2);
+  font-size:12.5px;color:#0b6b52;line-height:1.55;
+}
+.sbar .ok{
+  flex:0 0 auto;width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--green);color:#fff;font-size:9px;font-weight:800;
+}
+
+.feechips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.feec{
+  background:#fffdf7;border:1px solid rgba(200,121,26,.3);border-radius:9px;
+  padding:7px 11px;font-family:var(--mono);font-size:11.5px;color:#8a4a05;
+  line-height:1.35;text-align:center;
+}
+.feec small{display:block;font-size:9.5px;color:var(--muted);font-weight:400}
+.feec--m{background:none;border:0;color:#c2b8a8;font-size:16px;letter-spacing:.14em;padding:0 2px}
+.snote{font-size:12px;color:var(--muted);margin-top:11px}
+.snote b{color:var(--ink-2);font-weight:700}
+
+.calcbar{
+  margin-top:13px;padding:9px 12px;border-radius:10px;
+  background:#faf7f1;border:1px solid var(--line-2);
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
+}
+.calcbar b{color:#a35c08}
+
+/* ---------- step5 states ---------- */
+.states{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.note4{
+  margin-top:12px;padding:10px 13px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(247,147,26,.09),rgba(255,255,255,.5));
+  border:1px dashed rgba(247,147,26,.42);
+  font-size:12.5px;color:var(--ink-2);line-height:1.6;
+}
+.note4 b{color:#8a4a05}
+
+/* ---------- compare ---------- */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp-card{
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  padding:16px 17px;border-top:2.5px solid var(--c);
+  box-shadow:0 1px 2px rgba(31,28,24,.03),0 14px 30px -24px rgba(31,28,24,.34);
+}
+.cmp-card h3{
+  margin:0 0 8px;font-size:14.5px;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:8px;color:var(--ink);
+}
+.cmp-card h3 .ic{
+  width:26px;height:26px;border-radius:9px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  background:var(--cbg);
+}
+.cmp-card p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.72}
+.cmp-card p+p{margin-top:8px}
+.cmp-card b{color:var(--ink);font-weight:700}
+.cmp-card code{font-family:var(--mono);font-size:12px;background:#f4efe5;padding:1px 5px;border-radius:4px;color:var(--btc-ink)}
+
+footer{
+  margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+
+@media (max-width:760px){
+  body{padding:32px 14px 56px}
+  section{margin-top:34px}
+  .ver{grid-template-columns:38px 1fr;gap:11px}
+  .vb{width:34px;height:34px;border-radius:11px;font-size:13px}
+  .rail::before{top:48px}
+  .hrow .t{font-size:14.5px}
+  .blk__head{padding:12px 13px}
+  .blk__pad{padding:13px}
+
+  /* 横向流程改成纵向 */
+  .fgrid{grid-template-columns:1fr;gap:9px}
+  .fa{transform:rotate(90deg)}
+  .fbranch{
+    grid-column:1;padding-top:0;padding-left:19px;
+    flex-direction:column;align-items:stretch;gap:9px;
+  }
+  .fbranch::before{
+    content:"↳";display:block;
+    border:0;width:auto;height:auto;left:0;top:9px;
+    color:#cbbfae;font-size:13px;line-height:1;
+  }
+  .fbranch .ticket--fee{flex:0 0 auto}
+
+  .srow{grid-template-columns:1fr;gap:9px}
+  .sarrow{transform:rotate(90deg)}
+  .states{grid-template-columns:1fr}
+  .cmp{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Bitcoin · UTXO</span>
+    <h1>UTXO 模型完整流程</h1>
+    <p class="lede">发送方 → 收款方 → 矿工，跟着一张 <b>1.01 BTC</b> 的「钞票」走一遍，看清楚它怎么被整张消耗、拆成两张新钞票。</p>
+
+    <div class="thesis">
+      <span class="badge">重点</span>
+      <p>UTXO = 一张一张<b>「未花费钞票」</b>；交易消耗旧 UTXO，生成新 UTXO<span class="sep">｜</span>手续费是<b>输入 − 输出的差额</b>，不会单独生成交易，最后由 <b>Coinbase</b> 统一结算给矿工。</p>
+    </div>
+  </header>
+
+  <!-- ========== 资金流向 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>一笔钱去哪了</h2>
+      <span class="hint">1.01 BTC 的拆分</span>
+    </div>
+
+    <div class="flow-card">
+      <div class="fgrid">
+        <div class="ticket ticket--utxo">
+          <div class="k">旧 UTXO</div>
+          <div class="amt">1.01 BTC</div>
+          <div class="who">发送方持有</div>
+        </div>
+        <span class="fa">→</span>
+        <div class="ftx">
+          <div class="t">构造一笔普通交易</div>
+          <div class="cl"><span>输入总和</span><span class="r">1.01</span></div>
+          <div class="cl"><span>输出 1 → 收款方</span><span class="r">1.00</span></div>
+          <div class="cl cl--hi"><span>差额 = 手续费</span><span class="r">0.01</span></div>
+        </div>
+        <span class="fa">→</span>
+        <div class="ticket ticket--utxo">
+          <div class="k">新 UTXO</div>
+          <div class="amt">1.00 BTC</div>
+          <div class="who">归属收款方</div>
+        </div>
+
+        <div class="fbranch">
+          <div class="ticket ticket--fee">
+            <div class="k">差额 · 悬空</div>
+            <div class="amt">0.01 BTC</div>
+            <div class="memo">没有输出直接写给矿工</div>
+          </div>
+          <span class="fa">→</span>
+          <div class="ticket ticket--cb" style="flex:1 1 auto">
+            <div class="k">Coinbase 结算</div>
+            <div class="amt">3.125 + 0.01</div>
+            <div class="who">区块补贴 + 汇总手续费 → 矿工新 UTXO</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feq">
+        <span>金额守恒：</span>
+        <b>1.01</b><span class="eq-x">=</span><b>1.00</b><span>（收款方）</span>
+        <span class="eq-x">+</span><b>0.01</b><span>（手续费）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 五步流程 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>全流程五步</h2>
+      <span class="hint">发送方 → 收款方 → 矿工</span>
+      <span class="spacer"></span>
+      <button class="btn" id="toggleAll" type="button">全部收起</button>
+    </div>
+
+    <!-- 第1步 -->
+    <div class="ver">
+      <div class="rail"><span class="vb">1</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">发送方手里有一张 UTXO</span></span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="srow srow--two">
+            <div>
+              <div class="ticket ticket--utxo">
+                <div class="k">UTXO · 旧钞票</div>
+                <div class="amt">1.01 BTC</div>
+                <div class="who">归属：发送方</div>
+              </div>
+            </div>
+            <span class="sarrow">→</span>
+            <div>
+              <div class="ticket" style="--c:var(--blue);background:#fbfcff">
+                <div class="k">转账意图</div>
+                <div class="who" style="margin-top:3px;font-size:12.5px;color:var(--ink-2)">
+                  想转给收款方 <b>1.00 BTC</b>，预留手续费 <b>0.01 BTC</b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="snote" style="margin-top:12px">这张 1.01 BTC 是之前别的交易生成给发送方的</div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <!-- 第2步 -->
+    <div class="ver">
+      <div class="rail"><span class="vb">2</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">构造一笔普通交易</span><span class="stag">消耗旧 UTXO · 生成两个新 UTXO</span></span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="srow">
+            <div>
+              <div class="ticket ticket--in">
+                <div class="k">输入</div>
+                <div class="amt">1.01 BTC</div>
+                <div class="who">消耗旧 UTXO</div>
+              </div>
+            </div>
+            <span class="sarrow">→</span>
+            <div class="ftx">
+              <div class="t">交易本体</div>
+              <div class="cl"><span>输入总和</span><span class="r">1.01</span></div>
+              <div class="cl"><span>输出 1：给收款方</span><span class="r">1.00 BTC（新 UTXO）</span></div>
+              <div class="cl"><span>输出 2：找零</span><span class="r">可选，本例没有</span></div>
+              <div class="cl cl--hi"><span>差额 = 1.01 − 1.00</span><span class="r">0.01 → 手续费</span></div>
+              <div class="fwarn">这笔交易里<b>没有输出直接写给矿工</b>，差额悬空</div>
+            </div>
+            <span class="sarrow">→</span>
+            <div>
+              <div class="ticket ticket--utxo">
+                <div class="k">输出 1 · 新 UTXO</div>
+                <div class="amt">1.00 BTC</div>
+                <div class="who">归属：收款方</div>
+              </div>
+            </div>
+          </div>
+          <div class="sbar"><span class="ok">✓</span><span>这笔交易广播到全网，进入内存池 mempool，等待矿工挑选打包</span></div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <!-- 第3步 -->
+    <div class="ver">
+      <div class="rail"><span class="vb">3</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">矿工打包一批交易</span><span class="stag">举例：一共 3500 笔</span></span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="feechips">
+            <div class="feec">交易1<small>0.01</small></div>
+            <div class="feec">交易2<small>0.0005</small></div>
+            <div class="feec">交易3<small>0.002</small></div>
+            <span class="feec--m">……</span>
+            <div class="feec">交易3500<small>0.001</small></div>
+          </div>
+          <div class="calcbar">矿工汇总全部手续费：0.01 + 0.0005 + 0.002 + ... = <b>总手续费 F</b></div>
+          <div class="snote">矿工统计本区块所有交易的<b>输入输出差额之和</b></div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <!-- 第4步 -->
+    <div class="ver">
+      <div class="rail"><span class="vb">4</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">Coinbase 交易</span><span class="stag">区块第一笔 · 给矿工发奖励</span></span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="srow srow--one">
+            <div>
+              <div class="ticket ticket--cb">
+                <div class="k">Coinbase 交易 · 无输入</div>
+                <div style="display:grid;gap:0;margin-top:7px">
+                  <div class="cl"><span>区块补贴</span><span class="r">3.125 BTC</span></div>
+                  <div class="cl"><span>+ 本区块汇总手续费</span><span class="r">F</span></div>
+                  <div class="cl cl--hi"><span>合计 → 输出到矿工地址</span><span class="r">矿工新 UTXO</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="sbar"><span class="ok">✓</span><span>矿工成功算出 nonce，区块上链；Coinbase 这笔 UTXO 需要等 <b>100 个区块确认</b>之后矿工才能花</span></div>
+        </div></div></div>
+      </article>
+    </div>
+
+    <!-- 第5步 -->
+    <div class="ver is-last">
+      <div class="rail"><span class="vb">5</span></div>
+      <article class="blk is-open">
+        <button class="blk__head" type="button" aria-expanded="true">
+          <span class="hmeta">
+            <span class="hrow"><span class="t">上链之后的状态</span><span class="stag">谁还能花</span></span>
+          </span>
+          <span class="chev">▼</span>
+        </button>
+        <div class="blk__body"><div class="inner"><div class="blk__pad">
+          <div class="states">
+            <div class="ticket ticket--spent">
+              <div class="k">原 UTXO</div>
+              <div class="amt">1.01 BTC</div>
+              <div class="who">发送方</div>
+              <span class="stamp">已花费 · 不能再花</span>
+            </div>
+            <div class="ticket ticket--utxo">
+              <div class="k">新 UTXO</div>
+              <div class="amt">1.00 BTC</div>
+              <div class="who">收款方</div>
+              <span class="stamp stamp--live">可用</span>
+            </div>
+            <div class="ticket ticket--cb">
+              <div class="k">Coinbase UTXO</div>
+              <div class="amt">奖励 + F</div>
+              <div class="who">矿工</div>
+              <span class="stamp stamp--live">可用</span>
+            </div>
+          </div>
+          <div class="note4">
+            原来 1.01 的旧 UTXO 被标记为<b>【已花费】</b>，再也不能用（防止双花）；收款方拿到 1.00 BTC 的新 UTXO，以后可以拿它去转账；矿工拿到 Coinbase 生成的新 UTXO（奖励 + 手续费总和）。
+          </div>
+          <div class="note4">
+            那条 <b>0.01 的手续费差额</b>，并不是单独一笔交易 —— 它被<b>汇总进 Coinbase</b> 里面统一发放。
+          </div>
+        </div></div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ========== 对比 ========== -->
+  <section>
+    <div class="sec-head">
+      <h2>UTXO vs 银行账户</h2>
+      <span class="hint">一句话对比</span>
+    </div>
+    <div class="cmp">
+      <div class="cmp-card" style="--c:var(--blue);--cbg:rgba(59,130,246,.12)">
+        <h3><span class="ic">🏦</span>银行账户模式</h3>
+        <p>余额是一个<b>数字</b>，转账时直接扣余额。</p>
+        <p>一笔交易<b>同时</b>打给收款人和手续费接收方。</p>
+      </div>
+      <div class="cmp-card" style="--c:var(--btc);--cbg:rgba(247,147,26,.14)">
+        <h3><span class="ic">₿</span>BTC UTXO 模式</h3>
+        <p><b>没有余额</b>，只有一张张钞票（UTXO）；花的时候<b>整张消耗</b>，拆分出新钞票给别人。</p>
+        <p>没分配完的差额作为手续费，由矿工打包成功后，在 <code>Coinbase</code> 里<b>一次性领走</b>。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>BTC · UTXO 模型</span>
+    <span>点击步骤卡片展开／收起</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var blocks = document.querySelectorAll('.blk');
+  var btn = document.getElementById('toggleAll');
+
+  blocks.forEach(function(b){
+    var head = b.querySelector('.blk__head');
+    head.addEventListener('click', function(){
+      var open = b.classList.toggle('is-open');
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      syncBtn();
+    });
+  });
+
+  function allOpen(){
+    return Array.prototype.every.call(blocks, function(b){ return b.classList.contains('is-open'); });
+  }
+  function syncBtn(){ btn.textContent = allOpen() ? '全部收起' : '全部展开'; }
+
+  btn.addEventListener('click', function(){
+    var target = !allOpen();
+    blocks.forEach(function(b){
+      b.classList.toggle('is-open', target);
+      b.querySelector('.blk__head').setAttribute('aria-expanded', String(target));
+    });
+    syncBtn();
+  });
+
+  syncBtn();
+})();
+</script>
+</body>
+</html>
