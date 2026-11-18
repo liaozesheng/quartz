@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="放量：量价关系基础术语知识卡，解释放量的定义、判断方法与常见情形。">
+<title>放量 · 知识卡</title>
+<style>
+  :root {
+    --paper: #F1F5F8;
+    --card: #FBFCFD;
+    --ink: #1C2B3A;
+    --muted: #5B6C7E;
+    --faint: #8496A7;
+    --line: #D9E2EA;
+    --line-strong: #B9C7D3;
+    --red: #BE3A2F;
+    --red-wash: #F6E9E6;
+    --green: #2F7A5C;
+    --bar: #B4C4D2;
+    --serif: "Songti SC", "Noto Serif SC", "STSong", "SimSun", serif;
+    --sans: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    padding: 56px 20px 72px;
+    font-family: var(--sans);
+    color: var(--ink);
+    line-height: 1.75;
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(rgba(28, 43, 58, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28, 43, 58, 0.045) 1px, transparent 1px),
+      linear-gradient(rgba(28, 43, 58, 0.075) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28, 43, 58, 0.075) 1px, transparent 1px);
+    background-size: 24px 24px, 24px 24px, 120px 120px, 120px 120px;
+  }
+
+  .card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--card);
+    border: 1px solid rgba(28, 43, 58, 0.16);
+    border-radius: 6px;
+    box-shadow: 0 36px 70px -48px rgba(28, 43, 58, 0.45);
+    padding: 60px 64px 44px;
+  }
+
+  /* ---------- 头部 ---------- */
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .headword {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: 76px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+
+  .pinyin {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  .sub {
+    margin: 12px 0 0;
+    font-size: 15.5px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .seal {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    margin-top: 6px;
+    display: grid;
+    place-items: center;
+    background: var(--red);
+    color: #FBFCFD;
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 2px rgba(251, 252, 253, 0.28);
+    user-select: none;
+  }
+
+  .lede {
+    margin: 26px 0 0;
+    font-size: 16.5px;
+    max-width: 62ch;
+  }
+
+  .lede strong {
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  /* ---------- 示意图 ---------- */
+
+  .chart-figure {
+    margin: 34px 0 0;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #F7FAFC;
+    padding: 18px 20px 12px;
+  }
+
+  .chart-figure svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .chart-figure figcaption {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .bar {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes rise {
+    from { transform: scaleY(0.04); opacity: 0.35; }
+    to   { transform: scaleY(1); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bar { animation: none; }
+  }
+
+  /* ---------- 正文分节 ---------- */
+
+  .block {
+    margin-top: 44px;
+  }
+
+  h2 {
+    position: relative;
+    margin: 0 0 16px;
+    padding-left: 15px;
+    font-family: var(--serif);
+    font-size: 23px;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  h2::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.28em;
+    bottom: 0.24em;
+    width: 4px;
+    background: var(--red);
+    border-radius: 1px;
+  }
+
+  .block p {
+    margin: 0;
+    max-width: 64ch;
+    font-size: 15.5px;
+  }
+
+  .block p + p {
+    margin-top: 12px;
+  }
+
+  .block p strong {
+    font-weight: 600;
+  }
+
+  /* 判断口径 */
+
+  .formula {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    margin-top: 20px;
+    padding: 13px 18px;
+    background: #EDF3F7;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-size: 15px;
+  }
+
+  .formula .flabel {
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .formula .feq {
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  .formula .fbody {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .formula .fhint {
+    margin-left: auto;
+    color: var(--red);
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+
+  /* 情形表 */
+
+  .cases {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+
+  .cases thead th {
+    padding: 0 14px 9px;
+    text-align: left;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--faint);
+    border-bottom: 1.5px solid var(--line-strong);
+  }
+
+  .cases tbody th {
+    width: 148px;
+    padding: 16px 14px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cases tbody td {
+    padding: 16px 14px;
+    color: #33475B;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cases tbody tr:last-child th,
+  .cases tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .mark {
+    display: inline-block;
+    width: 22px;
+    font-weight: 700;
+    font-family: var(--serif);
+    text-align: left;
+  }
+
+  .mark.up { color: var(--red); }
+  .mark.down { color: var(--green); }
+  .mark.flat { color: var(--faint); font-size: 13px; }
+
+  /* 三个坑 */
+
+  .notes {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .notes li {
+    position: relative;
+    padding: 15px 0 15px 26px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    max-width: 64ch;
+  }
+
+  .notes li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    top: 15px;
+    color: var(--red);
+    font-weight: 700;
+  }
+
+  .notes b {
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  /* ---------- 费曼复述 ---------- */
+
+  .feynman-intro {
+    max-width: 64ch;
+  }
+
+  .worksheet {
+    margin-top: 20px;
+    padding: 20px 22px 16px;
+    background: #F6F9FB;
+    border: 1.5px dashed var(--line-strong);
+    border-radius: 4px;
+  }
+
+  .worksheet-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  #recall {
+    display: block;
+    width: 100%;
+    min-height: 150px;
+    resize: vertical;
+    padding: 13px 16px;
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--ink);
+    background: #FFFFFF;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    outline: none;
+  }
+
+  #recall:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(190, 58, 47, 0.12);
+  }
+
+  #recall::placeholder {
+    color: #9AA9B8;
+  }
+
+  .worksheet-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 6px 16px;
+    margin-top: 8px;
+    font-size: 12.5px;
+    color: var(--faint);
+  }
+
+  .checklist {
+    margin-top: 18px;
+    padding-top: 15px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 7px;
+  }
+
+  .checklist-title {
+    margin: 0 0 3px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .checklist label {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: #33475B;
+    cursor: pointer;
+  }
+
+  .checklist input {
+    flex: none;
+    width: 15px;
+    height: 15px;
+    margin: 5px 0 0;
+    accent-color: var(--red);
+  }
+
+  .reference {
+    margin-top: 16px;
+    padding-top: 13px;
+    border-top: 1px solid var(--line);
+  }
+
+  .reference summary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: fit-content;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--red);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .reference summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .reference summary::before {
+    content: "＋";
+    font-weight: 700;
+  }
+
+  .reference[open] summary::before {
+    content: "－";
+  }
+
+  .reference .reference-body {
+    margin: 10px 0 0;
+    padding: 12px 16px;
+    font-size: 14.5px;
+    line-height: 1.85;
+    color: #33475B;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--red);
+    border-radius: 2px;
+  }
+
+  .review-note {
+    margin: 14px 0 0;
+    font-size: 12.5px;
+    color: var(--faint);
+  }
+
+  /* ---------- 页脚 ---------- */
+
+  .card-foot {
+    margin-top: 46px;
+    padding-top: 18px;
+    border-top: 1.5px solid var(--line-strong);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .card-foot .glossary {
+    margin: 0;
+    max-width: 66ch;
+  }
+
+  .card-foot .glossary b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .card-foot .disclaimer {
+    margin: 10px 0 0;
+    color: var(--faint);
+    font-size: 12.5px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- 小屏 ---------- */
+
+  @media (max-width: 680px) {
+    body { padding: 24px 12px 40px; }
+
+    .card { padding: 34px 24px 30px; }
+
+    h1 { font-size: 52px; }
+
+    .pinyin { font-size: 15px; }
+
+    .seal { width: 38px; height: 38px; font-size: 21px; }
+
+    .lede { font-size: 15.5px; }
+
+    .chart-figure { padding: 12px 12px 10px; }
+
+    h2 { font-size: 20px; }
+
+    .formula { font-size: 14px; }
+
+    .formula .fhint { margin-left: 0; width: 100%; }
+
+    .cases { font-size: 14px; }
+
+    .cases tbody th { width: 98px; padding: 13px 8px; white-space: normal; }
+
+    .cases tbody td { padding: 13px 8px; }
+
+    .cases thead th { padding: 0 8px 8px; }
+
+    .notes li { font-size: 14.5px; }
+
+    .worksheet { padding: 15px 14px 13px; }
+
+    #recall { font-size: 14.5px; padding: 11px 13px; }
+
+    .worksheet-meta { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="card">
+
+  <header class="card-head">
+    <div>
+      <div class="headword">
+        <h1>放量</h1>
+        <span class="pinyin">fàng liàng</span>
+      </div>
+      <p class="sub">成交量比近期水平明显放大</p>
+    </div>
+    <div class="seal" aria-hidden="true">量</div>
+  </header>
+
+  <p class="lede">
+    放量，指某一时段的成交量比此前一段时间<strong>明显放大</strong>。它描述的是「量」的变化，而不是价格的方向——上涨可以放量，下跌也可以放量。
+  </p>
+
+  <figure class="chart-figure">
+    <svg viewBox="0 56 860 224" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="chartTitle chartDesc">
+      <title id="chartTitle">放量示意图</title>
+      <desc id="chartDesc">一排成交量柱中，最后一根红色柱子明显高出代表近期均量的虚线，这就是放量。</desc>
+
+      <line x1="36" y1="240" x2="836" y2="240" stroke="#C6D3DE" stroke-width="1"/>
+      <line x1="36" y1="168" x2="836" y2="168" stroke="#93A7B9" stroke-width="1.2" stroke-dasharray="4 5"/>
+      <text x="834" y="160" text-anchor="end" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="12" fill="#5B6C7E">近期均量</text>
+
+      <g>
+        <rect class="bar" style="--d:0.00s" x="48"  y="178" width="32" height="62"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.03s" x="106" y="166" width="32" height="74"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.06s" x="164" y="174" width="32" height="66"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.09s" x="222" y="158" width="32" height="82"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.12s" x="280" y="169" width="32" height="71"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.15s" x="338" y="172" width="32" height="68"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.18s" x="396" y="160" width="32" height="80"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.21s" x="454" y="166" width="32" height="74"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.24s" x="512" y="154" width="32" height="86"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.27s" x="570" y="162" width="32" height="78"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.30s" x="628" y="168" width="32" height="72"  rx="1" fill="#B4C4D2"/>
+        <rect class="bar" style="--d:0.42s" x="686" y="106" width="32" height="134" rx="1" fill="#BE3A2F"/>
+      </g>
+
+      <line x1="702" y1="98" x2="702" y2="112" stroke="#BE3A2F" stroke-width="1.5"/>
+      <text x="702" y="90" text-anchor="middle" font-family="Songti SC, STSong, serif" font-size="16" font-weight="700" fill="#BE3A2F">放量</text>
+
+      <text x="48" y="262" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="12" fill="#5B6C7E">此前交易日</text>
+      <text x="702" y="262" text-anchor="middle" font-family="PingFang SC, Noto Sans SC, sans-serif" font-size="12" fill="#5B6C7E">今日</text>
+    </svg>
+    <figcaption>示意图：最后一根红色成交量柱明显高出虚线（近期均量），即为放量。</figcaption>
+  </figure>
+
+  <section class="block">
+    <h2>怎么判断</h2>
+    <p>
+      没有统一标准。常见做法是把当日成交量与近 5 日或 10 日的平均成交量比较；经验上，当日量达到均量 <strong>1.5 倍以上</strong>便可视为放量，倍数越大，放量越明显。不同股票、不同市况差别很大，关键是和它自己的近期水平比，而不是和别的股票比。
+    </p>
+    <div class="formula">
+      <span class="flabel">放量程度</span>
+      <span class="feq">=</span>
+      <span class="fbody">当日成交量 ÷ 近 5 日均量</span>
+      <span class="fhint">≥ 1.5 倍为常见参考</span>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>四种常见情形</h2>
+    <table class="cases">
+      <thead>
+        <tr>
+          <th scope="col">情形</th>
+          <th scope="col">通常意味着</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row"><span class="mark up">↑</span>放量上涨</th>
+          <td>量价齐升，说明买盘积极、参与的资金多，趋势通常较健康。若已大幅上涨后放量却涨不动，则要提防出货。</td>
+        </tr>
+        <tr>
+          <th scope="row"><span class="mark down">↓</span>放量下跌</th>
+          <td>卖压集中释放，可能是恐慌抛售或资金离场。在下跌初期出现时，尤其需要谨慎。</td>
+        </tr>
+        <tr>
+          <th scope="row"><span class="mark flat">低</span>低位放量</th>
+          <td>长期下跌后出现，可能是资金开始进场，也可能只是恐慌盘涌出；关键看之后价格能否站稳。</td>
+        </tr>
+        <tr>
+          <th scope="row"><span class="mark flat">高</span>高位放量</th>
+          <td>涨幅已大时放量，往往意味着分歧加大或主力派发，风险意味强于机会。</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2>三个容易踩的坑</h2>
+    <ul class="notes">
+      <li><b>放量是现象，不是信号。</b>它只说明参与的人突然变多了，买卖方向还要看价格所处的位置和后续走势。</li>
+      <li><b>当心「假放量」。</b>除权除息、大宗交易、指数调仓、对倒都可能让量能失真，比较之前先排除这些干扰。</li>
+      <li><b>量在价先，但别只看量。</b>这句老话常被引用，可成交量只是线索之一，单独拿它做买卖决定很容易误判。</li>
+    </ul>
+  </section>
+
+  <section class="block">
+    <h2>轮到你了 · 费曼复述</h2>
+    <p class="feynman-intro">
+      费曼学习法的核心，是把知识讲给一个完全不懂的人听。合上上面的内容，用自己的话写一遍——哪里讲得不顺畅，哪里就是还没真正学会的地方。
+    </p>
+
+    <div class="worksheet">
+      <label class="worksheet-label" for="recall">用自己的话讲清「放量」</label>
+      <textarea id="recall" placeholder="可以这样开头：放量就是……。比如某只股票……"></textarea>
+      <div class="worksheet-meta">
+        <span id="counter">已写 0 字</span>
+        <span>提示：定义 → 怎么判断 → 举个例子 → 一句提醒</span>
+      </div>
+
+      <div class="checklist">
+        <p class="checklist-title">写完对照一下，四点都讲到了吗？</p>
+        <label><input type="checkbox"> 我用一句话说出了它是什么</label>
+        <label><input type="checkbox"> 我说清了「和什么比」「多少算大」</label>
+        <label><input type="checkbox"> 我举了一个放量上涨或下跌的例子</label>
+        <label><input type="checkbox"> 我留了一句提醒：放量不是买卖信号</label>
+      </div>
+
+      <details class="reference">
+        <summary>卡住了？看参考复述</summary>
+        <p class="reference-body">
+          放量就是成交量比最近一段时间明显变大。一般拿当日量和近 5 日均量比，超过 1.5 倍就算放量。比如一只股票平时每天成交 1 亿元，今天成交 2 亿元，就是放量了。放量说明参与的人突然变多，但不一定涨：放量上涨可能是买盘积极，放量下跌可能是恐慌抛售。所以放量只是现象，不是买卖信号，还得看价格在什么位置。
+        </p>
+      </details>
+
+      <p class="review-note">第二天合上卡片，再讲一遍——比当天连写三次记得更牢。</p>
+    </div>
+  </section>
+
+  <footer class="card-foot">
+    <p class="glossary">反面情形叫<b>缩量</b>——成交量明显低于近期均量，通常意味着观望情绪浓、参与意愿低。</p>
+    <p class="disclaimer">本卡片仅为知识科普，不构成任何投资建议。</p>
+  </footer>
+
+</main>
+
+<script>
+  (function () {
+    var area = document.getElementById('recall');
+    var counter = document.getElementById('counter');
+    area.addEventListener('input', function () {
+      var n = Array.from(area.value.trim()).length;
+      counter.textContent = '已写 ' + n + ' 字';
+    });
+  })();
+</script>
+
+</body>
+</html>
